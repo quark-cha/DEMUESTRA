@@ -1,0 +1,564 @@
+# PckDemuestra/demuestra.py
+# DEMUESTRA - controlador de validacion Lean 4.
+#
+# Regla central:
+#   Solo DEMUESTRA/ es proyecto Lake. Todos los proyectos bajo Proyectos/
+#   y YaEvaluado/ se validan usando la raiz DEMUESTRA como entorno Lean
+#   compartido, para evitar crear .lake/Mathlib duplicados por proyecto.
+
+from __future__ import annotations
+
+from pathlib import Path
+import logging
+import os
+import re
+import shutil
+import subprocess
+from shutil import which
+from typing import Any, Dict, List, Optional
+
+from .proyecto import Proyecto
+
+
+DEFAULT_TIMEOUT = 600
+CACHE_TIMEOUT = 900
+
+
+def _buscar_raiz_demuestra(desde: Path) -> Path:
+    """
+    Busca hacia arriba la carpeta DEMUESTRA.
+
+    La raiz valida debe contener PckDemuestra, Proyectos, lakefile.toml
+    y lean-toolchain. Si no se encuentra, se usa la carpeta indicada para
+    poder producir errores claros.
+    """
+    p = desde.resolve()
+    if p.is_file():
+        p = p.parent
+
+    for candidato in [p, *p.parents]:
+        if (
+            (candidato / "PckDemuestra").is_dir()
+            and (candidato / "Proyectos").is_dir()
+            and (candidato / "lakefile.toml").is_file()
+            and (candidato / "lean-toolchain").is_file()
+        ):
+            return candidato
+
+    return p
+
+
+def _crear_logger(raiz_demuestra: Path) -> logging.Logger:
+    logger = logging.getLogger("Demuestra")
+
+    if getattr(logger, "_demuestra_configurado", False):
+        return logger
+
+    logger.setLevel(logging.INFO)
+    logger.propagate = False
+
+    logs = raiz_demuestra / "logs"
+    logs.mkdir(parents=True, exist_ok=True)
+    log_file = logs / "demuestra.log"
+
+    formato = logging.Formatter(
+        "%(asctime)s - Demuestra - %(levelname)s - %(message)s"
+    )
+
+    fh = logging.FileHandler(log_file, encoding="utf-8")
+    fh.setFormatter(formato)
+    logger.addHandler(fh)
+
+    ch = logging.StreamHandler()
+    ch.setFormatter(formato)
+    logger.addHandler(ch)
+
+    logger._demuestra_configurado = True
+
+    logger.info("=" * 50)
+    logger.info("Sistema DEMUESTRA inicializado.")
+    logger.info("Raiz Lake compartida: %s", raiz_demuestra.resolve())
+    logger.info("Log guardado en: %s", log_file.resolve())
+
+    return logger
+
+
+def _entorno_con_elan() -> dict[str, str]:
+    env = os.environ.copy()
+    elan_home = Path.home() / ".elan"
+    elan_bin = elan_home / "bin"
+
+    if elan_home.exists():
+        env.setdefault("ELAN_HOME", str(elan_home))
+    if elan_bin.exists():
+        env["PATH"] = f"{elan_bin}{os.pathsep}{env.get('PATH', '')}"
+
+    return env
+
+
+def _resolver_exe(nombre: str) -> str:
+    encontrado = which(nombre)
+    if encontrado:
+        return encontrado
+
+    for candidato in (
+        Path.home() / ".elan" / "bin" / f"{nombre}.exe",
+        Path.home() / ".elan" / "bin" / nombre,
+    ):
+        if candidato.exists():
+            return str(candidato)
+
+    return nombre
+
+
+def _ejecutar(
+    comando: List[str],
+    cwd: Path,
+    timeout: int = DEFAULT_TIMEOUT,
+) -> subprocess.CompletedProcess[str]:
+    """
+    Ejecuta un comando sin shell y captura stdout/stderr.
+
+    Codigos sinteticos:
+      127 -> ejecutable no encontrado
+      124 -> timeout
+    """
+    try:
+        comando_resuelto = [_resolver_exe(comando[0]), *comando[1:]]
+        return subprocess.run(
+            comando_resuelto,
+            cwd=str(cwd),
+            env=_entorno_con_elan(),
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            timeout=timeout,
+            shell=False,
+        )
+    except FileNotFoundError as exc:
+        return subprocess.CompletedProcess(
+            comando,
+            127,
+            stdout="",
+            stderr=f"No se encontro el ejecutable: {comando[0]}\n{exc}",
+        )
+    except subprocess.TimeoutExpired as exc:
+        stdout = exc.stdout or ""
+        stderr = exc.stderr or ""
+        if isinstance(stdout, bytes):
+            stdout = stdout.decode("utf-8", errors="replace")
+        if isinstance(stderr, bytes):
+            stderr = stderr.decode("utf-8", errors="replace")
+
+        return subprocess.CompletedProcess(
+            comando,
+            124,
+            stdout=stdout,
+            stderr=(
+                stderr
+                + f"\nTIMEOUT: el comando supero {timeout} segundos: "
+                + " ".join(comando)
+            ),
+        )
+
+
+class Demuestra:
+    """
+    Controlador de proyectos Lean.
+
+    Uso principal:
+
+        app = Demuestra()
+        app = Demuestra(__file__)
+
+        app.inspeccionar(nombre="ES_46_RV5")
+        app.validar(nombre="ES_46_RV5")
+        app.validar(nombre="ES_46_RV5", preparar_cache=True)
+        app.validar(incluir_ya_evaluado=True)
+    """
+
+    def __init__(self, raiz: Optional[object] = None):
+        origen = Path(raiz).resolve() if raiz is not None else Path.cwd().resolve()
+        if origen.is_file():
+            origen = origen.parent
+
+        self.origen = origen
+        self.raiz_demuestra = _buscar_raiz_demuestra(origen)
+        self.raiz = self.raiz_demuestra
+        self.logger = _crear_logger(self.raiz_demuestra)
+
+    @property
+    def proyectos_dir(self) -> Path:
+        return self.raiz_demuestra / "Proyectos"
+
+    @property
+    def ya_evaluado_dir(self) -> Path:
+        return self.raiz_demuestra / "YaEvaluado"
+
+    def _resolver_proyecto(self, nombre: Optional[str] = None) -> Path:
+        actual = self.origen.resolve()
+
+        if nombre:
+            for base in (self.proyectos_dir, self.ya_evaluado_dir):
+                candidato = base / nombre
+                if candidato.is_dir():
+                    return candidato.resolve()
+
+            if actual.name == nombre and (actual / "lean").is_dir():
+                return actual
+
+            return (self.proyectos_dir / nombre).resolve()
+
+        if (actual / "lean").is_dir():
+            return actual
+
+        return self.raiz_demuestra
+
+    def obtener_proyecto(self, nombre: str) -> Proyecto:
+        return Proyecto(self._resolver_proyecto(nombre))
+
+    def _proyectos_pendientes(self, incluir_ya_evaluado: bool = False) -> List[Path]:
+        proyectos: List[Path] = []
+
+        if self.proyectos_dir.is_dir():
+            proyectos.extend(
+                sorted(p.resolve() for p in self.proyectos_dir.iterdir() if p.is_dir())
+            )
+
+        if incluir_ya_evaluado and self.ya_evaluado_dir.is_dir():
+            proyectos.extend(
+                sorted(p.resolve() for p in self.ya_evaluado_dir.iterdir() if p.is_dir())
+            )
+
+        return proyectos
+
+    @staticmethod
+    def _archivos_lean(proyecto: Path) -> List[Path]:
+        lean_dir = proyecto / "lean"
+
+        if lean_dir.is_dir():
+            return sorted(p.resolve() for p in lean_dir.rglob("*.lean"))
+
+        return sorted(
+            p.resolve()
+            for p in proyecto.rglob("*.lean")
+            if ".lake" not in p.parts and "__pycache__" not in p.parts
+        )
+
+    def _relativo_a_raiz_lake(self, archivo: Path) -> str:
+        try:
+            return str(archivo.resolve().relative_to(self.raiz_demuestra))
+        except ValueError:
+            return str(archivo.resolve())
+
+    def inspeccionar(self, nombre: Optional[str] = None) -> Dict[str, Any]:
+        proyecto = self._resolver_proyecto(nombre)
+        self.raiz = proyecto
+
+        archivos = self._archivos_lean(proyecto) if proyecto.exists() else []
+
+        info = {
+            "nombre": nombre or proyecto.name,
+            "raiz_demuestra": self.raiz_demuestra,
+            "raiz": proyecto,
+            "archivos_lean": archivos,
+            "cantidad": len(archivos),
+        }
+
+        print(f"Proyecto: {info['nombre']}")
+        print(f"Raiz DEMUESTRA/Lake: {self.raiz_demuestra}")
+        print(f"Raiz proyecto: {proyecto}")
+        print(f"Archivos Lean: {len(archivos)}")
+        for archivo in archivos:
+            print(f"  - {archivo}")
+
+        return info
+
+    def comprobar_lake(self) -> bool:
+        resultado = _ejecutar(["lake", "--version"], self.raiz_demuestra, timeout=30)
+
+        if resultado.returncode != 0:
+            self.logger.error(
+                "No se puede ejecutar lake.\n%s",
+                (resultado.stderr or resultado.stdout).strip(),
+            )
+            return False
+
+        version = (resultado.stdout or resultado.stderr).strip()
+        if version:
+            self.logger.info("Lake disponible: %s", version.splitlines()[0])
+
+        return True
+
+    def preparar_cache_mathlib(self) -> int:
+        self.logger.info("Preparando cache de Mathlib en la raiz compartida...")
+
+        resultado = _ejecutar(
+            ["lake", "exe", "cache", "get"],
+            self.raiz_demuestra,
+            timeout=CACHE_TIMEOUT,
+        )
+
+        if resultado.stdout.strip():
+            print(resultado.stdout.rstrip())
+        if resultado.stderr.strip():
+            print(resultado.stderr.rstrip())
+
+        if resultado.returncode != 0:
+            self.logger.error(
+                "No se pudo preparar cache Mathlib. Codigo %s.",
+                resultado.returncode,
+            )
+        else:
+            self.logger.info("Cache Mathlib preparada correctamente.")
+
+        return resultado.returncode
+
+    def _compilar_archivo(self, archivo: Path) -> int:
+        relativo = self._relativo_a_raiz_lake(archivo)
+        self.logger.info("Compilando %s desde %s", archivo, self.raiz_demuestra)
+
+        resultado = _ejecutar(
+            ["lake", "env", "lean", relativo],
+            self.raiz_demuestra,
+            timeout=DEFAULT_TIMEOUT,
+        )
+
+        salida = (resultado.stdout or "").strip()
+        error = (resultado.stderr or "").strip()
+
+        if resultado.returncode == 0:
+            if salida:
+                print(salida)
+            if error:
+                print(error)
+            print(f"\nOK: {archivo.name} compilado correctamente.")
+            return 0
+
+        print(f"\nNo se pudo compilar {archivo.name}.")
+        if salida:
+            print(salida)
+        if error:
+            print(error)
+
+        return resultado.returncode
+
+    def _validar_un_proyecto(self, proyecto: Path) -> int:
+        if not proyecto.exists():
+            self.logger.error("No existe el proyecto: %s", proyecto)
+            print(f"No existe el proyecto: {proyecto}")
+            return 2
+
+        archivos = self._archivos_lean(proyecto)
+
+        if not archivos:
+            mensaje = (
+                f"No hay archivos .lean en {proyecto}. "
+                "No se ejecuta compilacion."
+            )
+            self.logger.warning(mensaje)
+            print(mensaje)
+            return 0
+
+        fallos = []
+        for archivo in archivos:
+            rc = self._compilar_archivo(archivo)
+            if rc != 0:
+                fallos.append((archivo, rc))
+
+        if fallos:
+            self.logger.error(
+                "Validacion Lean terminada con %d archivo(s) fallido(s).",
+                len(fallos),
+            )
+            print("\nValidacion Lean terminada con errores:")
+            for archivo, rc in fallos:
+                print(f"  - {archivo.name}: codigo {rc}")
+            return fallos[0][1] or 1
+
+        self.logger.info("Validacion Lean correcta: %d archivo(s).", len(archivos))
+        print(f"\nValidacion Lean correcta: {len(archivos)} archivo(s) compilado(s).")
+        return 0
+
+    def validar(
+        self,
+        nombre: Optional[str] = None,
+        incluir_ya_evaluado: bool = False,
+        preparar_cache: bool = False,
+    ) -> int:
+        """
+        Valida proyectos usando siempre la raiz DEMUESTRA como cwd de Lake.
+
+        Reglas:
+        - No se ejecuta lake si no hay archivos .lean.
+        - La cache de Mathlib solo se prepara si preparar_cache=True.
+        - Cada archivo se compila con lake env lean <ruta-relativa-a-DEMUESTRA>.
+        """
+        if nombre:
+            proyectos = [self._resolver_proyecto(nombre)]
+        else:
+            proyectos = self._proyectos_pendientes(incluir_ya_evaluado)
+
+        if not proyectos:
+            print("No hay proyectos para validar.")
+            return 0
+
+        hay_lean = any(
+            self._archivos_lean(proyecto) for proyecto in proyectos if proyecto.exists()
+        )
+        if not hay_lean:
+            print("No hay archivos .lean en los proyectos seleccionados. No se ejecuta lake.")
+            return 0
+
+        if not self.comprobar_lake():
+            return 127
+
+        if preparar_cache:
+            rc_cache = self.preparar_cache_mathlib()
+            if rc_cache != 0:
+                return rc_cache
+
+        fallos = []
+        for proyecto in proyectos:
+            print(f"\n== Proyecto: {proyecto.name} ==")
+            rc = self._validar_un_proyecto(proyecto)
+            if rc != 0:
+                fallos.append((proyecto, rc))
+
+        if fallos:
+            print("\nValidacion global terminada con errores:")
+            for proyecto, rc in fallos:
+                print(f"  - {proyecto.name}: codigo {rc}")
+            return fallos[0][1] or 1
+
+        print("\nValidacion global correcta.")
+        return 0
+
+    def nuevo_proyecto(self, nombre: str) -> Path:
+        if not re.match(r"^[A-Z][A-Za-z0-9_]*$", nombre):
+            raise ValueError("Usa un nombre de modulo Lean valido, por ejemplo ES_47_RV1.")
+
+        proyecto = self.proyectos_dir / nombre
+        Proyecto(proyecto).asegurar_estructura()
+
+        main = proyecto / "Main.lean"
+        lean_main = proyecto / "lean" / "Main.lean"
+        launcher = proyecto / "demuestra.py"
+
+        if not main.exists():
+            main.write_text(
+                "\n".join(
+                    [
+                        f"import Proyectos.{nombre}.lean.Main",
+                        "",
+                        f"namespace Proyectos.{nombre}",
+                        "",
+                        f"end Proyectos.{nombre}",
+                        "",
+                    ]
+                ),
+                encoding="utf-8",
+            )
+
+        if not lean_main.exists():
+            lean_main.write_text(
+                "\n".join(
+                    [
+                        "import Mathlib",
+                        "",
+                        f"namespace Proyectos.{nombre}",
+                        "",
+                        "theorem sanity_check : True := by",
+                        "  trivial",
+                        "",
+                        f"end Proyectos.{nombre}",
+                        "",
+                    ]
+                ),
+                encoding="utf-8",
+            )
+
+        if not launcher.exists():
+            launcher.write_text(_launcher_proyecto(nombre), encoding="utf-8")
+
+        return proyecto
+
+    def finalizar_evaluacion(self, nombre: str) -> Path:
+        origen = self.proyectos_dir / nombre
+        destino = self.ya_evaluado_dir / nombre
+
+        if not origen.exists():
+            raise FileNotFoundError(f"No existe el proyecto '{nombre}' en Proyectos.")
+        if destino.exists():
+            raise FileExistsError(f"Ya existe '{nombre}' en YaEvaluado.")
+
+        self.ya_evaluado_dir.mkdir(parents=True, exist_ok=True)
+        shutil.move(str(origen), str(destino))
+        return destino
+
+
+def _launcher_proyecto(nombre: str) -> str:
+    return "\n".join(
+        [
+            "#!/usr/bin/env python3",
+            f"# {nombre}/demuestra.py",
+            "import sys",
+            "from pathlib import Path",
+            "",
+            "demuestra_path = Path(__file__).resolve().parents[2]",
+            "sys.path.insert(0, str(demuestra_path))",
+            "",
+            "from PckDemuestra.demuestra import Demuestra",
+            "",
+            "TEST = 1 + 2",
+            f"PROYECTO = {nombre!r}",
+            "INCLUIR_YA_EVALUADO = False",
+            "FINALIZAR_AL_TERMINAR = False",
+            "PREPARAR_CACHE_MATHLIB = False",
+            "",
+            "",
+            "if __name__ == \"__main__\":",
+            "    app = Demuestra(__file__)",
+            "    exit_code = 0",
+            "",
+            "    if TEST & 1:",
+            "        print(f\"TEST{TEST}: Inspeccionando proyecto...\")",
+            "        app.inspeccionar(nombre=PROYECTO)",
+            "",
+            "    if TEST & 2:",
+            "        print(f\"TEST{TEST}: Validando proyecto con Lean 4...\")",
+            "        exit_code = app.validar(",
+            "            nombre=PROYECTO,",
+            "            preparar_cache=PREPARAR_CACHE_MATHLIB,",
+            "        )",
+            "",
+            "    if TEST & 4:",
+            "        print(f\"TEST{TEST}: Validando todos los proyectos pendientes...\")",
+            "        exit_code = app.validar(",
+            "            incluir_ya_evaluado=INCLUIR_YA_EVALUADO,",
+            "            preparar_cache=PREPARAR_CACHE_MATHLIB,",
+            "        )",
+            "",
+            "    if TEST & 8:",
+            "        print(f\"TEST{TEST}: Moviendo proyecto a YaEvaluado...\")",
+            "        if FINALIZAR_AL_TERMINAR:",
+            "            destino = app.finalizar_evaluacion(PROYECTO)",
+            "            print(f\"Proyecto archivado en: {destino}\")",
+            "        else:",
+            "            print(\"FINALIZAR_AL_TERMINAR=False; no se mueve el proyecto.\")",
+            "",
+            "    if TEST & 16:",
+            "        print(f\"TEST{TEST}: Preparando cache Mathlib compartida...\")",
+            "        exit_code = app.preparar_cache_mathlib()",
+            "",
+            "    print(\"Proceso DEMUESTRA completado.\")",
+            "    raise SystemExit(exit_code)",
+            "",
+        ]
+    )
+
+
+__all__ = ["Demuestra"]
+

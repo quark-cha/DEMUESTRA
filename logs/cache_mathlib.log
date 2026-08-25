@@ -1,0 +1,54 @@
+Current branch: HEAD
+Using cache from origin: (some leanprover-community/mathlib4)
+Decompressing 8689 already-cached file(s) (1 already decompressed)
+No files to download
+Decompressed 8689 already-cached file(s)
+Completed successfully in 568457 ms!
+Current branch: HEAD
+Using cache from origin: (some leanprover-community/mathlib4)
+No files to download
+Already decompressed 8690 file(s)
+info: PckDemuestra: no previous manifest, creating one from scratch
+info: leanprover-community/mathlib: cloning https://github.com/leanprover-community/mathlib4
+info: leanprover-community/mathlib: checking out revision '0df444a360eaa60ab8c11dca51a86af692955474'
+info: toolchain not updated; already up-to-date
+info: plausible: cloning https://github.com/leanprover-community/plausible
+info: plausible: checking out revision 'b7eb3304aeae834b12dda98993a37f6a41f6f0bb'
+info: LeanSearchClient: cloning https://github.com/leanprover-community/LeanSearchClient
+info: LeanSearchClient: checking out revision '5f4d51b81cbd3f6b32b156bfad9056621a040404'
+info: importGraph: cloning https://github.com/leanprover-community/import-graph
+info: importGraph: checking out revision '16f02aa7642864af59f1ff0e384a015994db9118'
+info: proofwidgets: cloning https://github.com/leanprover-community/ProofWidgets4
+info: proofwidgets: checking out revision '4be2e3d5087eeb272cf5a8853b8f9dd025ef5957'
+info: aesop: cloning https://github.com/leanprover-community/aesop
+info: aesop: checking out revision '3448c0bcc5ce01b2d1546e483ec3620e32df3d0e'
+info: Qq: cloning https://github.com/leanprover-community/quote4
+info: Qq: checking out revision '92c15be17b7caf78c2ad767ec40f89052d908d81'
+info: batteries: cloning https://github.com/leanprover-community/batteries
+info: batteries: checking out revision '4488d40d070b9700d4d5a6aa342f0d40c31b2a2d'
+info: Cli: cloning https://github.com/leanprover/lean4-cli
+info: Cli: checking out revision '6130a47896ce867c6a4a55373441e59e565bad0f'
+info: mathlib: running post-update hooks
+âœ” [2/6] Built Cache.Cli (6.1s)
+âœ” [3/6] Built Cache.Lean (5.0s)
+âœ” [7/27] Built Cache.Cli:c.o (3.4s)
+âœ” [8/27] Built Cache.Lean:c.o (3.4s)
+âœ” [9/27] Built Cache.Infra (41s)
+âœ” [10/27] Built Batteries.Tactic.OpenPrivate (42s)
+âœ” [11/27] Built Cache.Infra:c.o (2.5s)
+âœ” [12/27] Built Batteries.Tactic.OpenPrivate:c.o (3.3s)
+âœ” [13/27] Built Cache.IO (25s)
+âœ” [14/27] Built Cache.IO:c.o (7.4s)
+âœ” [15/27] Built Cache.Hashing (7.6s)
+âœ” [16/27] Built Cache.Hashing:c.o (7.0s)
+âœ” [17/27] Built Cache.Requests (7.2s)
+âœ” [18/27] Built Cache.Marker (2.9s)
+âœ” [19/27] Built Cache.Marker:c.o (316ms)
+âœ” [20/27] Built Cache.Requests:c.o (4.8s)
+âœ” [21/27] Built Cache.Query (3.2s)
+âœ” [22/27] Built Cache.Query:c.o (2.8s)
+âœ” [23/27] Built Cache.Warning (2.9s)
+âœ” [24/27] Built Cache.Warning:c.o (3.3s)
+âœ” [25/27] Built Cache.Main (3.5s)
+âœ” [26/27] Built Cache.Main:c.o (1.8s)
+âœ” [27/27] Built cache:exe (6.4s)

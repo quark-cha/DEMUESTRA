@@ -1,0 +1,2 @@
+C:\Users\vedq\Desktop\desarrollo\SRC-VED\DEMUESTRA\Proyectos\ES_46_RV5\lean\HR46_RV5.lean:123:4: error(lean.dependsOnNoncomputable): failed to compile definition, consider marking it as 'noncomputable' because it depends on 'Real.instDivInvMonoid', which is 'noncomputable'
+C:\Users\vedq\Desktop\desarrollo\SRC-VED\DEMUESTRA\Proyectos\ES_46_RV5\lean\HR46_RV5.lean:162:4: error(lean.dependsOnNoncomputable): failed to compile definition, consider marking it as 'noncomputable' because it depends on 'rhoR', which is 'noncomputable'

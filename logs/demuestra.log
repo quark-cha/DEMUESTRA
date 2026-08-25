@@ -1,0 +1,50 @@
+2026-08-24 17:46:05 - Demuestra - INFO - ==================================================
+2026-08-24 17:46:05 - Demuestra - INFO - Sistema DEMUESTRA inicializado.
+2026-08-24 17:46:05 - Demuestra - INFO - Log guardado en: C:\Users\vedq\Desktop\desarrollo\SRC-VED\DEMUESTRA\logs\demuestra.log
+2026-08-24 18:11:45 - Demuestra - INFO - Compilando C:\Users\vedq\Desktop\desarrollo\SRC-VED\DEMUESTRA\Proyectos\ES_46_RV5\lean\HR46_RV5.lean
+2026-08-24 18:32:33 - Demuestra - INFO - ==================================================
+2026-08-24 18:32:33 - Demuestra - INFO - Sistema DEMUESTRA inicializado.
+2026-08-24 18:32:33 - Demuestra - INFO - Log guardado en: C:\Users\vedq\Desktop\desarrollo\SRC-VED\DEMUESTRA\logs\demuestra.log
+2026-08-24 18:39:41 - Demuestra - INFO - ==================================================
+2026-08-24 18:39:41 - Demuestra - INFO - Sistema DEMUESTRA inicializado.
+2026-08-24 18:39:41 - Demuestra - INFO - Log guardado en: C:\Users\vedq\Desktop\desarrollo\SRC-VED\DEMUESTRA\logs\demuestra.log
+2026-08-24 18:43:02 - Demuestra - INFO - ==================================================
+2026-08-24 18:43:02 - Demuestra - INFO - Sistema DEMUESTRA inicializado.
+2026-08-24 18:43:02 - Demuestra - INFO - Log guardado en: C:\Users\vedq\Desktop\desarrollo\SRC-VED\DEMUESTRA\logs\demuestra.log
+2026-08-24 18:43:02 - Demuestra - INFO - Compilando C:\Users\vedq\Desktop\desarrollo\SRC-VED\DEMUESTRA\Proyectos\ES_46_RV5\lean\HR46_RV5.lean
+2026-08-24 18:46:48 - Demuestra - INFO - ==================================================
+2026-08-24 18:46:48 - Demuestra - INFO - Sistema DEMUESTRA inicializado.
+2026-08-24 18:46:48 - Demuestra - INFO - Log guardado en: C:\Users\vedq\Desktop\desarrollo\SRC-VED\DEMUESTRA\logs\demuestra.log
+2026-08-24 18:46:48 - Demuestra - INFO - Compilando C:\Users\vedq\Desktop\desarrollo\SRC-VED\DEMUESTRA\Proyectos\ES_46_RV5\lean\HR46_RV5.lean
+2026-08-24 20:50:26 - Demuestra - INFO - ==================================================
+2026-08-24 20:50:26 - Demuestra - INFO - Sistema DEMUESTRA inicializado.
+2026-08-24 20:50:26 - Demuestra - INFO - Log guardado en: C:\Users\vedq\Desktop\desarrollo\SRC-VED\DEMUESTRA\logs\demuestra.log
+2026-08-24 21:26:06 - Demuestra - INFO - ==================================================
+2026-08-24 21:26:06 - Demuestra - INFO - Sistema DEMUESTRA inicializado.
+2026-08-24 21:26:06 - Demuestra - INFO - Log guardado en: C:\Users\vedq\Desktop\desarrollo\SRC-VED\DEMUESTRA\logs\demuestra.log
+2026-08-24 21:26:06 - Demuestra - INFO - Compilando C:\Users\vedq\Desktop\desarrollo\SRC-VED\DEMUESTRA\Proyectos\ES_46_RV5\lean\HR46_RV5.lean
+2026-08-24 23:06:59,374 - Demuestra - INFO - ==================================================
+2026-08-24 23:06:59,376 - Demuestra - INFO - Sistema DEMUESTRA inicializado.
+2026-08-24 23:06:59,377 - Demuestra - INFO - Raiz Lake compartida: C:\Users\vedq\Desktop\desarrollo\SRC-VED\DEMUESTRA
+2026-08-24 23:06:59,378 - Demuestra - INFO - Log guardado en: C:\Users\vedq\Desktop\desarrollo\SRC-VED\DEMUESTRA\logs\demuestra.log
+2026-08-24 23:06:59,383 - Demuestra - ERROR - No se puede ejecutar lake.
+No se encontro el ejecutable: lake
+[WinError 2] El sistema no puede encontrar el archivo especificado
+2026-08-24 23:09:27,176 - Demuestra - INFO - ==================================================
+2026-08-24 23:09:27,176 - Demuestra - INFO - Sistema DEMUESTRA inicializado.
+2026-08-24 23:09:27,176 - Demuestra - INFO - Raiz Lake compartida: C:\Users\vedq\Desktop\desarrollo\SRC-VED\DEMUESTRA
+2026-08-24 23:09:27,176 - Demuestra - INFO - Log guardado en: C:\Users\vedq\Desktop\desarrollo\SRC-VED\DEMUESTRA\logs\demuestra.log
+2026-08-24 23:09:28,797 - Demuestra - INFO - Lake disponible: Lake version 5.0.0-src+819816b (Lean version 4.33.1)
+2026-08-24 23:09:28,798 - Demuestra - INFO - Compilando C:\Users\vedq\Desktop\desarrollo\SRC-VED\DEMUESTRA\Proyectos\ES_46_RV5\lean\HR46_RV5.lean desde C:\Users\vedq\Desktop\desarrollo\SRC-VED\DEMUESTRA
+2026-08-24 23:09:34,994 - Demuestra - INFO - ==================================================
+2026-08-24 23:09:34,994 - Demuestra - INFO - Sistema DEMUESTRA inicializado.
+2026-08-24 23:09:34,994 - Demuestra - INFO - Raiz Lake compartida: C:\Users\vedq\Desktop\desarrollo\SRC-VED\DEMUESTRA
+2026-08-24 23:09:34,995 - Demuestra - INFO - Log guardado en: C:\Users\vedq\Desktop\desarrollo\SRC-VED\DEMUESTRA\logs\demuestra.log
+2026-08-24 23:12:28,821 - Demuestra - ERROR - Validacion Lean terminada con 1 archivo(s) fallido(s).
+2026-08-24 23:15:47,616 - Demuestra - INFO - ==================================================
+2026-08-24 23:15:47,617 - Demuestra - INFO - Sistema DEMUESTRA inicializado.
+2026-08-24 23:15:47,617 - Demuestra - INFO - Raiz Lake compartida: C:\Users\vedq\Desktop\desarrollo\SRC-VED\DEMUESTRA
+2026-08-24 23:15:47,618 - Demuestra - INFO - Log guardado en: C:\Users\vedq\Desktop\desarrollo\SRC-VED\DEMUESTRA\logs\demuestra.log
+2026-08-24 23:15:47,726 - Demuestra - INFO - Lake disponible: Lake version 5.0.0-src+819816b (Lean version 4.33.1)
+2026-08-24 23:15:47,727 - Demuestra - INFO - Compilando C:\Users\vedq\Desktop\desarrollo\SRC-VED\DEMUESTRA\Proyectos\ES_46_RV5\lean\HR46_RV5.lean desde C:\Users\vedq\Desktop\desarrollo\SRC-VED\DEMUESTRA
+2026-08-24 23:21:37,829 - Demuestra - INFO - Validacion Lean correcta: 1 archivo(s).

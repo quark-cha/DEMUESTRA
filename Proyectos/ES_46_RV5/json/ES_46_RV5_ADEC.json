@@ -1,0 +1,40 @@
+{
+  "title": "Einstein-VED / UNIHOLOG - ES_46 Revision 5",
+  "version": "5.0",
+  "status": "placeholder_pending_full_import",
+  "notice": "Este archivo reserva la ubicacion del JSON ADEC completo. No sustituye al grafo canonico de 36 nodos y 64 dependencias validado por ADEC.",
+  "known_validation_summary": {
+    "engine": "ADEC Engine v0.7.6",
+    "global_score": 100,
+    "grade": "A+",
+    "nodes": 36,
+    "dependencies": 64,
+    "structural": {
+      "score": 100,
+      "grade": "A+"
+    },
+    "semantic": {
+      "score": 100,
+      "grade": "A+",
+      "checks": "111/111"
+    },
+    "formal": {
+      "score": 100,
+      "grade": "A+",
+      "checks": "15/15",
+      "proof_coverage": "0/19 proof-bearing nodes with proof/evidence records"
+    },
+    "self_meta": {
+      "score": 100,
+      "grade": "A+"
+    }
+  },
+  "critical_nodes_to_preserve": [
+    "D_RIM_STABLE",
+    "P_RIM_UNKNOWN_A",
+    "P_CONS_E",
+    "P_VR_E",
+    "T_RIEMANN"
+  ],
+  "pending_action": "Importar aqui el JSON ADEC canonico completo cuando este disponible como archivo fuente."
+}

@@ -1,0 +1,21 @@
+name = "PckDemuestra"
+version = "0.1.0"
+keywords = ["lean4", "mathlib", "formal-validation"]
+defaultTargets = ["PckDemuestra"]
+
+[leanOptions]
+pp.unicode.fun = true
+relaxedAutoImplicit = false
+weak.linter.mathlibStandardSet = true
+maxSynthPendingDepth = 3
+
+[[require]]
+name = "mathlib"
+scope = "leanprover-community"
+rev = "v4.33.1"
+
+[[lean_lib]]
+name = "PckDemuestra"
+
+[[lean_lib]]
+name = "Proyectos"
