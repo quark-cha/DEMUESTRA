@@ -1,0 +1,3 @@
+Este proyecto presenta la revisión 6 del Documento 46, un desarrollo deductivo del marco Einstein-VED/UNIHOLOG sobre estabilidad geométrico-topológica, espacios de soluciones y localización transversal de ceros no triviales. La exposición organiza definiciones, antecedentes y proposiciones en una cadena lógica destinada a ser analizada por ADEC y complementada con verificación formal en Lean.
+
+El objetivo de esta versión es hacer explícita la evolución deductiva del argumento: desde la geometría diferencial y las condiciones de cierre estable hasta la formulación espectral asociada a la Hipótesis de Riemann. Los archivos publicados incluyen el artículo en PDF y Markdown, el grafo JSON compatible con ADEC y la entrada Lean correspondiente para revisión formal.

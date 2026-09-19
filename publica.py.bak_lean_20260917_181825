@@ -1,0 +1,372 @@
+#!/usr/bin/env python3
+# DEMUESTRA/publica.py
+# Este script se usa para publicar y para construir los pdfs
+# no forma parte del proyecto
+
+import sys
+import shutil
+import os
+from pathlib import Path
+
+# AÃƒÂ±adir PUBLICAR al path
+PROJECT_ROOT = Path(__file__).resolve().parent
+os.chdir(PROJECT_ROOT)
+publicar_path = PROJECT_ROOT.parent / "PUBLICAR"
+sys.path.insert(0, str(publicar_path))
+
+# Imports desde PackPublica
+from PackPublica.env import env
+from PackPublica.publicar import Publicar, Libro
+from PackPublica.articulo import Articulo
+from PackPublica.md import Md
+from PackPublica.KDP import KDP
+from PackPublica.FTPClient import FTPClient
+from PackPublica.ZenodoClient import ZenodoClient
+from PackPublica.ZenodoPublisher import ZenodoPublisher
+from PackPublica.WebPublisher import WebPublisher
+
+# ============================================================
+# CONFIGURACIÃƒâ€œN DEL PROYECTO
+# ============================================================
+TEST = 2 + 64 #  + 4 + 8 + 16 + 32 + 64
+PAGE_SIZE = "6x9"
+
+#ZENODO_TITLE = "The theory that will reconcile Quantum Mechanics with Einstein's Relativity"
+#ZENODO_PDF_DIR = "zenodo"
+#ZENODO_STATE_FILE = "zenodo/zenodo_state.json"
+INIT_LOCAL = False
+
+# Proyectos que DEMUESTRA decide publicar expresamente en la web.
+# Se publican siempre con el nombre completo de su carpeta para no mezclar revisiones.
+PROYECTOS_DEMOSTRADOS_WEB = [
+    "ES_46_RV6",
+]
+
+PROYECTOS_CONFIRMADOS_WEB = [
+]
+
+PROYECTOS_PUBLICABLES_WEB = [
+    *PROYECTOS_DEMOSTRADOS_WEB,
+    *PROYECTOS_CONFIRMADOS_WEB,
+]
+
+DEMOSTRACIONES_WEB_EXTENSIONS = {".json", ".lean", ".md", ".pdf", ".php", ".html", ".jpg", ".jpeg", ".png", ".webp", ".svg", ".ico", ".abstract", ".es", ".en", ".bat"}
+MARKDOWNS_DEMOSTRACIONES_WEB_PREPARADOS = set()
+
+
+def _nombre_proyecto_web(project_spec):
+    if isinstance(project_spec, tuple):
+        project_spec = project_spec[0]
+    return Path(project_spec).name
+
+
+def _primer_archivo(candidatos):
+    for candidato in candidatos:
+        if candidato.exists():
+            return candidato
+    return None
+
+
+def _index_proyectos_web():
+    return _primer_archivo([
+        PROJECT_ROOT / "proyectos" / "index.php",
+        PROJECT_ROOT / "Proyectos" / "index.php",
+    ])
+
+
+def _proyecto_dir(project_name):
+    return PROJECT_ROOT / "Proyectos" / project_name
+
+
+def _markdown_proyecto(proyecto):
+    return _primer_archivo([proyecto / f"{proyecto.name}.md"])
+
+
+def preparar_markdowns_demostraciones_web(project_names):
+    MARKDOWNS_DEMOSTRACIONES_WEB_PREPARADOS.clear()
+
+    for project_spec in project_names:
+        project_name = _nombre_proyecto_web(project_spec)
+        markdown = _markdown_proyecto(_proyecto_dir(project_name))
+        if markdown is None:
+            print(f"Ã¢Å¡Â Ã¯Â¸Â Falta {project_name}.md; no se prepararÃƒÂ¡ para generar PDF.")
+            continue
+
+        destino = PROJECT_ROOT / f"{project_name}.md"
+        if destino.exists() and destino.resolve() != markdown.resolve():
+            if destino.read_bytes() != markdown.read_bytes():
+                print(f"Ã¢Å¡Â Ã¯Â¸Â Ya existe {destino.name} en la raÃƒÂ­z y no coincide con {markdown}; no se reemplaza.")
+                continue
+
+        shutil.copyfile(markdown, destino)
+        os.utime(destino, None)
+        MARKDOWNS_DEMOSTRACIONES_WEB_PREPARADOS.add(project_name)
+
+
+def _limpiar_markdown_preparado(public_name, source):
+    preparado = PROJECT_ROOT / f"{public_name}.md"
+    if public_name not in MARKDOWNS_DEMOSTRACIONES_WEB_PREPARADOS:
+        return
+    if not preparado.exists() or source is None:
+        return
+    if preparado.resolve() != source.resolve() and preparado.read_bytes() == source.read_bytes():
+        preparado.unlink()
+
+
+def _mover_pdf_generado_al_proyecto(project_name, proyecto):
+    pdf_generado = PROJECT_ROOT / "pdfs" / f"{project_name}.pdf"
+    pdf_proyecto = proyecto / f"{project_name}.pdf"
+    if not pdf_generado.exists():
+        return _primer_archivo([pdf_proyecto])
+    if pdf_generado.resolve() != pdf_proyecto.resolve():
+        if pdf_proyecto.exists():
+            pdf_proyecto.unlink()
+        shutil.move(str(pdf_generado), str(pdf_proyecto))
+    return pdf_proyecto
+
+
+def preparar_demostraciones_web(project_names):
+    index_php = _index_proyectos_web()
+
+    for project_spec in project_names:
+        project_name = _nombre_proyecto_web(project_spec)
+        proyecto = _proyecto_dir(project_name)
+        markdown_proyecto = _markdown_proyecto(proyecto)
+
+        if index_php is None:
+            print("Ã¢Å¡Â Ã¯Â¸Â Falta proyectos/index.php; no se publicarÃƒÂ¡ el ÃƒÂ­ndice web.")
+        else:
+            shutil.copy2(index_php, proyecto / "index.php")
+
+        artefactos_generados = {
+            ".json": PROJECT_ROOT / "json" / f"{project_name}.json",
+            ".lean": PROJECT_ROOT / "lean" / f"{project_name}.lean",
+        }
+
+        for extension, generado in artefactos_generados.items():
+            destino = proyecto / f"{project_name}{extension}"
+            if generado.exists():
+                shutil.copy2(generado, destino)
+                print(f"  Ã¢Å“â€¦ {destino.name} actualizado desde {generado.parent.name}/")
+            elif not destino.exists():
+                print(f"Ã¢Å¡Â Ã¯Â¸Â Falta {project_name}{extension}; no se publicarÃƒÂ¡ ese artefacto.")
+
+        if not (proyecto / f"{project_name}.md").exists():
+            print(f"Ã¢Å¡Â Ã¯Â¸Â Falta {project_name}.md; no se publicarÃƒÂ¡ ese artefacto.")
+
+        if _mover_pdf_generado_al_proyecto(project_name, proyecto) is None:
+            print(f"Ã¢Å¡Â Ã¯Â¸Â Falta {project_name}.pdf; no se publicarÃƒÂ¡ ese artefacto.")
+
+        _limpiar_markdown_preparado(project_name, markdown_proyecto)
+
+
+# ============================================================
+# MAIN
+# ============================================================
+if __name__ == "__main__":
+    p = Publicar(__file__)
+
+    preparar_markdowns_demostraciones_web(PROYECTOS_PUBLICABLES_WEB)
+
+    # Procesar documentos (TEST & 1, 2...)
+    if TEST & 1:
+        print(f"TEST{TEST}: Procesando documentos...")
+        md_obj = p.test(ARCHIVO_PRUEBA)
+        if md_obj is None:
+            print("Ã¢ÂÅ’ Documento de prueba no encontrado.")
+            sys.exit(1)
+        print(f"Ã°Å¸â€œâ€ž Modo prueba: {md_obj.documento.nombre}")
+        md_objects = [md_obj]
+
+    if TEST & 2:
+        print(f"TEST{TEST}: Procesando documentos...")
+        print("Ã°Å¸â€œÂ Explorando todos los documentos...")
+        p.FORZADO = False
+
+        md_objects = p.explorar()
+
+        print(f"Ã°Å¸â€Â Encontrados {len(md_objects)} archivos .md")
+
+    if TEST & 1 or TEST & 2:
+        print(f"TEST{TEST}: Procesando documentos...")
+        for md_obj in md_objects:
+            doc = md_obj.documento
+            tipo = type(doc).__name__
+            #print(f"\nÃ°Å¸â€œâ€ž Procesando: {doc.nombre} ({tipo})")
+            try:
+                if hasattr(md_obj, "generar_derivados"):
+                    derivados = md_obj.generar_derivados(page_size=PAGE_SIZE)
+
+                    if derivados.get("html") is not None:
+                        print("  Ã¢Å“â€¦ HTML guardado en htmls/")
+                    else:
+                        print("  Ã¢Å“â€¦ HTML ya actualizado; no se regenera.")
+
+                    if derivados.get("pdf") is not None:
+                        print("  Ã¢Å“â€¦ PDF guardado en pdfs/")
+
+                    if derivados.get("docx") is not None:
+                        print("  Ã¢Å“â€¦ DOCX guardado en docxs/ (y ODT generado automÃƒÂ¡ticamente)")
+
+                    if derivados.get("json") is not None:
+                        print("  Ã¢Å“â€¦ JSON guardado en json/")
+
+                    if derivados.get("lean") is not None:
+                        print("  Ã¢Å“â€¦ Lean guardado en lean/")
+                else:
+                    html_obj = md_obj.html()
+                    if html_obj is None:
+                        continue
+
+                    html_obj.save()
+                    print("  Ã¢Å“â€¦ HTML guardado en htmls/")
+
+                    if html_obj.contenido:
+                        html_obj.pdf(page_size=PAGE_SIZE).save()
+                        print("  Ã¢Å“â€¦ PDF guardado en pdfs/")
+                        html_obj.docx().save()
+                        print("  Ã¢Å“â€¦ DOCX guardado en docxs/ (y ODT generado automÃƒÂ¡ticamente)")
+                    else:
+                        print("  Ã¢Å¡Â Ã¯Â¸Â HTML vacÃƒÂ­o, no se generan formatos derivados.")
+
+                if isinstance(doc, Libro):
+                    print("  Ã°Å¸â€œÅ¡ Generando artÃƒÂ­culos individuales...")
+                    doc.generar_articulos_individuales(
+                        output_dir="articulos",
+                        abstract_lang=None,
+                        page_size=PAGE_SIZE
+                    )
+
+            except Exception as e:
+                print(f"  Ã¢ÂÅ’ Error en la lista de documentos: {e}")
+                import traceback
+                traceback.print_exc()
+        print(f"\nÃ¢Å“â€¦ Procesamiento de documentos completado. Total: {len(md_objects)} archivos.")
+
+    # KDP
+    if TEST & 4:
+        print(f"TEST{TEST}: Procesando documentos...")
+        if KDP is not None:
+            print("\nÃ°Å¸â€œÂ¦ Publicando en KDP...")
+            KDP(r"C:\Users\vedq\Desktop\publicado\KDP\ES_KDP_EINSTEINVED-Tomo2_libro.docx")
+            KDP(r"C:\Users\vedq\Desktop\publicado\KDP\ES_KDP_EINSTEINVED-Tomo1_libro.docx")
+        else:
+            print("Ã¢Å¡Â Ã¯Â¸Â KDP no disponible.")
+
+    # ============================================================
+    # ZENODO - PublicaciÃƒÂ³n (Fase 1 + Fase 2)
+    # ============================================================
+    if TEST & 8:
+        print("\nÃ°Å¸Å’Â Publicando en Zenodo...")
+        try:
+            publisher = ZenodoPublisher()
+
+            # Fase 1: Generar archivos de estado (lectura, sin modificar Zenodo)
+            publisher.generate_state_files(conceptrecid=17172925, pdf_dir=ZENODO_PDF_DIR)
+
+            # Fase 2: Comparar y publicar (si hay cambios)
+            result = publisher.publish_from_state(init_local=INIT_LOCAL, pdf_dir=ZENODO_PDF_DIR)
+
+            if result["success"]:
+                print(f"Ã¢Å“â€¦ {result['message']}")
+                if result.get("published"):
+                    print(f"   Publicado en: {result['url']}")
+                else:
+                    if result.get("url"):
+                        print(f"   DepÃƒÂ³sito en: {result['url']}")
+            else:
+                print(f"Ã¢ÂÅ’ {result['message']}")
+
+            # Listar borradores para revisiÃƒÂ³n manual
+            drafts = publisher.list_drafts()
+            if drafts:
+                print("\nÃ°Å¸â€œÅ’ Borradores no publicados encontrados (revisar y eliminar manualmente):")
+                for d in drafts:
+                    print(f"   - ID: {d['id']} | Estado: {d['state']} | URL: {d['url']}")
+
+        except Exception as e:
+            print(f"Ã¢ÂÅ’ Error: {e}")
+            import traceback
+            traceback.print_exc()
+
+    # ============================================================
+    # ZENODO - VerificaciÃƒÂ³n
+    # ============================================================
+    if TEST & 16:
+        print(f"TEST{TEST}: Procesando documentos...")
+        print("\nÃ°Å¸â€Â Verificando estado en Zenodo...")
+        try:
+            publisher = ZenodoPublisher()
+            info = publisher.verify()
+            if info.get("error"):
+                print(f"Ã¢Å¡Â Ã¯Â¸Â {info['error']}")
+            else:
+                print(f"Ã¢Å“â€¦ DepÃƒÂ³sito {info['deposition_id']}: {info['title']}")
+                print(f"   Estado: {info['state']}")
+                lista = info.get("files", [])
+                print(f"   Archivos:{len(lista)}")
+                for f in lista:
+                    size = f.get('filesize', f.get('size', 'desconocido'))
+                    #print(f"     - {f['filename']} ({size} bytes)")
+        except Exception as e:
+            print(f"Ã¢ÂÅ’ Error al verificar: {e}")
+            import traceback
+            traceback.print_exc()
+
+    # ============================================================
+    # VERIFICACIÃƒâ€œN DE TRADUCCIONES
+    # ============================================================
+    if TEST & 32:
+        print(f"TEST{TEST}: Procesando documentos...")
+        print("\nÃ°Å¸â€Â Verificando cobertura de traducciones en PDFs...")
+        print("  Ã¢Å¡Â Ã¯Â¸Â FunciÃƒÂ³n verificar_traducciones no implementada.")
+
+    if TEST & 64:
+        print(f"TEST{TEST}: Procesando documentos...")
+
+        ftp = FTPClient()
+
+        # ============================================================
+        # DEMOSTRACIONES FIJADAS PARA WEB
+        # ============================================================
+        preparar_demostraciones_web(PROYECTOS_PUBLICABLES_WEB)
+
+        # ============================================================
+        # PDFs
+        # ============================================================
+        wp_pdf = WebPublisher(
+            ftp,
+            local_dir="./pdfs",
+            remote_dir="/estradad.es/teorias/pdf/DEMUESTRA",
+            extensions={".pdf"},
+            hash_name="hashes.json",
+            forzado=True
+        )
+        wp_pdf.sync()
+
+        # ============================================================
+        # MARKDOWN DEL PROYECTO DEMUESTRA
+        # ============================================================
+        wp_md = WebPublisher(
+            ftp,
+            local_dir="./",
+            remote_dir="/estradad.es/teorias/pdf/DEMUESTRA/md",
+            extensions={".md"},
+            hash_name="hashes_md.json",
+            forzado=True
+        )
+        wp_md.sync()
+
+        for project_spec in PROYECTOS_PUBLICABLES_WEB:
+            project_name = _nombre_proyecto_web(project_spec)
+            wp_demo = WebPublisher(
+                ftp,
+                local_dir=_proyecto_dir(project_name),
+                remote_dir=f"/estradad.es/teorias/pdf/DEMUESTRA/proyectos/{project_name}",
+                extensions=DEMOSTRACIONES_WEB_EXTENSIONS,
+                hash_name=f"hashes_{project_name}.json",
+                forzado=True
+            )
+            wp_demo.sync()
+
+    print("\nÃ¢Å“â€¦ Proceso completado.")

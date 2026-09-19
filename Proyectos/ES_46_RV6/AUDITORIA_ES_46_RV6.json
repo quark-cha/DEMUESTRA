@@ -1,0 +1,66 @@
+{
+  "project": "ES_46_RV6",
+  "tool": "DEMUESTRA Closure Audit",
+  "generated_on": "2026-09-19T17:24:45+00:00",
+  "verdict": "APROBADO_CON_OBSERVACIONES",
+  "goal": "T_RIEMANN",
+  "checks": {
+    "objetivo_existe": true,
+    "dependencias_resueltas": true,
+    "sin_ciclos": true,
+    "lean_aprobado": true,
+    "prolog_aprobado": true,
+    "nodo_lean_coincide": true,
+    "dependencias_lean_internalizadas": false
+  },
+  "reachable_nodes": [
+    "A_L",
+    "D_L",
+    "D_U",
+    "D_f",
+    "D_fInv",
+    "D_k",
+    "D_lambda",
+    "D_rho",
+    "D_rho_R",
+    "D_t_prime",
+    "P_COORD",
+    "P_RHO_ISO",
+    "P_ST",
+    "P_VED_E",
+    "P_VED_Inv",
+    "P_VR_E",
+    "P_VR_rho",
+    "P_Z",
+    "P_a",
+    "P_v",
+    "T_ISO",
+    "T_RIEMANN"
+  ],
+  "root_facts": [
+    "A_L",
+    "D_L",
+    "D_U",
+    "D_f",
+    "D_fInv",
+    "D_k",
+    "D_lambda",
+    "D_rho",
+    "D_rho_R",
+    "D_t_prime"
+  ],
+  "missing_dependencies": [],
+  "cycles": [],
+  "open_lean_hypotheses": [
+    {
+      "name": "hCompat",
+      "type": "HR46_RV6.TransversalCompatibilityForZeros IsZeroRim"
+    }
+  ],
+  "lean_axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+  ],
+  "scope": "Auditoria tecnica de trazabilidad formal; no mide aceptacion cientifica."
+}

@@ -11,13 +11,9 @@ from __future__ import annotations
 from pathlib import Path
 import logging
 import os
-import queue
 import re
 import shutil
 import subprocess
-import sys
-import threading
-import time
 from shutil import which
 from typing import Any, Dict, List, Optional
 
@@ -26,20 +22,6 @@ from .proyecto import Proyecto
 
 DEFAULT_TIMEOUT = 600
 CACHE_TIMEOUT = 900
-
-
-def _configurar_salida_utf8() -> None:
-    """Evita que la consola de Windows interrumpa Lean por simbolos Unicode."""
-    for flujo in (sys.stdout, sys.stderr):
-        reconfigure = getattr(flujo, "reconfigure", None)
-        if reconfigure is not None:
-            try:
-                reconfigure(encoding="utf-8", errors="replace")
-            except (OSError, ValueError):
-                pass
-
-
-_configurar_salida_utf8()
 
 
 def _buscar_raiz_demuestra(desde: Path) -> Path:
@@ -133,13 +115,9 @@ def _ejecutar(
     comando: List[str],
     cwd: Path,
     timeout: int = DEFAULT_TIMEOUT,
-    mostrar_progreso: bool = False,
-    etiqueta: str = "proceso",
 ) -> subprocess.CompletedProcess[str]:
     """
-    Ejecuta un comando sin shell, conserva su salida y opcionalmente la
-    muestra en tiempo real. Si el proceso no escribe nada, emite un latido
-    periodico para que una tarea larga nunca parezca bloqueada.
+    Ejecuta un comando sin shell y captura stdout/stderr.
 
     Codigos sinteticos:
       127 -> ejecutable no encontrado
@@ -147,85 +125,17 @@ def _ejecutar(
     """
     try:
         comando_resuelto = [_resolver_exe(comando[0]), *comando[1:]]
-        inicio = time.monotonic()
-        comando_texto = " ".join(str(parte) for parte in comando)
-        if mostrar_progreso:
-            print(f"INICIO [{etiqueta}]: {comando_texto}", flush=True)
-            print(f"Directorio: {cwd}", flush=True)
-
-        proceso = subprocess.Popen(
+        return subprocess.run(
             comando_resuelto,
             cwd=str(cwd),
             env=_entorno_con_elan(),
             stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
+            stderr=subprocess.PIPE,
             text=True,
             encoding="utf-8",
             errors="replace",
+            timeout=timeout,
             shell=False,
-            bufsize=1,
-        )
-        cola: queue.Queue[Optional[str]] = queue.Queue()
-
-        def leer_salida() -> None:
-            assert proceso.stdout is not None
-            for linea in iter(proceso.stdout.readline, ""):
-                cola.put(linea)
-            cola.put(None)
-
-        lector = threading.Thread(target=leer_salida, daemon=True)
-        lector.start()
-        lineas: List[str] = []
-        ultimo_aviso = inicio
-        fin_salida = False
-
-        while proceso.poll() is None or not fin_salida:
-            transcurrido = time.monotonic() - inicio
-            if transcurrido >= timeout:
-                proceso.kill()
-                lector.join(timeout=2)
-                mensaje = (
-                    f"TIMEOUT [{etiqueta}]: superados {timeout} segundos. "
-                    "El proceso fue interrumpido; no es un error de demostracion.\n"
-                )
-                lineas.append(mensaje)
-                if mostrar_progreso:
-                    print(mensaje.rstrip(), flush=True)
-                return subprocess.CompletedProcess(
-                    comando, 124, stdout="".join(lineas), stderr=""
-                )
-
-            try:
-                linea = cola.get(timeout=1)
-                if linea is None:
-                    fin_salida = True
-                else:
-                    lineas.append(linea)
-                    ultimo_aviso = time.monotonic()
-                    if mostrar_progreso:
-                        print(linea, end="", flush=True)
-            except queue.Empty:
-                ahora = time.monotonic()
-                if mostrar_progreso and ahora - ultimo_aviso >= 15:
-                    print(
-                        f"EN CURSO [{etiqueta}]: {int(ahora - inicio)} s "
-                        "sin nueva salida; el proceso sigue activo.",
-                        flush=True,
-                    )
-                    ultimo_aviso = ahora
-
-        lector.join(timeout=2)
-        duracion = time.monotonic() - inicio
-        codigo = proceso.returncode if proceso.returncode is not None else 1
-        if mostrar_progreso:
-            estado = "OK" if codigo == 0 else "FALLO"
-            print(
-                f"FIN [{etiqueta}]: {estado}, codigo {codigo}, "
-                f"duracion {duracion:.1f} s.",
-                flush=True,
-            )
-        return subprocess.CompletedProcess(
-            comando, codigo, stdout="".join(lineas), stderr=""
         )
     except FileNotFoundError as exc:
         return subprocess.CompletedProcess(
@@ -389,9 +299,12 @@ class Demuestra:
             ["lake", "exe", "cache", "get"],
             self.raiz_demuestra,
             timeout=CACHE_TIMEOUT,
-            mostrar_progreso=True,
-            etiqueta="cache Mathlib",
         )
+
+        if resultado.stdout.strip():
+            print(resultado.stdout.rstrip())
+        if resultado.stderr.strip():
+            print(resultado.stderr.rstrip())
 
         if resultado.returncode != 0:
             self.logger.error(
@@ -411,28 +324,24 @@ class Demuestra:
             ["lake", "env", "lean", relativo],
             self.raiz_demuestra,
             timeout=DEFAULT_TIMEOUT,
-            mostrar_progreso=True,
-            etiqueta=f"Lean {archivo.name}",
         )
 
         salida = (resultado.stdout or "").strip()
         error = (resultado.stderr or "").strip()
 
         if resultado.returncode == 0:
+            if salida:
+                print(salida)
+            if error:
+                print(error)
             print(f"\nOK: {archivo.name} compilado correctamente.")
             return 0
 
-        if resultado.returncode == 124:
-            print(f"\nINCONCLUSO: {archivo.name} excedio el tiempo permitido.")
-            print("Causa: Lean/Lake no termino; esto no demuestra un error formal.")
-            print("Revisar: preparacion de Mathlib, cache, red y logs/demuestra.log.")
-            print("Accion: preparar la cache y repetir la evaluacion.")
-        elif resultado.returncode == 127:
-            print(f"\nINCONCLUSO: no se pudo iniciar Lean para {archivo.name}.")
-            print("Revisar: instalacion de Elan/Lake, PATH y logs/demuestra.log.")
-        else:
-            print(f"\nRECHAZADO: Lean encontro errores en {archivo.name}.")
-            print("Revisar: los mensajes anteriores, con archivo, linea y columna.")
+        print(f"\nNo se pudo compilar {archivo.name}.")
+        if salida:
+            print(salida)
+        if error:
+            print(error)
 
         return resultado.returncode
 
@@ -466,8 +375,7 @@ class Demuestra:
             )
             print("\nValidacion Lean terminada con errores:")
             for archivo, rc in fallos:
-                clase = "INCONCLUSO" if rc in {124, 127} else "RECHAZADO"
-                print(f"  - {archivo.name}: {clase}, codigo {rc}")
+                print(f"  - {archivo.name}: codigo {rc}")
             return fallos[0][1] or 1
 
         self.logger.info("Validacion Lean correcta: %d archivo(s).", len(archivos))
@@ -522,8 +430,7 @@ class Demuestra:
         if fallos:
             print("\nValidacion global terminada con errores:")
             for proyecto, rc in fallos:
-                clase = "INCONCLUSO" if rc in {124, 127} else "RECHAZADO"
-                print(f"  - {proyecto.name}: {clase}, codigo {rc}")
+                print(f"  - {proyecto.name}: codigo {rc}")
             return fallos[0][1] or 1
 
         print("\nValidacion global correcta.")

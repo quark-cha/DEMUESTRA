@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="220" height="48" viewBox="0 0 220 48" role="img" aria-labelledby="title desc">
+  <title id="title">Licencia etica CC BY-SA-NC</title>
+  <desc id="desc">Distintivo de licencia Creative Commons con autoria, compartir igual, no comercial y licencia etica HL3.</desc>
+  <rect width="220" height="48" rx="8" fill="#fffaf0"/>
+  <rect x="1" y="1" width="218" height="46" rx="7" fill="none" stroke="#805c16" stroke-width="2"/>
+  <g fill="#5d430f" font-family="Arial, Helvetica, sans-serif" text-anchor="middle">
+    <circle cx="25" cy="24" r="14" fill="#5d430f"/>
+    <text x="25" y="29" fill="#fffaf0" font-size="15" font-weight="700">CC</text>
+    <text x="62" y="20" font-size="13" font-weight="700">BY</text>
+    <text x="62" y="34" font-size="10">autor</text>
+    <text x="101" y="20" font-size="13" font-weight="700">SA</text>
+    <text x="101" y="34" font-size="10">igual</text>
+    <text x="140" y="20" font-size="13" font-weight="700">NC</text>
+    <text x="140" y="34" font-size="10">no com.</text>
+    <circle cx="188" cy="24" r="14" fill="#5d430f"/>
+    <text x="188" y="29" fill="#fffaf0" font-size="14" font-weight="700">HL3</text>
+  </g>
+</svg>

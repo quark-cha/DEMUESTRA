@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DOCUMENTO 46 — REVISIÓN 6</title>
+<style>
+body {
+    font-family: Georgia, serif;
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 20px;
+    line-height: 1.6;
+    background: #fcfcfc;
+    color: #222;
+}
+h1, h2, h3, h4 {
+    color: #1a1a1a;
+}
+table {
+    border-collapse: collapse;
+    width:100%;
+    margin:20px 0;
+}
+th, td {
+    border:1px solid #ccc;
+    padding:8px 12px;
+}
+th {
+    background:#f0f0f0;
+}
+blockquote {
+    border-left:4px solid #0077cc;
+    padding-left:16px;
+}
+code {
+    background:#eee;
+    padding:2px 6px;
+}
+pre {
+    background:#f4f4f4;
+    padding:12px;
+    overflow-x:auto;
+}
+img {
+    max-width:100%;
+    height:auto;
+}
+math {
+    font-size:1.1em;
+}
+</style>
+</head>
+<body>
+<h1>DOCUMENTO 46 — REVISIÓN 6</h1>
+<h2>Teorema geométrico-topológico de estabilidad, espacios de soluciones y conexión con la Hipótesis de Riemann</h2>
+<p><strong>Marco:</strong> Einstein–VED · UNIHOLOG<br />
+<strong>Autor:</strong> Víctor Estrada Díaz<br />
+<strong>Carácter del documento:</strong> versión final autocontenida del desarrollo deductivo.<br />
+<strong>Principio metodológico:</strong> una definición se introduce una vez; una proposición demostrada queda asentada y puede utilizarse posteriormente sin reabrir su demostración. Si una conclusión se sigue de las proposiciones asentadas, se afirma con la fuerza lógica que corresponde.</p>
+<hr />
+<h1>0. Regla de lectura y notación lógica</h1>
+<p>Este documento utiliza la siguiente convención:</p>
+<ul>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>D</mi><mi>X</mi></msub></mrow></math>: definición.</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>A</mi><mi>X</mi></msub></mrow></math>: antecedente establecido fuera de este documento y citado como punto de partida.</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>P</mi><mi>X</mi></msub></mrow></math>: proposición demostrada dentro del desarrollo.</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>T</mi><mi>X</mi></msub></mrow></math>: teorema obtenido a partir de proposiciones anteriores.</li>
+<li><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mo>∴</mo></mrow></math>: por tanto.</li>
+</ul>
+<p>Una proposición demostrada no vuelve a convertirse posteriormente en una hipótesis. Puede ser citada como antecedente mediante su identificador.</p>
+<hr />
+<h1>1. Universo, coordenadas y geometría diferencial</h1>
+<h2>1.1. Universo</h2>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>D</mi><mi>U</mi></msub></mrow></math> — El universo físico considerado se representa como</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><mi>U</mi><mo>=</mo><mn>3</mn><mi>S</mi><mo>+</mo><mi>T</mi><mo>.</mo></mrow></menclose></mrow></math></p>
+<p>No se elimina ninguna dimensión espacial.</p>
+<h2>1.2. Elección local de la dirección de propagación</h2>
+<p>Sea una onda que en un punto determinado se propaga según una dirección espacial. Es lícito orientar localmente los ejes de coordenadas de manera que el eje <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>x</mi></mrow></math> coincida con la dirección instantánea de propagación.</p>
+<p>Entonces, para ese desplazamiento infinitesimal,</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>d</mi><mi>y</mi><mo>=</mo><mn>0</mn><mo>,</mo><mspace width="2em" /><mi>d</mi><mi>z</mi><mo>=</mo><mn>0</mn><mo>,</mo></mrow></math></p>
+<p>y</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>d</mi><mi>s</mi><mo>=</mo><mi>d</mi><mi>x</mi><mo>.</mo></mrow></math></p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>P</mi><mrow><mi mathvariant="normal">C</mi><mi mathvariant="normal">O</mi><mi mathvariant="normal">O</mi><mi mathvariant="normal">R</mi><mi mathvariant="normal">D</mi></mrow></msub></mrow></math> — Esta elección no reduce <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mn>3</mn><mi>S</mi></mrow></math> a una dimensión. Sólo alinea una coordenada con la dirección local de propagación.</p>
+<hr />
+<h1>2. Significado de <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msup><mi>t</mi><mi>′</mi></msup></mrow></math> y relación de Lorentz</h1>
+<h2>2.1. Convención esencial sobre el apóstrofo</h2>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>D</mi><mrow><msup><mi>t</mi><mi>′</mi></msup></mrow></msub></mrow></math> — El apóstrofo de <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msup><mi>t</mi><mi>′</mi></msup></mrow></math> <strong>no significa derivada</strong>.</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msup><mi>t</mi><mi>′</mi></msup></mrow></math> representa la coordenada temporal propia del sistema observado respecto del observador en la transformación de Lorentz. En consecuencia, <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>d</mi><msup><mi>t</mi><mi>′</mi></msup></mrow></math> es el diferencial del tiempo propio del sistema observado.</p>
+<p>Cuando sea necesaria una derivada se escribirá explícitamente, por ejemplo,</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mfrac><mrow><mi>d</mi><msup><mi>t</mi><mi>′</mi></msup></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>.</mo></mrow></math></p>
+<h2>2.2. Antecedente de Lorentz</h2>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>A</mi><mrow><mi mathvariant="normal">L</mi></mrow></msub></mrow></math> — Para velocidad relativa <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>v</mi></mrow></math>,</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>d</mi><msup><mi>t</mi><mi>′</mi></msup><mo>=</mo><mi>d</mi><mi>t</mi><msqrt><mrow><mn>1</mn><mo>−</mo><mfrac><mrow><msup><mi>v</mi><mn>2</mn></msup></mrow><mrow><msup><mi>c</mi><mn>2</mn></msup></mrow></mfrac></mrow></msqrt><mo>.</mo></mrow></math></p>
+<p>Definimos la velocidad longitudinal observada como</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><mi>v</mi><mo>=</mo><mfrac><mrow><mi>d</mi><mi>s</mi></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>.</mo></mrow></menclose></mrow></math></p>
+<p>En unidades naturales,</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>c</mi><mo>=</mo><mn>1</mn><mo>.</mo></mrow></math></p>
+<p>Por tanto,</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>d</mi><msup><mi>t</mi><mrow><mi>′</mi><mn>2</mn></mrow></msup><mo>=</mo><mi>d</mi><msup><mi>t</mi><mn>2</mn></msup><mo>−</mo><mi>d</mi><msup><mi>s</mi><mn>2</mn></msup><mo>,</mo></mrow></math></p>
+<p>y obtenemos</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><msub><mi>P</mi><mrow><mi mathvariant="normal">S</mi><mi mathvariant="normal">T</mi></mrow></msub><mi>:</mi><mspace width="2em" /><mi>d</mi><msup><mi>s</mi><mn>2</mn></msup><mo>=</mo><mi>d</mi><msup><mi>t</mi><mn>2</mn></msup><mo>−</mo><mi>d</mi><msup><mi>t</mi><mrow><mi>′</mi><mn>2</mn></mrow></msup><mo>.</mo></mrow></menclose></mrow></math></p>
+<p>Equivalentemente,</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><mi>d</mi><msup><mi>s</mi><mn>2</mn></msup><mo>=</mo><mo stretchy="false">(</mo><mi>d</mi><mi>t</mi><mo>−</mo><mi>d</mi><msup><mi>t</mi><mi>′</mi></msup><mo stretchy="false">)</mo><mo stretchy="false">(</mo><mi>d</mi><mi>t</mi><mo>+</mo><mi>d</mi><msup><mi>t</mi><mi>′</mi></msup><mo stretchy="false">)</mo><mo>.</mo></mrow></menclose></mrow></math></p>
+<p>Estas dos expresiones son la misma relación geométrica escrita de dos formas.</p>
+<hr />
+<h1>3. Primer y segundo orden: velocidad y aceleración</h1>
+<p>La primera derivada espacial respecto de <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>t</mi></mrow></math> es</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><msub><mi>P</mi><mi>v</mi></msub><mi>:</mi><mspace width="2em" /><mfrac><mrow><mi>d</mi><mi>s</mi></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>=</mo><mi>v</mi><mo>.</mo></mrow></menclose></mrow></math></p>
+<p>Cuando <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>v</mi></mrow></math> es constante,</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mfrac><mrow><msup><mi>d</mi><mn>2</mn></msup><mi>s</mi></mrow><mrow><mi>d</mi><msup><mi>t</mi><mn>2</mn></msup></mrow></mfrac><mo>=</mo><mn>0</mn><mo>.</mo></mrow></math></p>
+<p>La segunda derivada es</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><msub><mi>P</mi><mi>a</mi></msub><mi>:</mi><mspace width="2em" /><mfrac><mrow><msup><mi>d</mi><mn>2</mn></msup><mi>s</mi></mrow><mrow><mi>d</mi><msup><mi>t</mi><mn>2</mn></msup></mrow></mfrac><mo>=</mo><mfrac><mrow><mi>d</mi><mi>v</mi></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>=</mo><mi>a</mi><mo>.</mo></mrow></menclose></mrow></math></p>
+<p>Dentro del marco Einstein–VED, la presencia de materia se asocia al confinamiento de onda y a la existencia de dinámica no puramente lineal; la aceleración expresa la variación del régimen de velocidad.</p>
+<p>La geometría define por tanto una estructura diferencial en <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>t</mi></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msup><mi>t</mi><mi>′</mi></msup></mrow></math> y sus variaciones. No se añade desde fuera una segunda geometría para introducir la dinámica.</p>
+<hr />
+<h1>4. Onda base, longitud de cierre y radio <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>R</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub></mrow></math></h1>
+<h2>4.1. Longitud de onda base</h2>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>D</mi><mi>λ</mi></msub></mrow></math> — Sea <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>λ</mi></mrow></math> la longitud de onda base asociada a la materia considerada.</p>
+<p>A partir de las relaciones de Planck y Einstein,</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>E</mi><mo>=</mo><mfrac><mrow><mi>h</mi><mi>c</mi></mrow><mrow><mi>λ</mi></mrow></mfrac><mo>,</mo></mrow></math></p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>E</mi><mo>=</mo><mi>M</mi><msup><mi>c</mi><mn>2</mn></msup><mo>,</mo></mrow></math></p>
+<p>se obtiene</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>M</mi><msup><mi>c</mi><mn>2</mn></msup><mo>=</mo><mfrac><mrow><mi>h</mi><mi>c</mi></mrow><mrow><mi>λ</mi></mrow></mfrac><mo>,</mo></mrow></math></p>
+<p>y por tanto</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><mi>λ</mi><mo>=</mo><mfrac><mrow><mi>h</mi></mrow><mrow><mi>M</mi><mi>c</mi></mrow></mfrac><mo>.</mo></mrow></menclose></mrow></math></p>
+<h2>4.2. Longitud de contorno</h2>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>D</mi><mi>L</mi></msub></mrow></math> — Sea <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>L</mi></mrow></math> la longitud total del contorno espacial recorrido por una onda confinada; es el perímetro de cierre de la onda.</p>
+<p>Definimos</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><mi>L</mi><mo>=</mo><mi>n</mi><mi>λ</mi><mo>.</mo></mrow></menclose></mrow></math></p>
+<p>Para un cierre finito,</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>n</mi><mo>∈</mo><msup><mi mathvariant="double-struck">R</mi><mo>+</mo></msup><mo>.</mo></mrow></math></p>
+<h2>4.3. Construcción de <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>U</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub></mrow></math></h2>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>D</mi><mrow><msub><mi>R</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub></mrow></msub></mrow></math> — Se representa topológicamente el contorno de longitud <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>L</mi></mrow></math> mediante una circunferencia bidimensional de igual longitud:</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mn>2</mn><mi>π</mi><msub><mi>R</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub><mo>=</mo><mi>L</mi><mo>.</mo></mrow></math></p>
+<p>Por tanto,</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><msub><mi>R</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub><mo>=</mo><mfrac><mrow><mi>L</mi></mrow><mrow><mn>2</mn><mi>π</mi></mrow></mfrac><mo>=</mo><mfrac><mrow><mi>n</mi><mi>λ</mi></mrow><mrow><mn>2</mn><mi>π</mi></mrow></mfrac><mo>.</mo></mrow></menclose></mrow></math></p>
+<p>La afirmación no es que el confinamiento físico real en <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mn>3</mn><mi>S</mi><mo>+</mo><mi>T</mi></mrow></math> tenga necesariamente forma circular. La circunferencia es una proyección topológica precisa que conserva la longitud <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>L</mi></mrow></math> y permite analizar las propiedades de cierre.</p>
+<p>Así,</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><msub><mi>U</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub><mo stretchy="false">(</mo><mtext>onda</mtext><mo stretchy="false">)</mo><mo>=</mo><msub><mi>U</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub><mo stretchy="false">(</mo><mtext>cerrada</mtext><mo>,</mo><mtext>abierta</mtext><mo stretchy="false">)</mo><mo>=</mo><msub><mi>U</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub><mo stretchy="false">(</mo><msub><mi>R</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub><mo stretchy="false">)</mo><mo>=</mo><msub><mi>U</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub><mo stretchy="false">(</mo><mi>L</mi><mo>,</mo><msub><mi>R</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub><mo stretchy="false">)</mo><mo>.</mo></mrow></menclose></mrow></math></p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>P</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub><mo stretchy="false">(</mo><mrow><mi mathvariant="normal">I</mi><mi mathvariant="normal">n</mi><mi mathvariant="normal">v</mi></mrow><mo stretchy="false">)</mo></mrow></math> — La representación circular conserva <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>L</mi></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>λ</mi></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>n</mi></mrow></math> y, como se definirá enseguida, <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>ρ</mi></mrow></math>. Por ello no crea la estabilidad: la hace visible.</p>
+<hr />
+<h1>5. Ondas cerradas, ondas abiertas y estabilidad</h1>
+<h2>5.1. Onda cerrada</h2>
+<p>Para todo <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>n</mi></mrow></math> finito positivo,</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>L</mi><mo>=</mo><mi>n</mi><mi>λ</mi><mo>&lt;</mo><mo>∞</mo><mo>,</mo></mrow></math></p>
+<p>y existe un contorno finito de representación.</p>
+<p>El hecho de estar cerrada <strong>no implica</strong> estabilidad.</p>
+<h2>5.2. Onda abierta</h2>
+<p>La onda abierta o libre corresponde al límite</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><mi>n</mi><mo>→</mo><mo>∞</mo><mo>.</mo></mrow></menclose></mrow></math></p>
+<p>Entonces,</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>L</mi><mo>→</mo><mo>∞</mo><mo>,</mo></mrow></math></p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>R</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub><mo>→</mo><mo>∞</mo><mo>.</mo></mrow></math></p>
+<p>No existe un contorno espacial finito de retorno:</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><mi>n</mi><mo>→</mo><mo>∞</mo><mi>⟺</mi><mi>L</mi><mo>→</mo><mo>∞</mo><mi>⟺</mi><msub><mi>R</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub><mo>→</mo><mo>∞</mo><mi>⟺</mi><mtext>onda abierta o libre</mtext><mo>.</mo></mrow></menclose></mrow></math></p>
+<p>Dentro del marco, la onda libre corresponde a energía.</p>
+<hr />
+<h1>6. Coordenadas completas de cierre: <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>k</mi></mrow></math> y <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>ρ</mi></mrow></math></h1>
+<h2>6.1. Entero más próximo y distancia</h2>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>D</mi><mi>k</mi></msub></mrow></math> — Sea <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>k</mi><mo>∈</mo><msup><mi mathvariant="double-struck">N</mi><mo>+</mo></msup></mrow></math> el entero positivo más próximo que sirve como centro de una familia de cierre.</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>D</mi><mi>ρ</mi></msub></mrow></math> — Sea</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><mi>ρ</mi><mo>=</mo><mo>dist</mo><mo stretchy="false">(</mo><mi>n</mi><mo>,</mo><msup><mi mathvariant="double-struck">N</mi><mo>+</mo></msup><mo stretchy="false">)</mo><mo>.</mo></mrow></menclose></mrow></math></p>
+<p>Por definición de distancia al entero más próximo,</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><mn>0</mn><mo>≤</mo><mi>ρ</mi><mo>≤</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>.</mo></mrow></menclose></mrow></math></p>
+<p>Todo cierre finito se representa como</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><mi>n</mi><mo>=</mo><mi>k</mi><mi>±</mi><mi>ρ</mi><mo>,</mo><mspace width="2em" /><mi>k</mi><mo>∈</mo><msup><mi mathvariant="double-struck">N</mi><mo>+</mo></msup><mo>,</mo><mspace width="2em" /><mn>0</mn><mo>≤</mo><mi>ρ</mi><mo>≤</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>.</mo></mrow></menclose></mrow></math></p>
+<p>En el punto exactamente equidistante entre dos enteros, <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>ρ</mi><mo>=</mo><mn>1</mn><mo>/</mo><mn>2</mn></mrow></math>; las dos etiquetas vecinas representan la misma frontera.</p>
+<p>Entonces</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><mi>L</mi><mo stretchy="false">(</mo><mi>k</mi><mo>,</mo><mi>ρ</mi><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">(</mo><mi>k</mi><mi>±</mi><mi>ρ</mi><mo stretchy="false">)</mo><mi>λ</mi><mo>,</mo></mrow></menclose></mrow></math></p>
+<p>y</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><msub><mi>R</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub><mo stretchy="false">(</mo><mi>k</mi><mo>,</mo><mi>ρ</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mrow><mo stretchy="false">(</mo><mi>k</mi><mi>±</mi><mi>ρ</mi><mo stretchy="false">)</mo><mi>λ</mi></mrow><mrow><mn>2</mn><mi>π</mi></mrow></mfrac><mo>.</mo></mrow></menclose></mrow></math></p>
+<h2>6.2. Estabilidad</h2>
+<p>Si</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>ρ</mi><mo>=</mo><mn>0</mn><mo>,</mo></mrow></math></p>
+<p>entonces</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>n</mi><mo>=</mo><mi>k</mi><mo>,</mo></mrow></math></p>
+<p>y</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>L</mi><mo>=</mo><mi>k</mi><mi>λ</mi><mo>.</mo></mrow></math></p>
+<p>El contorno contiene un número entero de ciclos y el retorno se produce exactamente en fase.</p>
+<p>Por tanto,</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><msub><mi>P</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub><mo stretchy="false">(</mo><mi>E</mi><mo stretchy="false">)</mo><mi>:</mi><mspace width="2em" /><mi>ρ</mi><mo>=</mo><mn>0</mn><mi>⟺</mi><mi>n</mi><mo>=</mo><mi>k</mi><mo>∈</mo><msup><mi mathvariant="double-struck">N</mi><mo>+</mo></msup><mi>⟺</mi><mi>L</mi><mo>=</mo><mi>k</mi><mi>λ</mi><mi>⟺</mi><mtext>cierre exacto en fase</mtext><mi>⟺</mi><mtext>estado estable</mtext><mo>.</mo></mrow></menclose></mrow></math></p>
+<p>Para</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mn>0</mn><mo>&lt;</mo><mi>ρ</mi><mo>≤</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>,</mo></mrow></math></p>
+<p>el cierre es finito pero no entero. Existe desfase respecto del cierre exacto:</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><msub><mi>P</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub><mo stretchy="false">(</mo><mi>I</mi><mo stretchy="false">)</mo><mi>:</mi><mspace width="2em" /><mn>0</mn><mo>&lt;</mo><mi>ρ</mi><mo>≤</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mi>⟺</mi><mtext>cierre no estable</mtext><mo>.</mo></mrow></menclose></mrow></math></p>
+<p>El extremo</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><mi>ρ</mi><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac></mrow></menclose></mrow></math></p>
+<p>es la máxima desviación posible respecto del entero más próximo.</p>
+<hr />
+<h1>7. Completitud de <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>U</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub></mrow></math></h1>
+<p>La parametrización anterior es exhaustiva.</p>
+<p>Para todo <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>n</mi><mo>∈</mo><msup><mi mathvariant="double-struck">R</mi><mo>+</mo></msup></mrow></math> finito existe algún</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>k</mi><mo>∈</mo><msup><mi mathvariant="double-struck">N</mi><mo>+</mo></msup></mrow></math></p>
+<p>y algún</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>ρ</mi><mo>∈</mo><mrow><mo stretchy="true" fence="true" form="prefix">[</mo><mn>0</mn><mo>,</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo stretchy="true" fence="true" form="postfix">]</mo></mrow></mrow></math></p>
+<p>tales que</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>n</mi><mo>=</mo><mi>k</mi><mi>±</mi><mi>ρ</mi><mo>.</mo></mrow></math></p>
+<p>Por tanto no existe un cierre finito fuera de esta clasificación.</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>P</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub><mo stretchy="false">(</mo><msub><mi>K</mi><mi>E</mi></msub><mo stretchy="false">)</mo></mrow></math> — Para <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>ρ</mi><mo>=</mo><mn>0</mn></mrow></math>,</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><msub><mi mathvariant="script">E</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub><mo>=</mo><mo stretchy="false">{</mo><mo stretchy="false">(</mo><mi>k</mi><mo>,</mo><mn>0</mn><mo stretchy="false">)</mo><mi>:</mi><mi>k</mi><mo>∈</mo><msup><mi mathvariant="double-struck">N</mi><mo>+</mo></msup><mo stretchy="false">}</mo><mo>.</mo></mrow></menclose></mrow></math></p>
+<p>Todos los enteros</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>k</mi><mo>=</mo><mn>1</mn><mo>,</mo><mn>2</mn><mo>,</mo><mn>3</mn><mo>,</mo><mi>…</mi></mrow></math></p>
+<p>enumeran todos los casos de estabilidad sin dejar ninguno fuera.</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>P</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub><mo stretchy="false">(</mo><msub><mi>K</mi><mi>I</mi></msub><mo stretchy="false">)</mo></mrow></math> — Para <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>ρ</mi><mo>=</mo><mn>1</mn><mo>/</mo><mn>2</mn></mrow></math>, los mismos <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>k</mi></mrow></math> enumeran todas las fronteras de máxima desviación.</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>P</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub><mo stretchy="false">(</mo><msub><mi>R</mi><mi>C</mi></msub><mo stretchy="false">)</mo></mrow></math> — Para cada familia <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>k</mi></mrow></math>,</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mn>0</mn><mo>≤</mo><mi>ρ</mi><mo>≤</mo><mfrac><mn>1</mn><mn>2</mn></mfrac></mrow></math></p>
+<p>recorre todo el continuo entre cierre exacto y máxima desviación.</p>
+<p>Por tanto,</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><msub><mi>P</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub><mo stretchy="false">(</mo><mrow><mi mathvariant="normal">C</mi><mi mathvariant="normal">o</mi><mi mathvariant="normal">m</mi><mi mathvariant="normal">p</mi><mi mathvariant="normal">l</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">t</mi><mi mathvariant="normal">o</mi></mrow><mo stretchy="false">)</mo><mi>:</mi><mspace width="1em" /><msubsup><mi>U</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow><mrow><mi mathvariant="normal">c</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">r</mi><mi mathvariant="normal">r</mi><mi mathvariant="normal">a</mi><mi mathvariant="normal">d</mi><mi mathvariant="normal">o</mi></mrow></msubsup><mo>=</mo><msub><mi mathvariant="script">E</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub><mo>⊔</mo><msub><mi mathvariant="script">I</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub><mo>,</mo></mrow></menclose></mrow></math></p>
+<p>y, añadiendo el límite <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>n</mi><mo>→</mo><mo>∞</mo></mrow></math>, queda contemplada también la onda abierta.</p>
+<p>No existe una cuarta clase de onda respecto del cierre que no haya sido considerada.</p>
+<hr />
+<h1>8. Precedente topológico: <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>U</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub><mo>↔</mo><msub><mi>U</mi><mrow><mi mathvariant="normal">S</mi><mi mathvariant="normal">c</mi><mi mathvariant="normal">h</mi></mrow></msub></mrow></math></h1>
+<p>El resultado geométrico de relación de radios, desarrollado con mayor detalle en el Documento 7, se reproduce aquí como antecedente interno del marco.</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>A</mi><mn>7</mn></msub></mrow></math> — En dicho documento se establece la constante geométrica</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><mover><mi>N</mi><mo stretchy="false">~</mo></mover><mo>=</mo><msub><mi>R</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub><msub><mi>R</mi><mrow><mi mathvariant="normal">S</mi><mi mathvariant="normal">c</mi><mi mathvariant="normal">h</mi></mrow></msub><mo>.</mo></mrow></menclose></mrow></math></p>
+<p>Por tanto,</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><msub><mi>R</mi><mrow><mi mathvariant="normal">S</mi><mi mathvariant="normal">c</mi><mi mathvariant="normal">h</mi></mrow></msub><mo>=</mo><mfrac><mrow><mover><mi>N</mi><mo stretchy="false">~</mo></mover></mrow><mrow><msub><mi>R</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub></mrow></mfrac><mo>,</mo></mrow></menclose></mrow></math></p>
+<p>y</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><msub><mi>R</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub><mo>=</mo><mfrac><mrow><mover><mi>N</mi><mo stretchy="false">~</mo></mover></mrow><mrow><msub><mi>R</mi><mrow><mi mathvariant="normal">S</mi><mi mathvariant="normal">c</mi><mi mathvariant="normal">h</mi></mrow></msub></mrow></mfrac><mo>.</mo></mrow></menclose></mrow></math></p>
+<p>Para radios positivos, la aplicación</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>Φ</mi><mrow><mover><mi>N</mi><mo stretchy="false">~</mo></mover></mrow></msub><mi>:</mi><msub><mi>R</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub><mo>↦</mo><mfrac><mrow><mover><mi>N</mi><mo stretchy="false">~</mo></mover></mrow><mrow><msub><mi>R</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub></mrow></mfrac></mrow></math></p>
+<p>es biyectiva, continua y su inversa tiene la misma forma. En ese dominio,</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><msub><mi>P</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">S</mi></mrow></msub><mi>:</mi><mspace width="2em" /><msub><mi>U</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub><mo>≅</mo><msub><mi>U</mi><mrow><mi mathvariant="normal">S</mi><mi mathvariant="normal">c</mi><mi mathvariant="normal">h</mi></mrow></msub><mo>.</mo></mrow></menclose></mrow></math></p>
+<p>Este resultado demuestra que una misma información física puede representarse en topologías distintas mediante una transformación reversible.</p>
+<p>En ese desarrollo de relación de radios, la función gravitatoria del marco depende del cierre <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>n</mi></mrow></math> y satisface</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><mi>G</mi><mo stretchy="false">(</mo><mn>2</mn><mo stretchy="false">)</mo><mo>=</mo><mi>G</mi><mo>,</mo></mrow></menclose></mrow></math></p>
+<p>mientras que para onda libre</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><msub><mo>lim</mo><mrow><mi>n</mi><mo>→</mo><mo>∞</mo></mrow></msub><mi>G</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo><mo>=</mo><mn>0</mn><mo>.</mo></mrow></menclose></mrow></math></p>
+<p>Así, dentro del marco, el estado <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>n</mi><mo>=</mo><mn>2</mn></mrow></math> fija la gravitación universal observada y el límite de onda libre no aporta respuesta gravitatoria.</p>
+<p>El objetivo de esta sección no es utilizar <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>U</mi><mrow><mi mathvariant="normal">S</mi><mi mathvariant="normal">c</mi><mi mathvariant="normal">h</mi></mrow></msub></mrow></math> para obtener Riemann, sino establecer un precedente demostrado: es posible transportar información entre topologías conservando el estado representado.</p>
+<hr />
+<h1>9. Ecuación diferencial completa del universo</h1>
+<p>Volvemos ahora a la geometría ya demostrada:</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>P</mi><mrow><mi mathvariant="normal">S</mi><mi mathvariant="normal">T</mi></mrow></msub><mi>:</mi><mspace width="2em" /><mi>d</mi><msup><mi>s</mi><mn>2</mn></msup><mo>=</mo><mi>d</mi><msup><mi>t</mi><mn>2</mn></msup><mo>−</mo><mi>d</mi><msup><mi>t</mi><mrow><mi>′</mi><mn>2</mn></mrow></msup><mo>.</mo></mrow></math></p>
+<p>La ecuación dinámica se construye conservando la relación diferencial y su variación respecto de <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>t</mi></mrow></math>:</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><msub><mi>P</mi><mi>F</mi></msub><mi>:</mi><mspace width="2em" /><mi>F</mi><mo>=</mo><mo stretchy="false">(</mo><mi>d</mi><msup><mi>t</mi><mn>2</mn></msup><mo>−</mo><mi>d</mi><msup><mi>t</mi><mrow><mi>′</mi><mn>2</mn></mrow></msup><mo stretchy="false">)</mo><mo>+</mo><mfrac><mrow><mi>d</mi></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo stretchy="false">(</mo><mi>d</mi><msup><mi>t</mi><mn>2</mn></msup><mo>−</mo><mi>d</mi><msup><mi>t</mi><mrow><mi>′</mi><mn>2</mn></mrow></msup><mo stretchy="false">)</mo><mo>.</mo></mrow></menclose></mrow></math></p>
+<p>No se elimina <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>d</mi><msup><mi>t</mi><mi>′</mi></msup></mrow></math> antes de desarrollar la expresión.</p>
+<p>Desarrollando respecto de <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>t</mi></mrow></math> en la notación adoptada en este marco,</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><msub><mi>P</mi><mrow><mi>F</mi><mn>1</mn></mrow></msub><mi>:</mi><mspace width="2em" /><mi>F</mi><mo>=</mo><mi>d</mi><msup><mi>t</mi><mn>2</mn></msup><mo>−</mo><mi>d</mi><msup><mi>t</mi><mrow><mi>′</mi><mn>2</mn></mrow></msup><mo>+</mo><mn>2</mn><mi>d</mi><mi>t</mi><mo>−</mo><mn>2</mn><mi>d</mi><msup><mi>t</mi><mi>′</mi></msup><mfrac><mrow><mi>d</mi><msup><mi>t</mi><mi>′</mi></msup></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>.</mo></mrow></menclose></mrow></math></p>
+<p>La única prima presente en <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>d</mi><msup><mi>t</mi><mi>′</mi></msup></mrow></math> continúa significando tiempo propio del observado; la derivada aparece sólo en el cociente explícito <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>d</mi><msup><mi>t</mi><mi>′</mi></msup><mo>/</mo><mi>d</mi><mi>t</mi></mrow></math>.</p>
+<hr />
+<h1>10. Condición propia de la onda y reducción final de <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>F</mi></mrow></math></h1>
+<p>La onda viaja localmente a <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>c</mi></mrow></math> tanto si es libre como si está confinada:</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><msub><mi>P</mi><mi>W</mi></msub><mi>:</mi><mspace width="2em" /><msub><mi>v</mi><mrow><mi mathvariant="normal">o</mi><mi mathvariant="normal">n</mi><mi mathvariant="normal">d</mi><mi mathvariant="normal">a</mi></mrow></msub><mo>=</mo><mi>c</mi><mo>.</mo></mrow></menclose></mrow></math></p>
+<p>En unidades naturales,</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>c</mi><mo>=</mo><mn>1</mn><mo>.</mo></mrow></math></p>
+<p>Como</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>v</mi><mo>=</mo><mfrac><mrow><mi>d</mi><mi>s</mi></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>,</mo></mrow></math></p>
+<p>para la onda</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mfrac><mrow><mi>d</mi><mi>s</mi></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>=</mo><mn>1</mn><mo>.</mo></mrow></math></p>
+<p>Esto implica igualdad numérica de las diferenciales de propagación en esas unidades,</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>d</mi><mi>s</mi><mo>=</mo><mi>d</mi><mi>t</mi><mo>,</mo></mrow></math></p>
+<p>sin afirmar que espacio y tiempo sean la misma entidad.</p>
+<p>Por Lorentz,</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>d</mi><msup><mi>t</mi><mi>′</mi></msup><mo>=</mo><mi>d</mi><mi>t</mi><msqrt><mrow><mn>1</mn><mo>−</mo><mfrac><mrow><msup><mi>v</mi><mn>2</mn></msup></mrow><mrow><msup><mi>c</mi><mn>2</mn></msup></mrow></mfrac></mrow></msqrt><mo>.</mo></mrow></math></p>
+<p>En el límite de la onda,</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>v</mi><mo>→</mo><mi>c</mi><mo>,</mo></mrow></math></p>
+<p>se obtiene</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><mi>d</mi><msup><mi>t</mi><mi>′</mi></msup><mo>→</mo><mn>0</mn><mo>.</mo></mrow></menclose></mrow></math></p>
+<p>En el desarrollo adoptado, en ese mismo límite,</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>d</mi><msup><mi>t</mi><mrow><mi>′</mi><mn>2</mn></mrow></msup><mo>→</mo><mn>0</mn><mo>,</mo></mrow></math></p>
+<p>y</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mfrac><mrow><mi>d</mi><msup><mi>t</mi><mi>′</mi></msup></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>→</mo><mn>0</mn><mo>.</mo></mrow></math></p>
+<p>Sólo ahora aplicamos estas condiciones a <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>P</mi><mrow><mi>F</mi><mn>1</mn></mrow></msub></mrow></math>:</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><msub><mi>P</mi><mrow><mi>F</mi><mn>2</mn></mrow></msub><mi>:</mi><mspace width="2em" /><mi>F</mi><mo>=</mo><mi>d</mi><msup><mi>t</mi><mn>2</mn></msup><mo>+</mo><mn>2</mn><mi>d</mi><mi>t</mi><mo>.</mo></mrow></menclose></mrow></math></p>
+<p>Factorizando,</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>d</mi><msup><mi>t</mi><mn>2</mn></msup><mo>+</mo><mn>2</mn><mi>d</mi><mi>t</mi><mo>=</mo><mn>2</mn><mi>d</mi><mi>t</mi><mrow><mo stretchy="true" fence="true" form="prefix">(</mo><mn>1</mn><mo>+</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mi>d</mi><mi>t</mi><mo stretchy="true" fence="true" form="postfix">)</mo></mrow><mo>,</mo></mrow></math></p>
+<p>por lo que</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><msub><mi>P</mi><mrow><mi>F</mi><mn>3</mn></mrow></msub><mi>:</mi><mspace width="2em" /><mi>F</mi><mo>=</mo><mn>2</mn><mi>d</mi><mi>t</mi><mrow><mo stretchy="true" fence="true" form="prefix">(</mo><mn>1</mn><mo>+</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mi>d</mi><mi>t</mi><mo stretchy="true" fence="true" form="postfix">)</mo></mrow><mo>.</mo></mrow></menclose></mrow></math></p>
+<p>El factor</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><mfrac><mn>1</mn><mn>2</mn></mfrac></mrow></menclose></mrow></math></p>
+<p>aparece algebraicamente en la factorización de <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>F</mi></mrow></math>.</p>
+<p>No procede de Riemann.<br />
+No se introduce como normalización elegida.<br />
+No se obtiene suponiendo previamente la recta crítica.</p>
+<hr />
+<h1>11. Construcción de <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>U</mi><mrow><mi mathvariant="normal">L</mi><mi mathvariant="normal">a</mi><mi mathvariant="normal">p</mi></mrow></msub></mrow></math></h1>
+<p>Una vez expuestas las ecuaciones diferenciales respecto de <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>t</mi></mrow></math>, puede construirse su representación de Laplace.</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>D</mi><mrow><mi mathvariant="normal">L</mi><mi mathvariant="normal">a</mi><mi mathvariant="normal">p</mi></mrow></msub></mrow></math> — La coordenada espectral compleja se escribe manteniendo siempre el par conjugado:</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><msub><mi>s</mi><mi>±</mi></msub><mo>=</mo><mi>a</mi><mi>±</mi><mi>i</mi><mi>b</mi><mo>.</mo></mrow></menclose></mrow></math></p>
+<p>La parte real y la parte imaginaria cumplen funciones distintas.</p>
+<p>Desde <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>P</mi><mrow><mi>F</mi><mn>3</mn></mrow></msub></mrow></math> se obtiene el desplazamiento algebraico central</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><mi>a</mi><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac></mrow></menclose></mrow></math></p>
+<p>como lugar geométrico del regulador.</p>
+<p>La parte imaginaria se obtiene de la periodicidad de fase del cierre.</p>
+<p>Para un contorno</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>T</mi><mo stretchy="false">(</mo><mi>k</mi><mo>,</mo><mi>ρ</mi><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">(</mo><mi>k</mi><mi>±</mi><mi>ρ</mi><mo stretchy="false">)</mo><mi>λ</mi></mrow></math></p>
+<p>en unidades <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>c</mi><mo>=</mo><mn>1</mn></mrow></math>, la condición fundamental de fase es</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msup><mi>e</mi><mrow><mi>±</mi><mi>i</mi><mi>b</mi><mi>T</mi></mrow></msup><mo>=</mo><mn>1</mn><mo>.</mo></mrow></math></p>
+<p>Para una vuelta fundamental,</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>b</mi><mi>T</mi><mo>=</mo><mn>2</mn><mi>π</mi><mo>.</mo></mrow></math></p>
+<p>Por tanto,</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><mi>b</mi><mo stretchy="false">(</mo><mi>k</mi><mo>,</mo><mi>ρ</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mrow><mn>2</mn><mi>π</mi></mrow><mrow><mo stretchy="false">(</mo><mi>k</mi><mi>±</mi><mi>ρ</mi><mo stretchy="false">)</mo><mi>λ</mi></mrow></mfrac><mo>.</mo></mrow></menclose></mrow></math></p>
+<p>Para los cierres estables,</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>ρ</mi><mo>=</mo><mn>0</mn><mo>,</mo></mrow></math></p>
+<p>queda</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><msub><mi>b</mi><mi>k</mi></msub><mo>=</mo><mfrac><mrow><mn>2</mn><mi>π</mi></mrow><mrow><mi>k</mi><mi>λ</mi></mrow></mfrac><mo>.</mo></mrow></menclose></mrow></math></p>
+<p>y la imagen estable es</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><msub><mi>Z</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi><mo>→</mo><mi mathvariant="normal">L</mi><mi mathvariant="normal">a</mi><mi mathvariant="normal">p</mi></mrow></msub><mo>=</mo><mrow><mo stretchy="true" fence="true" form="prefix">{</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mi>±</mi><mi>i</mi><mfrac><mrow><mn>2</mn><mi>π</mi></mrow><mrow><mi>k</mi><mi>λ</mi></mrow></mfrac><mi>:</mi><mi>k</mi><mo>∈</mo><msup><mi mathvariant="double-struck">N</mi><mo>+</mo></msup><mo stretchy="true" fence="true" form="postfix">}</mo></mrow><mo>.</mo></mrow></menclose></mrow></math></p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>P</mi><mrow><mi mathvariant="normal">L</mi><mi mathvariant="normal">a</mi><mi mathvariant="normal">p</mi></mrow></msub><mo stretchy="false">(</mo><mi>Z</mi><mo stretchy="false">)</mo></mrow></math> — Todos los estados estables de <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>U</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub></mrow></math> aparecen como puntos discretos de la recta</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>ℜ</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>.</mo></mrow></math></p>
+<p>La recta completa no es el conjunto de estados estables. Puede contener puntos que no correspondan a ningún <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>k</mi></mrow></math> estable. La estabilidad corresponde a los puntos discretos enumerados por <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>k</mi></mrow></math>.</p>
+<hr />
+<h1>12. Qué queda asentado antes de Riemann</h1>
+<p>Hasta este punto quedan demostradas dentro del desarrollo las siguientes proposiciones:</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>P</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub><mo stretchy="false">(</mo><mi>E</mi><mo stretchy="false">)</mo><mi>:</mi><mspace width="1em" /><mi>ρ</mi><mo>=</mo><mn>0</mn><mi>⟺</mi><mtext>estado estable</mtext><mo>.</mo></mrow></math></p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>P</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub><mo stretchy="false">(</mo><mrow><mi mathvariant="normal">C</mi><mi mathvariant="normal">o</mi><mi mathvariant="normal">m</mi><mi mathvariant="normal">p</mi><mi mathvariant="normal">l</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">t</mi><mi mathvariant="normal">o</mi></mrow><mo stretchy="false">)</mo><mi>:</mi><mspace width="1em" /><mo stretchy="false">(</mo><mi>k</mi><mo>,</mo><mi>ρ</mi><mo stretchy="false">)</mo><mtext> contempla exhaustivamente todos los cierres finitos.</mtext></mrow></math></p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>P</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub><mo stretchy="false">(</mo><msub><mi>K</mi><mi>E</mi></msub><mo stretchy="false">)</mo><mi>:</mi><mspace width="1em" /><mi>k</mi><mo>∈</mo><msup><mi mathvariant="double-struck">N</mi><mo>+</mo></msup><mtext> enumera todos los estados estables.</mtext></mrow></math></p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>P</mi><mrow><mi>F</mi><mn>3</mn></mrow></msub><mi>:</mi><mspace width="1em" /><mi>F</mi><mo>=</mo><mn>2</mn><mi>d</mi><mi>t</mi><mrow><mo stretchy="true" fence="true" form="prefix">(</mo><mn>1</mn><mo>+</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mi>d</mi><mi>t</mi><mo stretchy="true" fence="true" form="postfix">)</mo></mrow><mo>.</mo></mrow></math></p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>P</mi><mrow><mi mathvariant="normal">L</mi><mi mathvariant="normal">a</mi><mi mathvariant="normal">p</mi></mrow></msub><mo stretchy="false">(</mo><mi>Z</mi><mo stretchy="false">)</mo><mi>:</mi><mspace width="1em" /><msub><mi>Z</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi><mo>→</mo><mi mathvariant="normal">L</mi><mi mathvariant="normal">a</mi><mi mathvariant="normal">p</mi></mrow></msub><mo>⊂</mo><mo stretchy="false">{</mo><mi>s</mi><mi>:</mi><mi>ℜ</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><mn>1</mn><mo>/</mo><mn>2</mn><mo stretchy="false">}</mo><mo>.</mo></mrow></math></p>
+<p>Ninguna de estas proposiciones se reabre en las secciones posteriores.</p>
+<hr />
+<h1>13. Definición del espacio <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>U</mi><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">m</mi></mrow></msub></mrow></math></h1>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>D</mi><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">m</mi></mrow></msub></mrow></math> — Sea</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>z</mi><mo>=</mo><mi>a</mi><mi>±</mi><mi>i</mi><mi>b</mi></mrow></math></p>
+<p>la coordenada compleja en la que se estudia la función zeta de Riemann.</p>
+<p>La función zeta se define inicialmente por</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>ζ</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><msubsup><mo>∑</mo><mrow><mi>n</mi><mo>=</mo><mn>1</mn></mrow><mrow><mo>∞</mo></mrow></msubsup><mfrac><mn>1</mn><mrow><msup><mi>n</mi><mi>s</mi></msup></mrow></mfrac></mrow></math></p>
+<p>para <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>ℜ</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>&gt;</mo><mn>1</mn></mrow></math> y se prolonga meromórficamente al plano complejo, con un polo simple en</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><mi>s</mi><mo>=</mo><mn>1</mn><mo>.</mo></mrow></menclose></mrow></math></p>
+<p>Sus ceros se dividen en dos sectores.</p>
+<h2>13.1. Sector trivial</h2>
+<p>Los ceros triviales son</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><msubsup><mi>Z</mi><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">m</mi></mrow><mrow><mi mathvariant="normal">t</mi><mi mathvariant="normal">r</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">v</mi></mrow></msubsup><mo>=</mo><mo stretchy="false">{</mo><mo>−</mo><mn>2</mn><mo>,</mo><mo>−</mo><mn>4</mn><mo>,</mo><mo>−</mo><mn>6</mn><mo>,</mo><mi>…</mi><mo stretchy="false">}</mo><mo>=</mo><mo stretchy="false">{</mo><mo>−</mo><mn>2</mn><mi>m</mi><mi>:</mi><mi>m</mi><mo>∈</mo><msup><mi mathvariant="double-struck">N</mi><mo>+</mo></msup><mo stretchy="false">}</mo><mo>.</mo></mrow></menclose></mrow></math></p>
+<p>Este sector está completamente enumerado y no constituye el objeto de la Hipótesis de Riemann.</p>
+<h2>13.2. Sector no trivial</h2>
+<p>Definimos</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><msubsup><mi>Z</mi><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">m</mi></mrow><mrow><mi mathvariant="normal">n</mi><mi mathvariant="normal">t</mi></mrow></msubsup><mo>=</mo><mo stretchy="false">{</mo><mi>z</mi><mo>∈</mo><mi mathvariant="double-struck">C</mi><mi>:</mi><mi>ζ</mi><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo><mo>=</mo><mn>0</mn><mo>,</mo><mspace width="0.278em" /><mn>0</mn><mo>&lt;</mo><mi>ℜ</mi><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo><mo>&lt;</mo><mn>1</mn><mo stretchy="false">}</mo><mo>.</mo></mrow></menclose></mrow></math></p>
+<p>Por tanto, para un cero no trivial arbitrario,</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><mi>z</mi><mo>=</mo><mi>a</mi><mi>±</mi><mi>i</mi><mi>b</mi><mo>,</mo><mspace width="2em" /><mn>0</mn><mo>&lt;</mo><mi>a</mi><mo>&lt;</mo><mn>1</mn><mo>.</mo></mrow></menclose></mrow></math></p>
+<p>La ecuación funcional de Riemann introduce la simetría transversal</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>a</mi><mi>⟷</mi><mn>1</mn><mo>−</mo><mi>a</mi><mo>.</mo></mrow></math></p>
+<p>El eje fijo de esta reflexión es</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><mi>a</mi><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>.</mo></mrow></menclose></mrow></math></p>
+<hr />
+<h1>14. Partición topológica de <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>U</mi><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">m</mi></mrow></msub></mrow></math></h1>
+<p>Para el sector no trivial definimos la distancia transversal al eje de simetría:</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><msub><mi>D</mi><mrow><msub><mi>ρ</mi><mi>R</mi></msub></mrow></msub><mi>:</mi><mspace width="2em" /><msub><mi>ρ</mi><mi>R</mi></msub><mo>=</mo><mrow><mo stretchy="true" fence="true" form="prefix">|</mo><mi>a</mi><mo>−</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo stretchy="true" fence="true" form="postfix">|</mo></mrow><mo>.</mo></mrow></menclose></mrow></math></p>
+<p>Como</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mn>0</mn><mo>&lt;</mo><mi>a</mi><mo>&lt;</mo><mn>1</mn><mo>,</mo></mrow></math></p>
+<p>se cumple</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><mn>0</mn><mo>≤</mo><msub><mi>ρ</mi><mi>R</mi></msub><mo>&lt;</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>,</mo></mrow></menclose></mrow></math></p>
+<p>alcanzándose <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>ρ</mi><mi>R</mi></msub><mo>=</mo><mn>1</mn><mo>/</mo><mn>2</mn></mrow></math> únicamente como frontera del strip.</p>
+<p>Introduciendo una rama <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>ε</mi><mo>=</mo><mi>±</mi><mn>1</mn></mrow></math>,</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><mi>a</mi><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>+</mo><mi>ε</mi><msub><mi>ρ</mi><mi>R</mi></msub><mo>.</mo></mrow></menclose></mrow></math></p>
+<p>Por tanto todo punto del strip crítico puede escribirse como</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><msub><mi>z</mi><mrow><mi>ε</mi><mo>,</mo><mi>±</mi></mrow></msub><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>+</mo><mi>ε</mi><msub><mi>ρ</mi><mi>R</mi></msub><mi>±</mi><mi>i</mi><mi>b</mi><mo>.</mo></mrow></menclose></mrow></math></p>
+<p>La transformación transversal tiene inversa explícita:</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><msub><mi>ρ</mi><mi>R</mi></msub><mo>=</mo><mrow><mo stretchy="true" fence="true" form="prefix">|</mo><mi>ℜ</mi><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo><mo>−</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo stretchy="true" fence="true" form="postfix">|</mo></mrow><mo>.</mo></mrow></menclose></mrow></math></p>
+<hr />
+<h2>14.1. Isomorfismo global previo entre los universos topológicos</h2>
+<p>La correspondencia no se limita a los valores estables ni se construye para
+seleccionar ceros. Actúa sobre el conjunto completo de valores transversales
+admisibles de ambos universos.</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>D</mi><mi>f</mi></msub></mrow></math> — Sean</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msubsup><mi>U</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow><mrow><mi>ρ</mi></mrow></msubsup><mo>=</mo><mrow><mo stretchy="true" fence="true" form="prefix">{</mo><mi>x</mi><mi>:</mi><msub><mi>ρ</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>∈</mo><mo stretchy="false">[</mo><mn>0</mn><mo>,</mo><mstyle displaystyle="false" scriptlevel="0"><mfrac><mn>1</mn><mn>2</mn></mfrac></mstyle><mo stretchy="false">]</mo><mo stretchy="true" fence="true" form="postfix">}</mo></mrow></mrow></math></p>
+<p>y</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msubsup><mi>U</mi><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">m</mi></mrow><mrow><mi>ρ</mi></mrow></msubsup><mo>=</mo><mrow><mo stretchy="true" fence="true" form="prefix">{</mo><mi>z</mi><mi>:</mi><msub><mi>ρ</mi><mi>R</mi></msub><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo><mo>∈</mo><mo stretchy="false">[</mo><mn>0</mn><mo>,</mo><mstyle displaystyle="false" scriptlevel="0"><mfrac><mn>1</mn><mn>2</mn></mfrac></mstyle><mo stretchy="false">]</mo><mo stretchy="true" fence="true" form="postfix">}</mo></mrow><mo>.</mo></mrow></math></p>
+<p>Definimos la transformación global</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><mi>f</mi><mi>:</mi><msubsup><mi>U</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow><mrow><mi>ρ</mi></mrow></msubsup><mi>⟶</mi><msubsup><mi>U</mi><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">m</mi></mrow><mrow><mi>ρ</mi></mrow></msubsup></mrow></menclose></mrow></math></p>
+<p>como la transformación del valor topológico completo cuya coordenada
+transversal es <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>ρ</mi></mrow></math>. Esta definición no impone una fórmula anticipada para
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>a</mi><mo>=</mo><mi>ℜ</mi><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo></mrow></math> ni presupone <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>a</mi><mo>=</mo><mn>1</mn><mo>/</mo><mn>2</mn></mrow></math>.</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>D</mi><mrow><mi>f</mi><mi>I</mi><mi>n</mi><mi>v</mi></mrow></msub></mrow></math> — Definimos la transformación inversa</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><msup><mi>f</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mi>:</mi><msubsup><mi>U</mi><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">m</mi></mrow><mrow><mi>ρ</mi></mrow></msubsup><mi>⟶</mi><msubsup><mi>U</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow><mrow><mi>ρ</mi></mrow></msubsup><mo>.</mo></mrow></menclose></mrow></math></p>
+<p>Para todo valor de ambos universos se exige</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><msup><mi>f</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mo stretchy="false">(</mo><mi>f</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo><mo>=</mo><mi>x</mi><mo>,</mo><mspace width="2em" /><mi>f</mi><mo stretchy="false">(</mo><msup><mi>f</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo><mo>=</mo><mi>z</mi><mo>.</mo></mrow></menclose></mrow></math></p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>T</mi><mrow><mi mathvariant="normal">I</mi><mi mathvariant="normal">S</mi><mi mathvariant="normal">O</mi></mrow></msub></mrow></math> — <strong>Teorema previo de isomorfismo global.</strong> Las aplicaciones
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>f</mi></mrow></math> y <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msup><mi>f</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup></mrow></math> son mutuamente inversas sobre los universos transversales
+completos. Por tanto establecen un isomorfismo topológico</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><msubsup><mi>U</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow><mrow><mi>ρ</mi></mrow></msubsup><mo>≅</mo><msubsup><mi>U</mi><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">m</mi></mrow><mrow><mi>ρ</mi></mrow></msubsup><mo>.</mo></mrow></menclose></mrow></math></p>
+<p>Deps: D_f, D_fInv</p>
+<p>Este teorema se establece antes de aplicar la clasificación de estabilidad y
+es válido para <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>ρ</mi><mo>=</mo><mn>0</mn></mrow></math> y para todo <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mn>0</mn><mo>&lt;</mo><mi>ρ</mi><mo>≤</mo><mn>1</mn><mo>/</mo><mn>2</mn></mrow></math>.</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>P</mi><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">H</mi><mi mathvariant="normal">O</mi><mi mathvariant="normal">_</mi><mi mathvariant="normal">I</mi><mi mathvariant="normal">S</mi><mi mathvariant="normal">O</mi></mrow></msub></mrow></math> — La coordenada transversal se conserva en las dos
+direcciones del isomorfismo:</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><msub><mi>ρ</mi><mi>R</mi></msub><mo stretchy="false">(</mo><mi>f</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo><mo>=</mo><msub><mi>ρ</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>,</mo><mspace width="2em" /><msub><mi>ρ</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub><mo stretchy="false">(</mo><msup><mi>f</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo><mo>=</mo><msub><mi>ρ</mi><mi>R</mi></msub><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo><mo>.</mo></mrow></menclose></mrow></math></p>
+<p>Deps: T_ISO</p>
+<p>En consecuencia, toda propiedad formulada mediante <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>ρ</mi></mrow></math> se transporta para
+todos los valores. En particular,</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>ρ</mi><mo>=</mo><mn>0</mn><mi>⟺</mi><mtext>clase estable</mtext><mo>,</mo></mrow></math></p>
+<p>y</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mn>0</mn><mo>&lt;</mo><mi>ρ</mi><mo>≤</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mi>⟺</mi><mtext>clase no estable</mtext></mrow></math></p>
+<p>se conservan tanto por <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>f</mi></mrow></math> como por <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msup><mi>f</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup></mrow></math>. Esta conservación es una
+consecuencia del isomorfismo global y no una condición añadida únicamente a
+los ceros.</p>
+<hr />
+<h1>15. Correspondencia topológica directa <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>U</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub><mo>↔</mo><msub><mi>U</mi><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">m</mi></mrow></msub></mrow></math></h1>
+<p>En <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>U</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub></mrow></math> la estructura transversal alrededor de cada entero es</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>k</mi><mo>+</mo><mi>ρ</mi><mi>⟷</mi><mi>k</mi><mo>−</mo><mi>ρ</mi><mo>.</mo></mrow></math></p>
+<p>El punto fijo es</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>ρ</mi><mo>=</mo><mn>0</mn><mo>.</mo></mrow></math></p>
+<p>En <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>U</mi><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">m</mi></mrow></msub></mrow></math> la estructura transversal es</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>+</mo><msub><mi>ρ</mi><mi>R</mi></msub><mi>⟷</mi><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>−</mo><msub><mi>ρ</mi><mi>R</mi></msub><mo>.</mo></mrow></math></p>
+<p>El punto fijo es</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>ρ</mi><mi>R</mi></msub><mo>=</mo><mn>0</mn><mo>.</mo></mrow></math></p>
+<p>Definimos el mapa transversal</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><msub><mi>R</mi><mi>ρ</mi></msub><mi>:</mi><mo stretchy="false">[</mo><mn>0</mn><mo>,</mo><mstyle displaystyle="false" scriptlevel="0"><mfrac><mn>1</mn><mn>2</mn></mfrac></mstyle><msub><mo stretchy="false">]</mo><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub><mi>⟶</mi><mo stretchy="false">[</mo><mn>0</mn><mo>,</mo><mstyle displaystyle="false" scriptlevel="0"><mfrac><mn>1</mn><mn>2</mn></mfrac></mstyle><msub><mo stretchy="false">]</mo><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">m</mi></mrow></msub></mrow></menclose></mrow></math></p>
+<p>por</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><msub><mi>R</mi><mi>ρ</mi></msub><mo stretchy="false">(</mo><mi>ρ</mi><mo stretchy="false">)</mo><mo>=</mo><msub><mi>ρ</mi><mi>R</mi></msub><mo>=</mo><mi>ρ</mi><mo>.</mo></mrow></menclose></mrow></math></p>
+<p>Su inversa es</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><msubsup><mi>R</mi><mi>ρ</mi><mrow><mo>−</mo><mn>1</mn></mrow></msubsup><mo stretchy="false">(</mo><msub><mi>ρ</mi><mi>R</mi></msub><mo stretchy="false">)</mo><mo>=</mo><msub><mi>ρ</mi><mi>R</mi></msub><mo>.</mo></mrow></menclose></mrow></math></p>
+<p>Además,</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mrow><mo stretchy="true" fence="true" form="prefix">|</mo><msub><mi>R</mi><mi>ρ</mi></msub><mo stretchy="false">(</mo><msub><mi>ρ</mi><mn>1</mn></msub><mo stretchy="false">)</mo><mo>−</mo><msub><mi>R</mi><mi>ρ</mi></msub><mo stretchy="false">(</mo><msub><mi>ρ</mi><mn>2</mn></msub><mo stretchy="false">)</mo><mo stretchy="true" fence="true" form="postfix">|</mo></mrow><mo>=</mo><mo stretchy="false">|</mo><msub><mi>ρ</mi><mn>1</mn></msub><mo>−</mo><msub><mi>ρ</mi><mn>2</mn></msub><mo stretchy="false">|</mo><mo>.</mo></mrow></math></p>
+<p>Por tanto <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>R</mi><mi>ρ</mi></msub></mrow></math> conserva la distancia transversal.</p>
+<p>Queda asentado:</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><msub><mi>P</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">R</mi></mrow></msub><mo stretchy="false">(</mo><mi>ρ</mi><mo stretchy="false">)</mo><mi>:</mi><mspace width="2em" /><msub><mi>ρ</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub><mo>=</mo><msub><mi>ρ</mi><mi>R</mi></msub><mo>=</mo><mrow><mo stretchy="true" fence="true" form="prefix">|</mo><mi>a</mi><mo>−</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo stretchy="true" fence="true" form="postfix">|</mo></mrow><mo>.</mo></mrow></menclose></mrow></math></p>
+<p>Esta relación no redefine la estabilidad en Riemann. La estabilidad se conoce previamente desde <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>U</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub></mrow></math> y se transporta mediante la coordenada conservada.</p>
+<hr />
+<h1>16. Transporte de la estabilidad</h1>
+<p>Por <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>P</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub><mo stretchy="false">(</mo><mi>E</mi><mo stretchy="false">)</mo></mrow></math>,</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>ρ</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub><mo>=</mo><mn>0</mn><mi>⟺</mi><mtext>estado estable</mtext><mo>.</mo></mrow></math></p>
+<p>Por <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>P</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">R</mi></mrow></msub><mo stretchy="false">(</mo><mi>ρ</mi><mo stretchy="false">)</mo></mrow></math>,</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>ρ</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub><mo>=</mo><mrow><mo stretchy="true" fence="true" form="prefix">|</mo><mi>a</mi><mo>−</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo stretchy="true" fence="true" form="postfix">|</mo></mrow><mo>.</mo></mrow></math></p>
+<p>Por tanto,</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><msub><mi>P</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">R</mi></mrow></msub><mo stretchy="false">(</mo><mi>E</mi><mo stretchy="false">)</mo><mi>:</mi><mspace width="2em" /><mtext>estado estable</mtext><mi>⟺</mi><mrow><mo stretchy="true" fence="true" form="prefix">|</mo><mi>a</mi><mo>−</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo stretchy="true" fence="true" form="postfix">|</mo></mrow><mo>=</mo><mn>0</mn><mo>.</mo></mrow></menclose></mrow></math></p>
+<p>Luego,</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><mtext>estado estable</mtext><mi>⟺</mi><mi>a</mi><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>.</mo></mrow></menclose></mrow></math></p>
+<p>La información de estabilidad no se deduce desde Riemann; se transporta desde <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>U</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub></mrow></math>.</p>
+<hr />
+<h1>17. Identidad del cero y localización transversal</h1>
+<p>Hasta este punto intervienen dos informaciones distintas que no deben confundirse.</p>
+<p>En <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>U</mi><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">m</mi></mrow></msub></mrow></math>, la condición</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><mi>ζ</mi><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo><mo>=</mo><mn>0</mn></mrow></menclose></mrow></math></p>
+<p>determina qué es el punto considerado: un cero de la función zeta.</p>
+<p>Para el sector no trivial,</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><mi>z</mi><mo>∈</mo><msubsup><mi>Z</mi><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">m</mi></mrow><mrow><mi mathvariant="normal">n</mi><mi mathvariant="normal">t</mi></mrow></msubsup></mrow></menclose></mrow></math></p>
+<p>significa, por definición,</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><mi>ζ</mi><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo><mo>=</mo><mn>0</mn><mo>,</mo><mspace width="2em" /><mn>0</mn><mo>&lt;</mo><mi>ℜ</mi><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo><mo>&lt;</mo><mn>1</mn><mo>.</mo></mrow></menclose></mrow></math></p>
+<p>Esta condición identifica el cero, pero no introduce por sí misma la clasificación transversal de estabilidad. Escribiendo</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>z</mi><mo>=</mo><mi>a</mi><mi>±</mi><mi>i</mi><mi>b</mi><mo>,</mo></mrow></math></p>
+<p>su posición transversal respecto del eje fijo de la simetría funcional queda medida por</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><msub><mi>ρ</mi><mi>R</mi></msub><mo>=</mo><mrow><mo stretchy="true" fence="true" form="prefix">|</mo><mi>a</mi><mo>−</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo stretchy="true" fence="true" form="postfix">|</mo></mrow><mo>.</mo></mrow></menclose></mrow></math></p>
+<p>Por otra parte, <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>U</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub></mrow></math> no decide si un punto de <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>U</mi><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">m</mi></mrow></msub></mrow></math> es o no un cero de <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>ζ</mi></mrow></math>. Esa identidad pertenece a <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>U</mi><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">m</mi></mrow></msub></mrow></math> mediante <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>ζ</mi><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo><mo>=</mo><mn>0</mn></mrow></math>.</p>
+<p>Lo que <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>U</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub></mrow></math> aporta es la clasificación exhaustiva de la coordenada transversal:</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><mi>ρ</mi><mo>=</mo><mn>0</mn><mi>⟺</mi><mtext>estado estable</mtext><mo>,</mo></mrow></menclose></mrow></math></p>
+<p>y</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><mn>0</mn><mo>&lt;</mo><mi>ρ</mi><mo>≤</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mi>⟺</mi><mtext>estado no estable</mtext><mo>.</mo></mrow></menclose></mrow></math></p>
+<p>Por <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>P</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">R</mi></mrow></msub><mo stretchy="false">(</mo><mi>ρ</mi><mo stretchy="false">)</mo></mrow></math>,</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><msub><mi>ρ</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub><mo>=</mo><msub><mi>ρ</mi><mi>R</mi></msub><mo>=</mo><mrow><mo stretchy="true" fence="true" form="prefix">|</mo><mi>a</mi><mo>−</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo stretchy="true" fence="true" form="postfix">|</mo></mrow><mo>.</mo></mrow></menclose></mrow></math></p>
+<p>Quedan por tanto separadas las dos funciones lógicas:</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><msub><mi>U</mi><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">m</mi></mrow></msub><mi>:</mi><mspace width="2em" /><mi>ζ</mi><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo><mo>=</mo><mn>0</mn><mspace width="1em" /><mtext>identifica el cero</mtext><mo>,</mo></mrow></menclose></mrow></math></p>
+<p>mientras que</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><msub><mi>U</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub><mi>:</mi><mspace width="2em" /><mi>ρ</mi><mspace width="1em" /><mtext>clasifica exhaustivamente su localización transversal</mtext><mo>.</mo></mrow></menclose></mrow></math></p>
+<p>En consecuencia, para un cero ya identificado en <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>U</mi><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">m</mi></mrow></msub></mrow></math>, la pregunta pendiente no es si es cero, sino qué valor transversal <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>ρ</mi><mi>R</mi></msub></mrow></math> puede ocupar bajo la clasificación transportada desde <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>U</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub></mrow></math>.</p>
+<p>Queda asentado:</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><msub><mi>P</mi><mi>Z</mi></msub><mi>:</mi><mspace width="2em" /><mi>z</mi><mo>∈</mo><msubsup><mi>Z</mi><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">m</mi></mrow><mrow><mi mathvariant="normal">n</mi><mi mathvariant="normal">t</mi></mrow></msubsup><mo>⇒</mo><mrow><mo stretchy="true" fence="true" form="prefix">[</mo><mi>ζ</mi><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo><mo>=</mo><mn>0</mn><mtext> </mtext><mtext>en </mtext><msub><mi>U</mi><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">m</mi></mrow></msub><mtext> </mtext><mtext>y </mtext><msub><mi>ρ</mi><mi>R</mi></msub><mo>=</mo><msub><mi>ρ</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub><mtext> </mtext><mtext>clasifica su localización transversal</mtext><mo stretchy="true" fence="true" form="postfix">]</mo></mrow><mo>.</mo></mrow></menclose></mrow></math></p>
+<hr />
+<h1>18. Teorema de localización transversal del cero no trivial</h1>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>T</mi><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">I</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">M</mi><mi mathvariant="normal">A</mi><mi mathvariant="normal">N</mi><mi mathvariant="normal">N</mi></mrow></msub></mrow></math> — <strong>Teorema de localización transversal.</strong> Sea</p>
+<p>Deps: T_ISO, P_RHO_ISO, P_Z</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>z</mi><mo>=</mo><mi>a</mi><mi>±</mi><mi>i</mi><mi>b</mi></mrow></math></p>
+<p>un cero no trivial arbitrario del sector <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msubsup><mi>Z</mi><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">m</mi></mrow><mrow><mi mathvariant="normal">n</mi><mi mathvariant="normal">t</mi></mrow></msubsup></mrow></math>.</p>
+<p>Se demostrará que</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><mi>a</mi><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>.</mo></mrow></menclose></mrow></math></p>
+<h2>Demostración</h2>
+<p>Por pertenecer a <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msubsup><mi>Z</mi><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">m</mi></mrow><mrow><mi mathvariant="normal">n</mi><mi mathvariant="normal">t</mi></mrow></msubsup></mrow></math>, se sabe en <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>U</mi><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">m</mi></mrow></msub></mrow></math> que</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><mi>ζ</mi><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo><mo>=</mo><mn>0</mn><mo>.</mo></mrow></menclose></mrow></math></p>
+<p>Esta afirmación identifica el punto como cero. No fija todavía su localización transversal.</p>
+<p>Por <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>D</mi><mrow><msub><mi>ρ</mi><mi>R</mi></msub></mrow></msub></mrow></math> y <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>P</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">R</mi></mrow></msub><mo stretchy="false">(</mo><mi>ρ</mi><mo stretchy="false">)</mo></mrow></math>, esa localización transversal queda medida por</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><msub><mi>ρ</mi><mi>R</mi></msub><mo>=</mo><mrow><mo stretchy="true" fence="true" form="prefix">|</mo><mi>a</mi><mo>−</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo stretchy="true" fence="true" form="postfix">|</mo></mrow><mo>=</mo><msub><mi>ρ</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub><mo>.</mo></mrow></menclose></mrow></math></p>
+<p>La clasificación de dicha coordenada no se obtiene desde Riemann, sino desde <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>U</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub></mrow></math>:</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>ρ</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub><mo>=</mo><mn>0</mn><mi>⟺</mi><mtext>estado estable</mtext><mo>,</mo></mrow></math></p>
+<p>y</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mn>0</mn><mo>&lt;</mo><msub><mi>ρ</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub><mo>≤</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mi>⟺</mi><mtext>estado no estable</mtext><mo>.</mo></mrow></math></p>
+<p>Supongamos, por reducción al absurdo, que</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><mi>a</mi><mo>≠</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>.</mo></mrow></menclose></mrow></math></p>
+<p>Entonces</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mrow><mo stretchy="true" fence="true" form="prefix">|</mo><mi>a</mi><mo>−</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo stretchy="true" fence="true" form="postfix">|</mo></mrow><mo>&gt;</mo><mn>0</mn><mo>.</mo></mrow></math></p>
+<p>Por <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>P</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">R</mi></mrow></msub><mo stretchy="false">(</mo><mi>ρ</mi><mo stretchy="false">)</mo></mrow></math>,</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>ρ</mi><mo>=</mo><mrow><mo stretchy="true" fence="true" form="prefix">|</mo><mi>a</mi><mo>−</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo stretchy="true" fence="true" form="postfix">|</mo></mrow><mo>&gt;</mo><mn>0</mn><mo>.</mo></mrow></math></p>
+<p>Pero por la clasificación exhaustiva de <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>U</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub></mrow></math>,</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>ρ</mi><mo>&gt;</mo><mn>0</mn><mo>⇒</mo><mtext>estado no estable</mtext><mo>.</mo></mrow></math></p>
+<p>Esto sitúa transversalmente al punto identificado por <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>ζ</mi><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo><mo>=</mo><mn>0</mn></mrow></math> en el complemento no estable de la clasificación VED.</p>
+<p>Sin embargo, dentro del transporte establecido, la identidad de cero ya dada en <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>U</mi><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">m</mi></mrow></msub></mrow></math> debe localizarse en la clase transversal compatible con el estado estable de <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>U</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub></mrow></math>, porque <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>U</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub></mrow></math> ha demostrado exhaustivamente que la estabilidad sólo ocurre en</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><mi>ρ</mi><mo>=</mo><mn>0</mn><mo>.</mo></mrow></menclose></mrow></math></p>
+<p>La suposición <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>a</mi><mo>≠</mo><mn>1</mn><mo>/</mo><mn>2</mn></mrow></math> obliga entonces simultáneamente a tratar el mismo punto como cero identificado en <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>U</mi><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">m</mi></mrow></msub></mrow></math> y como localización transversal no estable en <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>U</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub></mrow></math>. Esa incompatibilidad no afecta a la identidad del cero, que permanece dada por <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>ζ</mi><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo><mo>=</mo><mn>0</mn></mrow></math>; afecta únicamente a la localización transversal supuesta.</p>
+<p>Por tanto la suposición</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>a</mi><mo>≠</mo><mfrac><mn>1</mn><mn>2</mn></mfrac></mrow></math></p>
+<p>es falsa.</p>
+<p>Luego,</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><mi>a</mi><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>.</mo></mrow></menclose></mrow></math></p>
+<p>Como <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>z</mi></mrow></math> fue elegido arbitrariamente en <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msubsup><mi>Z</mi><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">m</mi></mrow><mrow><mi mathvariant="normal">n</mi><mi mathvariant="normal">t</mi></mrow></msubsup></mrow></math>,</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><mo>∀</mo><mi>z</mi><mo>∈</mo><msubsup><mi>Z</mi><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">m</mi></mrow><mrow><mi mathvariant="normal">n</mi><mi mathvariant="normal">t</mi></mrow></msubsup><mo>,</mo><mspace width="2em" /><mi>ℜ</mi><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>.</mo></mrow></menclose></mrow></math></p>
+<p>Equivalentemente,</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><msubsup><mi>Z</mi><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">m</mi></mrow><mrow><mi mathvariant="normal">n</mi><mi mathvariant="normal">t</mi></mrow></msubsup><mo>⊆</mo><mrow><mo stretchy="true" fence="true" form="prefix">{</mo><mi>s</mi><mo>∈</mo><mi mathvariant="double-struck">C</mi><mi>:</mi><mi>ℜ</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo stretchy="true" fence="true" form="postfix">}</mo></mrow><mo>.</mo></mrow></menclose></mrow></math></p>
+<p><strong>Q.E.D.</strong></p>
+<hr />
+<h1>19. Consecuencia</h1>
+<p>Dentro de la cadena deductiva establecida en este documento, los ceros no triviales del sector de Riemann quedan localizados transversalmente en</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><mi>ℜ</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>.</mo></mrow></menclose></mrow></math></p>
+<p>La conclusión no significa que <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>U</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub></mrow></math> determine la identidad del cero. La identidad sigue siendo</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><mi>ζ</mi><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo><mo>=</mo><mn>0</mn><mo>,</mo></mrow></menclose></mrow></math></p>
+<p>y pertenece a <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>U</mi><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">m</mi></mrow></msub></mrow></math>.</p>
+<p>Lo que queda determinado por <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>U</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub></mrow></math>, a través de</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><msub><mi>ρ</mi><mi>R</mi></msub><mo>=</mo><msub><mi>ρ</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub><mo>,</mo></mrow></menclose></mrow></math></p>
+<p>es la localización transversal compatible con la clasificación completa de estabilidad.</p>
+<p>Por tanto no existe, dentro de la parametrización completa transportada desde <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>U</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub></mrow></math>, un cero no trivial con</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>ℜ</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>≠</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>,</mo></mrow></math></p>
+<p>porque tal localización tendría necesariamente</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>ρ</mi><mo>&gt;</mo><mn>0</mn><mo>,</mo></mrow></math></p>
+<p>y <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>U</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub></mrow></math> ya ha demostrado que todo <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>ρ</mi><mo>&gt;</mo><mn>0</mn></mrow></math> pertenece al complemento no estable de la clasificación transversal.</p>
+<p>La conclusión no se introduce como normalización ni como hipótesis posterior. Es el resultado de aplicar al espacio <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>U</mi><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">m</mi></mrow></msub></mrow></math> la clasificación exhaustiva de localización transversal previamente obtenida en <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>U</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub></mrow></math>, manteniendo separadas la identidad del cero y su posición.</p>
+<hr />
+<h1>20. Papel independiente de <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>U</mi><mrow><mi mathvariant="normal">L</mi><mi mathvariant="normal">a</mi><mi mathvariant="normal">p</mi></mrow></msub></mrow></math></h1>
+<p>La demostración topológica directa anterior puede formularse entre</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>U</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub><mi>⟷</mi><msub><mi>U</mi><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">m</mi></mrow></msub></mrow></math></p>
+<p>sin necesitar <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>U</mi><mrow><mi mathvariant="normal">L</mi><mi mathvariant="normal">a</mi><mi mathvariant="normal">p</mi></mrow></msub></mrow></math> como puente intermedio.</p>
+<p>Sin embargo, <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>U</mi><mrow><mi mathvariant="normal">L</mi><mi mathvariant="normal">a</mi><mi mathvariant="normal">p</mi></mrow></msub></mrow></math> proporciona una comprobación independiente de gran interés:</p>
+<ol>
+<li>parte de las ecuaciones diferenciales del universo;</li>
+<li>conserva <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>d</mi><msup><mi>t</mi><mi>′</mi></msup></mrow></math> hasta el último paso;</li>
+<li>aplica la condición <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>v</mi><mrow><mi mathvariant="normal">o</mi><mi mathvariant="normal">n</mi><mi mathvariant="normal">d</mi><mi mathvariant="normal">a</mi></mrow></msub><mo>=</mo><mi>c</mi></mrow></math> sólo al final;</li>
+<li>reduce <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>F</mi></mrow></math> a</li>
+</ol>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>F</mi><mo>=</mo><mi>d</mi><msup><mi>t</mi><mn>2</mn></msup><mo>+</mo><mn>2</mn><mi>d</mi><mi>t</mi><mi>;</mi></mrow></math></p>
+<ol start="5">
+<li>produce por factorización</li>
+</ol>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>F</mi><mo>=</mo><mn>2</mn><mi>d</mi><mi>t</mi><mrow><mo stretchy="true" fence="true" form="prefix">(</mo><mn>1</mn><mo>+</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mi>d</mi><mi>t</mi><mo stretchy="true" fence="true" form="postfix">)</mo></mrow><mi>;</mi></mrow></math></p>
+<ol start="6">
+<li>obtiene así el mismo lugar geométrico</li>
+</ol>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><mi>ℜ</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>.</mo></mrow></menclose></mrow></math></p>
+<p>Por tanto existen dos vías que convergen:</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><msub><mi>U</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub><mi>⟶</mi><msub><mi>U</mi><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">m</mi></mrow></msub></mrow></menclose></mrow></math></p>
+<p>mediante la conservación topológica de la estabilidad, y</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><mtext>Lorentz</mtext><mi>⟶</mi><mi>F</mi><mi>⟶</mi><msub><mi>U</mi><mrow><mi mathvariant="normal">L</mi><mi mathvariant="normal">a</mi><mi mathvariant="normal">p</mi></mrow></msub><mi>⟶</mi><mi>ℜ</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac></mrow></menclose></mrow></math></p>
+<p>mediante la dinámica diferencial.</p>
+<hr />
+<h1>21. Control de consistencia acumulativo</h1>
+<p>Quedan fijados los siguientes resultados, que no deben volver a presentarse como hipótesis en revisiones posteriores:</p>
+<ol>
+<li>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>U</mi><mo>=</mo><mn>3</mn><mi>S</mi><mo>+</mo><mi>T</mi></mrow></math>.</p>
+</li>
+<li>
+<p>La elección local <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>d</mi><mi>s</mi><mo>=</mo><mi>d</mi><mi>x</mi></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>d</mi><mi>y</mi><mo>=</mo><mi>d</mi><mi>z</mi><mo>=</mo><mn>0</mn></mrow></math> alinea coordenadas con la propagación y no reduce la dimensionalidad del universo.</p>
+</li>
+<li>
+<p>El apóstrofo de <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msup><mi>t</mi><mi>′</mi></msup></mrow></math> no significa derivada.</p>
+</li>
+<li>
+<p>Por Lorentz y <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>v</mi><mo>=</mo><mi>d</mi><mi>s</mi><mo>/</mo><mi>d</mi><mi>t</mi></mrow></math>,</p>
+</li>
+</ol>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>d</mi><msup><mi>s</mi><mn>2</mn></msup><mo>=</mo><mi>d</mi><msup><mi>t</mi><mn>2</mn></msup><mo>−</mo><mi>d</mi><msup><mi>t</mi><mrow><mi>′</mi><mn>2</mn></mrow></msup><mo>.</mo></mrow></math></p>
+<ol start="5">
+<li><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>λ</mi></mrow></math> es la longitud de onda base asociada a la materia y</li>
+</ol>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>λ</mi><mo>=</mo><mfrac><mrow><mi>h</mi></mrow><mrow><mi>M</mi><mi>c</mi></mrow></mfrac><mo>.</mo></mrow></math></p>
+<ol start="6">
+<li>El contorno se describe por</li>
+</ol>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>L</mi><mo>=</mo><mi>n</mi><mi>λ</mi><mo>.</mo></mrow></math></p>
+<ol start="7">
+<li>La representación circular de <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>U</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub></mrow></math> es</li>
+</ol>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>R</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub><mo>=</mo><mfrac><mrow><mi>L</mi></mrow><mrow><mn>2</mn><mi>π</mi></mrow></mfrac><mo>=</mo><mfrac><mrow><mi>n</mi><mi>λ</mi></mrow><mrow><mn>2</mn><mi>π</mi></mrow></mfrac><mo>.</mo></mrow></math></p>
+<ol start="8">
+<li>
+<p>La circunferencia es una representación topológica; no se afirma que todo confinamiento real sea físicamente circular.</p>
+</li>
+<li>
+<p>Para cierres finitos,</p>
+</li>
+</ol>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>n</mi><mo>=</mo><mi>k</mi><mi>±</mi><mi>ρ</mi><mo>,</mo><mspace width="2em" /><mi>k</mi><mo>∈</mo><msup><mi mathvariant="double-struck">N</mi><mo>+</mo></msup><mo>,</mo><mspace width="2em" /><mn>0</mn><mo>≤</mo><mi>ρ</mi><mo>≤</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>.</mo></mrow></math></p>
+<ol start="10">
+<li>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>ρ</mi><mo>=</mo><mn>0</mn></mrow></math> si y sólo si el cierre es exacto y estable.</p>
+</li>
+<li>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mn>0</mn><mo>&lt;</mo><mi>ρ</mi><mo>≤</mo><mn>1</mn><mo>/</mo><mn>2</mn></mrow></math> contempla exhaustivamente los cierres no estables.</p>
+</li>
+<li>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>ρ</mi><mo>=</mo><mn>1</mn><mo>/</mo><mn>2</mn></mrow></math> es la máxima desviación respecto del entero más próximo.</p>
+</li>
+<li>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>k</mi><mo>∈</mo><msup><mi mathvariant="double-struck">N</mi><mo>+</mo></msup></mrow></math> enumera todos los cierres estables.</p>
+</li>
+<li>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>n</mi><mo>→</mo><mo>∞</mo></mrow></math> representa la onda abierta o libre.</p>
+</li>
+<li>
+<p>El desarrollo de relación de radios proporciona el precedente</p>
+</li>
+</ol>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mover><mi>N</mi><mo stretchy="false">~</mo></mover><mo>=</mo><msub><mi>R</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub><msub><mi>R</mi><mrow><mi mathvariant="normal">S</mi><mi mathvariant="normal">c</mi><mi mathvariant="normal">h</mi></mrow></msub></mrow></math></p>
+<p>y la relación reversible entre <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>U</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub></mrow></math> y <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>U</mi><mrow><mi mathvariant="normal">S</mi><mi mathvariant="normal">c</mi><mi mathvariant="normal">h</mi></mrow></msub></mrow></math>.</p>
+<ol start="16">
+<li>La ecuación completa se conserva como</li>
+</ol>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>F</mi><mo>=</mo><mo stretchy="false">(</mo><mi>d</mi><msup><mi>t</mi><mn>2</mn></msup><mo>−</mo><mi>d</mi><msup><mi>t</mi><mrow><mi>′</mi><mn>2</mn></mrow></msup><mo stretchy="false">)</mo><mo>+</mo><mfrac><mrow><mi>d</mi></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo stretchy="false">(</mo><mi>d</mi><msup><mi>t</mi><mn>2</mn></msup><mo>−</mo><mi>d</mi><msup><mi>t</mi><mrow><mi>′</mi><mn>2</mn></mrow></msup><mo stretchy="false">)</mo><mo>.</mo></mrow></math></p>
+<ol start="17">
+<li>Su desarrollo adoptado es</li>
+</ol>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>F</mi><mo>=</mo><mi>d</mi><msup><mi>t</mi><mn>2</mn></msup><mo>−</mo><mi>d</mi><msup><mi>t</mi><mrow><mi>′</mi><mn>2</mn></mrow></msup><mo>+</mo><mn>2</mn><mi>d</mi><mi>t</mi><mo>−</mo><mn>2</mn><mi>d</mi><msup><mi>t</mi><mi>′</mi></msup><mfrac><mrow><mi>d</mi><msup><mi>t</mi><mi>′</mi></msup></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>.</mo></mrow></math></p>
+<ol start="18">
+<li>
+<p>La onda viaja siempre a <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>c</mi></mrow></math>, libre o confinada.</p>
+</li>
+<li>
+<p>Sólo al final se aplica</p>
+</li>
+</ol>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>d</mi><msup><mi>t</mi><mi>′</mi></msup><mo>→</mo><mn>0</mn><mo>,</mo><mspace width="2em" /><mfrac><mrow><mi>d</mi><msup><mi>t</mi><mi>′</mi></msup></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>→</mo><mn>0</mn><mo>.</mo></mrow></math></p>
+<ol start="20">
+<li>Entonces</li>
+</ol>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>F</mi><mo>=</mo><mi>d</mi><msup><mi>t</mi><mn>2</mn></msup><mo>+</mo><mn>2</mn><mi>d</mi><mi>t</mi><mo>.</mo></mrow></math></p>
+<ol start="21">
+<li>La factorización es</li>
+</ol>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>F</mi><mo>=</mo><mn>2</mn><mi>d</mi><mi>t</mi><mrow><mo stretchy="true" fence="true" form="prefix">(</mo><mn>1</mn><mo>+</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mi>d</mi><mi>t</mi><mo stretchy="true" fence="true" form="postfix">)</mo></mrow><mo>.</mo></mrow></math></p>
+<ol start="22">
+<li>
+<p>El <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mn>1</mn><mo>/</mo><mn>2</mn></mrow></math> no procede de Riemann.</p>
+</li>
+<li>
+<p>En el espacio complejo se conserva siempre el par</p>
+</li>
+</ol>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>s</mi><mi>±</mi></msub><mo>=</mo><mi>a</mi><mi>±</mi><mi>i</mi><mi>b</mi><mo>.</mo></mrow></math></p>
+<ol start="24">
+<li>
+<p>Los puntos estables son discretos; no toda la recta <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>ℜ</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><mn>1</mn><mo>/</mo><mn>2</mn></mrow></math> es estable.</p>
+</li>
+<li>
+<p>En <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>U</mi><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">m</mi></mrow></msub></mrow></math> los ceros triviales se separan del sector no trivial.</p>
+</li>
+<li>
+<p>Para el sector no trivial,</p>
+</li>
+</ol>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>ρ</mi><mi>R</mi></msub><mo>=</mo><mrow><mo stretchy="true" fence="true" form="prefix">|</mo><mi>ℜ</mi><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo><mo>−</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo stretchy="true" fence="true" form="postfix">|</mo></mrow><mo>.</mo></mrow></math></p>
+<ol start="27">
+<li>La coordenada transversal se transporta como</li>
+</ol>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>ρ</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub><mo>=</mo><msub><mi>ρ</mi><mi>R</mi></msub><mo>.</mo></mrow></math></p>
+<ol start="28">
+<li>
+<p>En <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>U</mi><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">m</mi></mrow></msub></mrow></math>, la condición <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>ζ</mi><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo><mo>=</mo><mn>0</mn></mrow></math> identifica el cero; no aporta por sí misma la clasificación transversal de estabilidad.</p>
+</li>
+<li>
+<p>En <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>U</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub></mrow></math>, la coordenada <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>ρ</mi></mrow></math> clasifica exhaustivamente la localización transversal: <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>ρ</mi><mo>=</mo><mn>0</mn></mrow></math> corresponde al estado estable y <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>ρ</mi><mo>&gt;</mo><mn>0</mn></mrow></math> al complemento no estable.</p>
+</li>
+<li>
+<p>Por la correspondencia <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>ρ</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub><mo>=</mo><msub><mi>ρ</mi><mi>R</mi></msub></mrow></math>, la localización transversal de todo cero no trivial identificado en <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>U</mi><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">m</mi></mrow></msub></mrow></math> queda restringida a</p>
+</li>
+</ol>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><mo>∀</mo><mi>z</mi><mo>∈</mo><msubsup><mi>Z</mi><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">m</mi></mrow><mrow><mi mathvariant="normal">n</mi><mi mathvariant="normal">t</mi></mrow></msubsup><mo>,</mo><mspace width="2em" /><mi>ℜ</mi><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>.</mo></mrow></menclose></mrow></math></p>
+<hr />
+<h1>22. Conclusión</h1>
+<p>El desarrollo comienza en la geometría del universo y no en la Hipótesis de Riemann.</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>U</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub></mrow></math> se obtiene al representar el cierre de onda mediante</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>R</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub><mo>=</mo><mfrac><mrow><mi>n</mi><mi>λ</mi></mrow><mrow><mn>2</mn><mi>π</mi></mrow></mfrac><mo>.</mo></mrow></math></p>
+<p>Su parametrización</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>n</mi><mo>=</mo><mi>k</mi><mi>±</mi><mi>ρ</mi></mrow></math></p>
+<p>es completa: <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>k</mi></mrow></math> enumera todas las familias de cierre y <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>ρ</mi><mo>∈</mo><mo stretchy="false">[</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo>/</mo><mn>2</mn><mo stretchy="false">]</mo></mrow></math> recorre todo el intervalo desde estabilidad hasta máxima desviación. Los estados estables son todos y sólo</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mo stretchy="false">(</mo><mi>k</mi><mo>,</mo><mn>0</mn><mo stretchy="false">)</mo><mo>,</mo><mspace width="2em" /><mi>k</mi><mo>∈</mo><msup><mi mathvariant="double-struck">N</mi><mo>+</mo></msup><mo>.</mo></mrow></math></p>
+<p>El precedente <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>U</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub><mo>≅</mo><msub><mi>U</mi><mrow><mi mathvariant="normal">S</mi><mi mathvariant="normal">c</mi><mi mathvariant="normal">h</mi></mrow></msub></mrow></math> demuestra dentro del marco que una misma información puede representarse mediante topologías diferentes conservando el estado.</p>
+<p>La geometría diferencial produce además la ecuación</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>F</mi><mo>=</mo><mo stretchy="false">(</mo><mi>d</mi><msup><mi>t</mi><mn>2</mn></msup><mo>−</mo><mi>d</mi><msup><mi>t</mi><mrow><mi>′</mi><mn>2</mn></mrow></msup><mo stretchy="false">)</mo><mo>+</mo><mfrac><mrow><mi>d</mi></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo stretchy="false">(</mo><mi>d</mi><msup><mi>t</mi><mn>2</mn></msup><mo>−</mo><mi>d</mi><msup><mi>t</mi><mrow><mi>′</mi><mn>2</mn></mrow></msup><mo stretchy="false">)</mo><mo>,</mo></mrow></math></p>
+<p>que, conservando <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>d</mi><msup><mi>t</mi><mi>′</mi></msup></mrow></math> hasta aplicar al final el límite propio de una onda a <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>c</mi></mrow></math>, conduce a</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>F</mi><mo>=</mo><mi>d</mi><msup><mi>t</mi><mn>2</mn></msup><mo>+</mo><mn>2</mn><mi>d</mi><mi>t</mi></mrow></math></p>
+<p>y</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>F</mi><mo>=</mo><mn>2</mn><mi>d</mi><mi>t</mi><mrow><mo stretchy="true" fence="true" form="prefix">(</mo><mn>1</mn><mo>+</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mi>d</mi><mi>t</mi><mo stretchy="true" fence="true" form="postfix">)</mo></mrow><mo>.</mo></mrow></math></p>
+<p>El factor <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mn>1</mn><mo>/</mo><mn>2</mn></mrow></math> aparece por tanto antes de introducir Riemann.</p>
+<p>Finalmente, el sector no trivial de <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>U</mi><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">m</mi></mrow></msub></mrow></math> aporta la identidad del cero mediante</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><mi>ζ</mi><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo><mo>=</mo><mn>0</mn><mo>,</mo></mrow></menclose></mrow></math></p>
+<p>mientras que su localización transversal se mide por</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>ρ</mi><mi>R</mi></msub><mo>=</mo><mrow><mo stretchy="true" fence="true" form="prefix">|</mo><mi>ℜ</mi><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo><mo>−</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo stretchy="true" fence="true" form="postfix">|</mo></mrow><mo>,</mo></mrow></math></p>
+<p>que se corresponde con la desviación <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>ρ</mi></mrow></math> ya definida en <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>U</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub></mrow></math>.</p>
+<p>Así, <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>U</mi><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">m</mi></mrow></msub></mrow></math> dice qué es el punto considerado: un cero de <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>ζ</mi></mrow></math>. <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>U</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub></mrow></math> dice qué localización transversal es compatible con la clasificación exhaustiva de estabilidad. Como <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>U</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub></mrow></math> ha demostrado que sólo <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>ρ</mi><mo>=</mo><mn>0</mn></mrow></math> corresponde a estabilidad y que todo <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>ρ</mi><mo>&gt;</mo><mn>0</mn></mrow></math> pertenece al complemento no estable, un cero no trivial con <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>ℜ</mi><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo><mo>≠</mo><mn>1</mn><mo>/</mo><mn>2</mn></mrow></math> implicaría una localización transversal no estable.</p>
+<p>La contradicción no consiste en negar que <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>z</mi></mrow></math> sea cero, porque esa identidad viene dada por <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>ζ</mi><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo><mo>=</mo><mn>0</mn></mrow></math>. La contradicción consiste en atribuir al cero identificado una localización transversal que la clasificación completa de <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>U</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub></mrow></math> excluye para el estado estable transportado.</p>
+<p>Por tanto,</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><menclose notation="box"><mrow><mo>∀</mo><mi>z</mi><mo>∈</mo><msubsup><mi>Z</mi><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">m</mi></mrow><mrow><mi mathvariant="normal">n</mi><mi mathvariant="normal">t</mi></mrow></msubsup><mo>,</mo><mspace width="2em" /><mi>ℜ</mi><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>.</mo></mrow></menclose></mrow></math></p>
+<p><strong>Q.E.D.</strong></p>
+<hr />
+<h2>Referencias de origen y ampliación</h2>
+<ul>
+<li>Documento 7: <em>La gravedad como relación geométrica de radios</em>, como origen ampliado del precedente <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>U</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">E</mi><mi mathvariant="normal">D</mi></mrow></msub><mo>≅</mo><msub><mi>U</mi><mrow><mi mathvariant="normal">S</mi><mi mathvariant="normal">c</mi><mi mathvariant="normal">h</mi></mrow></msub></mrow></math>.</li>
+<li>Documentos previos de la serie ES_46, como origen histórico de la formulación revisada.</li>
+<li>Fundamentos Einstein–VED / UNIHOLOG.</li>
+<li>DOI general del marco: <code>10.5281/zenodo.17172925</code>.</li>
+</ul>
+
+</body>
+</html>

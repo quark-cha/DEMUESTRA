@@ -1,0 +1,3 @@
+This project presents revision 6 of Document 46, a deductive development of the Einstein-VED/UNIHOLOG framework concerning geometric-topological stability, solution spaces, and transversal localization of non-trivial zeros. The text organizes definitions, foundations, and propositions into a logical chain intended for ADEC analysis and complementary formal verification in Lean.
+
+The aim of this version is to make the deductive evolution of the argument explicit: from differential geometry and stable closure conditions to the spectral formulation associated with the Riemann Hypothesis. The published files include the article in PDF and Markdown, the ADEC-compatible JSON graph, and the corresponding Lean entry point for formal review.

@@ -1,0 +1,469 @@
+<?php // Modificar este archivo desde DEMUESTRA/proyectos/index.php; se publica en pdfs/proyectos/index.php para garantizar un uso correcto desde la web.
+$dir = __DIR__;
+
+const ADEC_BASE_URL = 'https://sites.google.com/view/numeriprimi-teoremiecongetture/adec-engine/v0-8-6';
+const ADEC_ANCHOR = '#h.4q0y44bfwvi3';
+
+function h($value) {
+    return htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+}
+
+function starts_with($value, $prefix) {
+    return substr((string) $value, 0, strlen($prefix)) === $prefix;
+}
+
+function preferred_language() {
+    $header = strtolower($_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? '');
+    return starts_with($header, 'es') ? 'es' : 'en';
+}
+
+function label($es, $en) {
+    return preferred_language() === 'en' ? $en : $es;
+}
+
+function public_file_url($file) {
+    $https = (
+        (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ||
+        (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https')
+    );
+    $scheme = $https ? 'https' : 'http';
+    $host = $_SERVER['HTTP_HOST'] ?? '';
+    $path = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '')), '/');
+    $encoded = implode('/', array_map('rawurlencode', explode('/', str_replace('\\', '/', $file))));
+
+    return $scheme . '://' . $host . ($path ? $path : '') . '/' . $encoded;
+}
+
+function adec_url_for_json($jsonFile) {
+    return ADEC_BASE_URL
+        . '?json_url=' . rawurlencode(public_file_url($jsonFile))
+        . '&authuser=0'
+        . ADEC_ANCHOR;
+}
+
+function file_text_if_exists($path) {
+    if (!is_file($path)) {
+        return null;
+    }
+
+    $text = trim((string) file_get_contents($path));
+    return $text === '' ? null : $text;
+}
+
+function project_files($base) {
+    $files = [];
+
+    foreach (['pdf', 'md', 'json', 'lean'] as $ext) {
+        $name = $base . '.' . $ext;
+        if (is_file(__DIR__ . DIRECTORY_SEPARATOR . $name)) {
+            $files[$ext] = $name;
+        }
+    }
+
+    return $files;
+}
+
+function project_image($dir, $base) {
+    foreach ([$base . '.jpg', $base . '.jpeg', $base . '.png', $base . '.webp', 'image.jpg', 'image.png', 'image.webp'] as $name) {
+        if (is_file($dir . DIRECTORY_SEPARATOR . $name)) {
+            return $name;
+        }
+    }
+    return null;
+}
+
+function license_badge($dir) {
+    foreach (['licencia-etica-cc-by-nc-sa.svg', 'licencia-etica-cc-by-sa-nc.svg'] as $name) {
+        if (is_file($dir . DIRECTORY_SEPARATOR . $name)) {
+            return $name;
+        }
+    }
+    return null;
+}
+
+$abstractHtml = file_text_if_exists($dir . DIRECTORY_SEPARATOR . 'abstract.html');
+$licenseBadge = license_badge($dir);
+$projects = [];
+
+foreach (glob($dir . DIRECTORY_SEPARATOR . '*.json') ?: [] as $jsonPath) {
+    $name = basename($jsonPath);
+    if (starts_with($name, 'hashes')) {
+        continue;
+    }
+
+    $base = pathinfo($name, PATHINFO_FILENAME);
+    $raw = file_get_contents($jsonPath);
+    $data = json_decode($raw, true);
+    if (!is_array($data)) {
+        $data = [];
+    }
+
+    $legacyAbstract = file_text_if_exists($dir . DIRECTORY_SEPARATOR . $base . '.abstract');
+    $icon = is_file($dir . DIRECTORY_SEPARATOR . $base . '.ico') ? $base . '.ico' : null;
+
+    $projects[] = [
+        'base' => $base,
+        'title' => $data['title'] ?? $base,
+        'subtitle' => $data['subtitle'] ?? null,
+        'author' => $data['author'] ?? null,
+        'framework' => $data['framework'] ?? null,
+        'revision' => $data['revision'] ?? null,
+        'status' => $data['status'] ?? null,
+        'generated_on' => $data['generated_on'] ?? null,
+        'legacy_abstract' => $legacyAbstract,
+        'image' => project_image($dir, $base),
+        'icon' => $icon,
+        'files' => project_files($base),
+    ];
+}
+
+usort($projects, function ($a, $b) {
+    return strcasecmp($a['base'], $b['base']);
+});
+?>
+<!doctype html>
+<html lang="<?= h(preferred_language()) ?>" class="lang-<?= h(preferred_language()) ?>">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>DEMUESTRA - Proyectos</title>
+    <style>
+        :root {
+            color-scheme: light;
+            --bg: #f7f7f4;
+            --text: #1e2428;
+            --muted: #657077;
+            --line: #d9ddd8;
+            --panel: #ffffff;
+            --accent: #176b87;
+            --accent-strong: #0f4f67;
+            --ok: #287047;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        header {
+            border-bottom: 1px solid var(--line);
+            background: #ffffff;
+        }
+
+        .wrap {
+            width: min(1120px, calc(100% - 32px));
+            margin: 0 auto;
+        }
+
+        .top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 28px 0 22px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: clamp(28px, 5vw, 52px);
+            line-height: 1;
+            font-weight: 780;
+            letter-spacing: 0;
+        }
+
+        .count {
+            color: var(--muted);
+            font-size: 15px;
+            white-space: nowrap;
+        }
+
+        main { padding: 28px 0 46px; }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 18px;
+        }
+
+        article {
+            display: grid;
+            grid-template-columns: minmax(280px, 0.9fr) minmax(320px, 1.1fr);
+            grid-template-rows: 1fr auto;
+            min-height: 100%;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: var(--panel);
+            overflow: hidden;
+        }
+
+        .image {
+            grid-row: 1 / span 2;
+            min-height: 100%;
+            background: linear-gradient(135deg, #e6ece9, #f7f7f4);
+            border-right: 1px solid var(--line);
+        }
+
+        .image img {
+            width: 100%;
+            height: 100%;
+            min-height: 360px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .body { padding: 18px 18px 12px; }
+
+        .meta {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .badge {
+            border: 1px solid #b7d2c3;
+            color: var(--ok);
+            border-radius: 999px;
+            padding: 3px 9px;
+            font-weight: 650;
+            background: #f3fbf6;
+        }
+
+        h2 {
+            margin: 0 0 8px;
+            font-size: 22px;
+            line-height: 1.18;
+            letter-spacing: 0;
+        }
+
+        p {
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.55;
+        }
+
+        .abstract {
+            margin-top: 12px;
+            color: var(--text);
+        }
+
+        .project-abstract h2 {
+            margin: 0 0 8px;
+            color: var(--text);
+            font-size: clamp(24px, 3vw, 36px);
+            line-height: 1.08;
+        }
+
+        .project-abstract p {
+            margin-top: 12px;
+            color: var(--text);
+        }
+
+        .project-abstract .doc-title {
+            color: var(--muted);
+        }
+
+        [data-lang="es"] { display: none; }
+        [data-lang="en"] { display: block; }
+        .lang-es [data-lang="es"] { display: block; }
+        .lang-es [data-lang="en"] { display: none; }
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            padding: 0 18px 18px;
+        }
+
+        .actions a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 36px;
+            padding: 7px 12px;
+            border: 1px solid var(--accent);
+            border-radius: 6px;
+            color: var(--accent-strong);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 650;
+            background: #ffffff;
+        }
+
+        .actions a.primary {
+            background: var(--accent);
+            color: #ffffff;
+        }
+
+        .actions a.adec {
+            border-color: #2563eb;
+            background: #2563eb;
+            color: #ffffff;
+        }
+
+        .actions a.adec:hover {
+            background: #1d4ed8;
+            border-color: #1d4ed8;
+        }
+
+        .actions a.license {
+            margin-left: auto;
+            gap: 8px;
+            border-color: #805c16;
+            color: #5d430f;
+            background: #fffaf0;
+        }
+
+        .actions a.license img {
+            display: block;
+            width: auto;
+            height: 23px;
+        }
+
+        .adec-credit {
+            width: 100%;
+            margin-top: -2px;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .empty {
+            border: 1px dashed var(--line);
+            border-radius: 8px;
+            padding: 28px;
+            background: #ffffff;
+            color: var(--muted);
+        }
+
+        @media (max-width: 640px) {
+            .top { display: block; }
+            .count {
+                display: block;
+                margin-top: 10px;
+            }
+            article {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr auto;
+            }
+            .image {
+                grid-row: auto;
+                min-height: auto;
+                aspect-ratio: 16 / 9;
+                border-right: 0;
+                border-bottom: 1px solid var(--line);
+            }
+            .image img {
+                min-height: 0;
+            }
+            .actions a.license { margin-left: 0; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="wrap top">
+            <h1>DEMUESTRA</h1>
+            <div class="count"><?= count($projects) ?> proyecto<?= count($projects) === 1 ? '' : 's' ?></div>
+        </div>
+    </header>
+
+    <main class="wrap">
+        <?php if (!$projects): ?>
+            <div class="empty">No hay proyectos publicados todavía.</div>
+        <?php else: ?>
+            <section class="grid" aria-label="Proyectos DEMUESTRA">
+                <?php foreach ($projects as $project): ?>
+                    <article>
+                        <div class="image">
+                            <?php if ($project['image']): ?>
+                                <img src="<?= h($project['image']) ?>" alt="<?= h($project['title']) ?>">
+                            <?php endif; ?>
+                        </div>
+
+                        <div class="body">
+                            <div class="meta">
+                                <?php if ($project['icon']): ?>
+                                    <img src="<?= h($project['icon']) ?>" alt="" width="18" height="18">
+                                <?php endif; ?>
+                                <strong><?= h($project['base']) ?></strong>
+                                <?php if ($project['status']): ?>
+                                    <span class="badge"><?= h($project['status']) ?></span>
+                                <?php endif; ?>
+                                <?php if ($project['revision']): ?>
+                                    <span>rev. <?= h($project['revision']) ?></span>
+                                <?php endif; ?>
+                                <?php if ($project['generated_on']): ?>
+                                    <span><?= h($project['generated_on']) ?></span>
+                                <?php endif; ?>
+                            </div>
+
+                            <?php if ($abstractHtml !== null): ?>
+                                <?= $abstractHtml ?>
+                            <?php else: ?>
+                                <h2><?= h($project['title']) ?></h2>
+                                <?php if ($project['subtitle']): ?>
+                                    <p><?= h($project['subtitle']) ?></p>
+                                <?php endif; ?>
+                                <?php if ($project['legacy_abstract']): ?>
+                                    <p class="abstract"><?= nl2br(h($project['legacy_abstract'])) ?></p>
+                                <?php endif; ?>
+                            <?php endif; ?>
+
+                            <?php if ($project['author'] || $project['framework']): ?>
+                                <p><?= h(trim(($project['author'] ?? '') . ' · ' . ($project['framework'] ?? ''), ' ·')) ?></p>
+                            <?php endif; ?>
+                        </div>
+
+                        <div class="actions">
+                            <?php if (isset($project['files']['pdf'])): ?>
+                                <a class="primary" href="<?= h($project['files']['pdf']) ?>">PDF</a>
+                            <?php endif; ?>
+
+                            <?php if (isset($project['files']['md'])): ?>
+                                <a href="<?= h($project['files']['md']) ?>">MD</a>
+                            <?php endif; ?>
+
+                            <?php if (isset($project['files']['json'])): ?>
+                                <a href="<?= h($project['files']['json']) ?>">JSON</a>
+                                <a
+                                    class="adec"
+                                    href="<?= h(adec_url_for_json($project['files']['json'])) ?>"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    title="Analyze this project's JSON with ADEC - Engine developed by Gianluca Remigio Pisano"
+                                >ADEC Analysis</a>
+                                <span class="adec-credit">ADEC engine by Gianluca Remigio Pisano</span>
+                            <?php endif; ?>
+
+                            <?php if (isset($project['files']['lean'])): ?>
+                                <a href="<?= h($project['files']['lean']) ?>">Lean</a>
+                            <?php endif; ?>
+
+                            <a
+                                class="license"
+                                href="/licencia.php"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                title="<?= h(label('Licencia etica CC BY-SA-NC', 'Ethical license CC BY-SA-NC')) ?>"
+                            >
+                                <?php if ($licenseBadge): ?>
+                                    <img src="<?= h($licenseBadge) ?>" alt="CC BY-SA-NC HL3">
+                                <?php endif; ?>
+                                <span><?= h(label('Licencia', 'License')) ?></span>
+                            </a>
+                        </div>
+                    </article>
+                <?php endforeach; ?>
+            </section>
+        <?php endif; ?>
+    </main>
+</body>
+</html>

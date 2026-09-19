@@ -1,0 +1,14 @@
+import Mathlib
+
+/-!
+# DOCUMENTO 46 — REVISIÓN 6
+
+Archivo Lean generado desde ES_46_RV6.md.
+El Markdown original no se modifica.
+-/
+
+namespace ES_46_RV6
+
+-- Punto de entrada estable para completar la formalizacion del documento.
+
+end ES_46_RV6

@@ -15,7 +15,6 @@ import queue
 import re
 import shutil
 import subprocess
-import sys
 import threading
 import time
 from shutil import which
@@ -26,20 +25,6 @@ from .proyecto import Proyecto
 
 DEFAULT_TIMEOUT = 600
 CACHE_TIMEOUT = 900
-
-
-def _configurar_salida_utf8() -> None:
-    """Evita que la consola de Windows interrumpa Lean por simbolos Unicode."""
-    for flujo in (sys.stdout, sys.stderr):
-        reconfigure = getattr(flujo, "reconfigure", None)
-        if reconfigure is not None:
-            try:
-                reconfigure(encoding="utf-8", errors="replace")
-            except (OSError, ValueError):
-                pass
-
-
-_configurar_salida_utf8()
 
 
 def _buscar_raiz_demuestra(desde: Path) -> Path:
