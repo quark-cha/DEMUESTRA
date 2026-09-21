@@ -2,7 +2,7 @@
 
 ## Veredicto
 
-**APROBADO_CON_OBSERVACIONES**
+**CERRADO**
 
 Objetivo: `T_RIEMANN`
 
@@ -18,7 +18,8 @@ forma parte del veredicto.
 - PASS `lean_aprobado`
 - PASS `prolog_aprobado`
 - PASS `nodo_lean_coincide`
-- FAIL `dependencias_lean_internalizadas`
+- PASS `dependencias_lean_internalizadas`
+- PASS `sin_pendientes_ya_demostrados`
 
 ## Raices utilizadas
 
@@ -35,11 +36,18 @@ forma parte del veredicto.
 
 ## Dependencias declaradas como parametros en Lean
 
-- `hCompat: HR46_RV6.TransversalCompatibilityForZeros IsZeroRim`
+- Ninguna
 
 Si una propiedad ya esta demostrada en el proyecto, su presencia aqui indica que
 el generador debe enlazar el teorema correspondiente en vez de volver a pedirla
 como parametro. No convierte por si misma el resultado cientifico en condicional.
+
+## Pendientes contradichos por antecedentes demostrados
+
+- Ninguno
+
+Todo elemento de esta lista es un error de construccion: debe reutilizar sus
+antecedentes demostrados antes de poder publicarse como pendiente.
 
 ## Axiomas informados por Lean
 

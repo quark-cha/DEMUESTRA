@@ -1,0 +1,85 @@
+from pathlib import Path
+import subprocess
+import shutil
+from .base import Publicacion
+
+class Odt(Publicacion):
+    carpeta_salida = "odts"
+    extension = ".odt"
+
+    def __init__(self, docx_path=None, documento=None):
+        super().__init__(documento)
+        self.docx_path = Path(docx_path).resolve() if docx_path else None
+
+    def _escribir(self, fichero):
+        if not self.docx_path or not self.docx_path.exists():
+            raise FileNotFoundError(
+                f"No se encontró el DOCX para convertir a ODT: {self.docx_path}"
+            )
+
+        print(f"  🔍 Convertir DOCX a ODT: {self.docx_path} -> {fichero}")
+
+        # Crear carpeta de salida
+        fichero.parent.mkdir(parents=True, exist_ok=True)
+
+        # Buscar soffice
+        soffice_path = shutil.which("soffice")
+        if not soffice_path:
+            # Rutas típicas en Windows
+            possible = [
+                r"C:\Program Files\LibreOffice\program\soffice.exe",
+                r"C:\Program Files (x86)\LibreOffice\program\soffice.exe",
+            ]
+            for p in possible:
+                if Path(p).exists():
+                    soffice_path = p
+                    break
+            if not soffice_path:
+                raise RuntimeError("No se encontró soffice. Instala LibreOffice y asegúrate de que esté en el PATH.")
+
+        cmd = [
+            soffice_path,
+            "--headless",
+            "--convert-to", "odt",
+            "--outdir", str(fichero.parent),
+            str(self.docx_path)
+        ]
+        print(f"  🔍 Ejecutando: {' '.join(cmd)}")
+
+        try:
+            result = subprocess.run(
+                cmd,
+                check=True,
+                capture_output=True,
+                text=True,
+                timeout=300,
+            )
+            if result.stderr:
+                print(f"  ⚠️ soffice stderr: {result.stderr}")
+
+            # Verificar que se generó el ODT
+            odt_generado = fichero.parent / f"{self.docx_path.stem}.odt"
+            if odt_generado.exists():
+                if odt_generado != fichero:
+                    shutil.move(str(odt_generado), str(fichero))
+                print(f"  ✅ ODT generado desde DOCX con soffice: {fichero.resolve()}")
+            else:
+                # Buscar cualquier .odt en la carpeta de salida (por si el nombre cambió)
+                posibles = list(fichero.parent.glob("*.odt"))
+                if posibles:
+                    # Tomar el más reciente
+                    ultimo = max(posibles, key=lambda p: p.stat().st_mtime)
+                    if ultimo != fichero:
+                        shutil.move(str(ultimo), str(fichero))
+                    print(f"  ✅ ODT generado (renombrado) desde DOCX con soffice: {fichero.resolve()}")
+                else:
+                    raise FileNotFoundError(f"No se encontró el ODT generado en {fichero.parent}")
+
+        except subprocess.CalledProcessError as e:
+            print(f"  ❌ Error en soffice (código {e.returncode})")
+            print(f"  stderr: {e.stderr}")
+            raise RuntimeError(f"Error al convertir DOCX a ODT con soffice:\n{e.stderr}")
+        except subprocess.TimeoutExpired as e:
+            raise TimeoutError(
+                f"LibreOffice superó el tiempo máximo al convertir a ODT: {self.docx_path}"
+            ) from e

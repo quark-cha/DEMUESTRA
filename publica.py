@@ -12,10 +12,12 @@ import re
 from datetime import datetime, timezone
 from pathlib import Path
 
-# Anadir PUBLICAR al path
+# Usar primero la copia versionada de PUBLICAR incluida en DEMUESTRA.
 PROJECT_ROOT = Path(__file__).resolve().parent
 os.chdir(PROJECT_ROOT)
-publicar_path = PROJECT_ROOT.parent / "PUBLICAR"
+publicar_incluido = PROJECT_ROOT / "vendor" / "PUBLICAR"
+publicar_externo = PROJECT_ROOT.parent / "PUBLICAR"
+publicar_path = publicar_incluido if publicar_incluido.is_dir() else publicar_externo
 sys.path.insert(0, str(publicar_path))
 
 # Imports desde PackPublica
@@ -56,6 +58,7 @@ PROYECTOS_PUBLICABLES_WEB = [
 
 DEMOSTRACIONES_WEB_EXTENSIONS = {".json", ".lean", ".pl", ".md", ".pdf", ".log", ".php", ".html", ".jpg", ".jpeg", ".png", ".webp", ".svg", ".ico", ".abstract", ".es", ".en", ".bat"}
 MARKDOWNS_DEMOSTRACIONES_WEB_PREPARADOS = {}
+CONFIG_ORIGEN_NOMBRE = "config.txt"
 
 # Solo estos Markdown son fuentes de demostraciones. Ejemplo: ES_46_RV6.md.
 PATRON_MARKDOWN_DEMOSTRACION = re.compile(
@@ -115,6 +118,93 @@ def _markdown_proyecto(proyecto):
     return _primer_archivo([proyecto / f"{proyecto.name}.md"])
 
 
+def _leer_proyecto_origen(proyecto, preguntar=False):
+    """Obtiene y, si hace falta, registra el proyecto al que vuelven MD y PDF."""
+    config = proyecto / CONFIG_ORIGEN_NOMBRE
+    nombre = None
+    if config.is_file():
+        for linea in config.read_text(encoding="utf-8-sig", errors="replace").splitlines():
+            clave, separador, valor = linea.partition("=")
+            if separador and clave.strip().lower() == "proyecto_origen":
+                nombre = valor.strip()
+                break
+
+    if not nombre and preguntar:
+        try:
+            respuesta = input(
+                f"De que proyecto procede {proyecto.name}.md? [UNIHOLOG]: "
+            ).strip()
+        except EOFError:
+            respuesta = ""
+        nombre = respuesta or "UNIHOLOG"
+        config.write_text(f"proyecto_origen={nombre}\n", encoding="utf-8")
+        print(f"  Configuracion de origen guardada: {config}")
+
+    if not nombre:
+        return None
+    if nombre in {".", ".."} or Path(nombre).name != nombre or "/" in nombre or "\\" in nombre:
+        raise ValueError(
+            f"Proyecto de origen no valido en {config}: {nombre!r}. "
+            "Debe ser el nombre de un directorio hermano, por ejemplo UNIHOLOG."
+        )
+
+    origen = (PROJECT_ROOT.parent / nombre).resolve()
+    if origen.parent != PROJECT_ROOT.parent.resolve():
+        raise ValueError(f"El proyecto de origen queda fuera de SRC-VED: {origen}")
+    return origen
+
+
+def _copiar_verificado(origen, destino):
+    """Copia al destino sin retirar la evidencia conservada en DEMUESTRA."""
+    if not origen.is_file():
+        raise FileNotFoundError(f"No existe el artefacto verificado: {origen}")
+    destino.parent.mkdir(parents=True, exist_ok=True)
+    temporal = destino.with_name(f".{destino.name}.demuestra.tmp")
+    if temporal.exists():
+        temporal.unlink()
+    shutil.copy2(origen, temporal)
+    if temporal.read_bytes() != origen.read_bytes():
+        temporal.unlink(missing_ok=True)
+        raise OSError(f"Fallo de integridad al devolver {origen.name} a {destino.parent}")
+    os.replace(temporal, destino)
+
+
+def _copiar_markdown_verificado_sin_lean(origen, destino):
+    """Devuelve el documento científico sin reinsertar el derivado Lean."""
+    texto = origen.read_text(encoding="utf-8-sig")
+    marcador = "# Apéndice formal Lean 4"
+    posicion = texto.find(marcador)
+    if posicion >= 0:
+        texto = texto[:posicion].rstrip() + "\n"
+
+    destino.parent.mkdir(parents=True, exist_ok=True)
+    temporal = destino.with_name(f".{destino.name}.demuestra.tmp")
+    temporal.write_text(texto, encoding="utf-8")
+    if marcador in temporal.read_text(encoding="utf-8") or "```lean" in temporal.read_text(encoding="utf-8"):
+        temporal.unlink(missing_ok=True)
+        raise OSError(f"No se pudo retirar el apendice Lean de {origen.name}")
+    os.replace(temporal, destino)
+
+
+def devolver_fuentes_verificadas(project_names):
+    """Cierra el ciclo copiando el MD y PDF al proyecto que los origino."""
+    for project_spec in project_names:
+        project_name = _nombre_proyecto_web(project_spec)
+        proyecto = _proyecto_dir(project_name)
+        raiz_origen = _leer_proyecto_origen(proyecto, preguntar=True)
+        if not raiz_origen.is_dir():
+            raise FileNotFoundError(
+                f"No existe el proyecto de origen configurado: {raiz_origen}"
+            )
+
+        markdown = proyecto / f"{project_name}.md"
+        pdf = proyecto / f"{project_name}.pdf"
+        _copiar_markdown_verificado_sin_lean(markdown, raiz_origen / markdown.name)
+        _copiar_verificado(pdf, raiz_origen / "pdfs" / pdf.name)
+        print(f"  [OK] {markdown.name} copiado a {raiz_origen}")
+        print(f"  [OK] {pdf.name} copiado a {raiz_origen / 'pdfs'}")
+
+
 def preparar_markdowns_demostraciones_web(project_names):
     MARKDOWNS_DEMOSTRACIONES_WEB_PREPARADOS.clear()
 
@@ -127,6 +217,18 @@ def preparar_markdowns_demostraciones_web(project_names):
             )
             continue
         markdown = _markdown_proyecto(_proyecto_dir(project_name))
+        if markdown is None:
+            proyecto = _proyecto_dir(project_name)
+            raiz_origen = _leer_proyecto_origen(proyecto, preguntar=False)
+            candidato = (
+                raiz_origen / f"{project_name}.md"
+                if raiz_origen is not None else None
+            )
+            if candidato is not None and candidato.is_file():
+                markdown_destino = proyecto / candidato.name
+                shutil.copy2(candidato, markdown_destino)
+                markdown = markdown_destino
+                print(f"  {project_name}.md copiado temporalmente desde {raiz_origen}")
         if markdown is None:
             print(f"[AVISO] Falta {project_name}.md; no se preparara para generar PDF.")
             continue
@@ -142,21 +244,6 @@ def preparar_markdowns_demostraciones_web(project_names):
         shutil.move(str(markdown), str(destino))
         os.utime(destino, None)
         MARKDOWNS_DEMOSTRACIONES_WEB_PREPARADOS[project_name] = markdown
-
-        # PUBLICAR conserva una formalizacion completa previa cuando el MD no
-        # incluye bloques ```lean. Se prepara en la ubicacion comun lean/ para
-        # que PackPublica.lean la valide y regenere, nunca como esqueleto.
-        lean_proyecto = _proyecto_dir(project_name) / f"{project_name}.lean"
-        lean_preparado = PROJECT_ROOT / "lean" / f"{project_name}.lean"
-        if lean_proyecto.is_file():
-            contenido_lean = lean_proyecto.read_text(encoding="utf-8", errors="replace")
-            if (
-                "Punto de entrada estable para completar la formalizacion" not in contenido_lean
-                and ("theorem " in contenido_lean or "lemma " in contenido_lean)
-            ):
-                lean_preparado.parent.mkdir(parents=True, exist_ok=True)
-                shutil.copy2(lean_proyecto, lean_preparado)
-
 
 def _restaurar_markdown_preparado(public_name):
     preparado = PROJECT_ROOT / f"{public_name}.md"
@@ -188,7 +275,11 @@ def _mover_derivados_generados_al_proyecto(project_name, proyecto):
     destinos = {}
     for carpeta, extension in (("json", ".json"), ("lean", ".lean"), ("prolog", ".pl")):
         origen = PROJECT_ROOT / carpeta / f"{project_name}{extension}"
-        destino = proyecto / f"{project_name}{extension}"
+        nombre_destino = (
+            f"{project_name}.extracted.json"
+            if extension == ".json" else f"{project_name}{extension}"
+        )
+        destino = proyecto / nombre_destino
         if not origen.is_file():
             raise FileNotFoundError(
                 f"PUBLICAR no genero el archivo esperado: {origen}"
@@ -251,7 +342,7 @@ def _registrar_resultado_lean_en_json(
     veredicto, diagnostico, accion, veredicto_json, log
 ):
     """Consolida el JSON con Lean y solo verifica un nodo si es inequívoco."""
-    json_proyecto = proyecto / f"{project_name}.json"
+    json_proyecto = proyecto / f"{project_name}.extracted.json"
     if not json_proyecto.is_file():
         return []
 
@@ -667,6 +758,7 @@ def evaluar_formalizaciones_proyectos(project_names):
         if not evaluar_prolog_proyecto(project_name):
             return False
         auditar_cierre_proyecto(project_name)
+        consolidar_json_final(project_name)
     return True
 
 
@@ -677,29 +769,69 @@ def auditar_cierre_proyecto(project_name):
     logs = proyecto / "logs"
     evaluaciones.mkdir(parents=True, exist_ok=True)
     logs.mkdir(parents=True, exist_ok=True)
-    grafo = json.loads((proyecto / f"{project_name}.json").read_text(encoding="utf-8"))
+    grafo = json.loads((proyecto / f"{project_name}.extracted.json").read_text(encoding="utf-8"))
     lean = json.loads((proyecto / f"LEAN_{project_name}.json").read_text(encoding="utf-8"))
     prolog = json.loads((proyecto / f"PROLOG_{project_name}.json").read_text(encoding="utf-8"))
     nodos = {n.get("id"): n for n in grafo.get("nodes", []) if n.get("id")}
     objetivo = lean.get("result_json_node") or "T_RIEMANN"
     faltantes = sorted({d for n in nodos.values() for d in n.get("deps", []) if d not in nodos})
 
-    ciclos = []
-    visitados, activos = set(), []
-    def visitar(node_id):
-        if node_id in activos:
-            ciclos.append(activos[activos.index(node_id):] + [node_id])
-            return
+    # Recorrido iterativo: evita desbordar la pila con proyectos extensos.
+    visitados = set()
+    pendientes = [objetivo]
+    while pendientes:
+        node_id = pendientes.pop()
         if node_id in visitados or node_id not in nodos:
-            return
-        activos.append(node_id)
-        for dep in nodos[node_id].get("deps", []):
-            visitar(dep)
-        activos.pop()
+            continue
         visitados.add(node_id)
-    visitar(objetivo)
+        pendientes.extend(nodos[node_id].get("deps", []))
+
+    # Kahn sobre el subgrafo alcanzable. Si quedan nodos, existe un ciclo.
+    grados = {
+        node_id: sum(1 for dep in nodos[node_id].get("deps", []) if dep in visitados)
+        for node_id in visitados
+    }
+    dependientes = {node_id: [] for node_id in visitados}
+    for node_id in visitados:
+        for dep in nodos[node_id].get("deps", []):
+            if dep in visitados:
+                dependientes[dep].append(node_id)
+    cola = [node_id for node_id, grado in grados.items() if grado == 0]
+    procesados = set()
+    while cola:
+        node_id = cola.pop()
+        if node_id in procesados:
+            continue
+        procesados.add(node_id)
+        for dependiente in dependientes[node_id]:
+            grados[dependiente] -= 1
+            if grados[dependiente] == 0:
+                cola.append(dependiente)
+    ciclo_nodos = sorted(visitados - procesados)
+    ciclos = [ciclo_nodos] if ciclo_nodos else []
     alcanzables = sorted(visitados)
     raices = sorted(n for n in alcanzables if not nodos[n].get("deps"))
+
+    pendientes_con_antecedentes = []
+    for node_id, nodo in nodos.items():
+        proof = nodo.get("proof") if isinstance(nodo.get("proof"), dict) else {}
+        estados = {
+            str(proof.get("status", "")).lower(),
+            str(nodo.get("formalization_status", "")).lower(),
+            str(nodo.get("verification_status", "")).lower(),
+        }
+        esta_pendiente = bool(estados & {"pending", "not_evaluated", "pendiente"})
+        deps = [nodos.get(dep) for dep in nodo.get("deps", [])]
+        deps_demostradas = bool(deps) and all(
+            dep and isinstance(dep.get("proof"), dict)
+            and dep["proof"].get("status") in {"declared", "verified"}
+            for dep in deps
+        )
+        if esta_pendiente and deps_demostradas:
+            pendientes_con_antecedentes.append({
+                "node": node_id,
+                "dependencies": list(nodo.get("deps", [])),
+            })
 
     lean_log = (proyecto / f"LEAN_{project_name}.log").read_text(encoding="utf-8", errors="replace")
     hipotesis_abiertas = sorted(set(re.findall(r"\((h[A-Za-z0-9_']*)\s*:\s*([^\)]+)\)", lean_log)))
@@ -713,6 +845,7 @@ def auditar_cierre_proyecto(project_name):
         "prolog_aprobado": prolog.get("passed") is True,
         "nodo_lean_coincide": lean.get("result_json_node") == objetivo,
         "dependencias_lean_internalizadas": not hipotesis_abiertas,
+        "sin_pendientes_ya_demostrados": not pendientes_con_antecedentes,
     }
     if all(comprobaciones.values()):
         veredicto = "CERRADO"
@@ -730,6 +863,7 @@ def auditar_cierre_proyecto(project_name):
         "verdict": veredicto, "goal": objetivo, "checks": comprobaciones,
         "reachable_nodes": alcanzables, "root_facts": raices,
         "missing_dependencies": faltantes, "cycles": ciclos,
+        "pending_with_demonstrated_dependencies": pendientes_con_antecedentes,
         "open_lean_hypotheses": [{"name": n, "type": t.strip()} for n, t in hipotesis_abiertas],
         "lean_axioms": axiomas,
         "scope": "Auditoria tecnica de trazabilidad formal; no mide aceptacion cientifica.",
@@ -739,6 +873,10 @@ def auditar_cierre_proyecto(project_name):
     checks_md = "\n".join(f"- {'PASS' if ok else 'FAIL'} `{k}`" for k, ok in comprobaciones.items())
     roots_md = "\n".join(f"- `{r}`" for r in raices) or "- Ninguna"
     open_md = "\n".join(f"- `{n}: {t.strip()}`" for n, t in hipotesis_abiertas) or "- Ninguna"
+    pending_md = "\n".join(
+        f"- `{item['node']}` depende de: " + ", ".join(f"`{dep}`" for dep in item["dependencies"])
+        for item in pendientes_con_antecedentes
+    ) or "- Ninguno"
     informe = f"""# Auditoria final — {project_name}
 
 ## Veredicto
@@ -767,6 +905,13 @@ Si una propiedad ya esta demostrada en el proyecto, su presencia aqui indica que
 el generador debe enlazar el teorema correspondiente en vez de volver a pedirla
 como parametro. No convierte por si misma el resultado cientifico en condicional.
 
+## Pendientes contradichos por antecedentes demostrados
+
+{pending_md}
+
+Todo elemento de esta lista es un error de construccion: debe reutilizar sus
+antecedentes demostrados antes de poder publicarse como pendiente.
+
 ## Axiomas informados por Lean
 
 {', '.join(axiomas) if axiomas else 'Ninguno informado'}
@@ -779,7 +924,86 @@ como parametro. No convierte por si misma el resultado cientifico en condicional
         shutil.copy2(archivo, proyecto / archivo.name)
     print(f"  Auditoria final {project_name}: {veredicto}")
     print(f"  Raices: {len(raices)} | Enlaces Lean por internalizar: {len(hipotesis_abiertas)}")
+    print(f"  Pendientes con antecedentes demostrados: {len(pendientes_con_antecedentes)}")
     return veredicto
+
+
+def consolidar_json_final(project_name):
+    """Escribe al final el JSON publico y elimina el JSON provisional."""
+    proyecto = _proyecto_dir(project_name)
+    provisional = proyecto / f"{project_name}.extracted.json"
+    definitivo = proyecto / f"{project_name}.json"
+    lean_path = proyecto / f"LEAN_{project_name}.json"
+    prolog_path = proyecto / f"PROLOG_{project_name}.json"
+    audit_path = proyecto / f"AUDITORIA_{project_name}.json"
+
+    requeridos = (provisional, lean_path, prolog_path, audit_path)
+    faltantes = [str(path) for path in requeridos if not path.is_file()]
+    if faltantes:
+        raise FileNotFoundError(
+            "No se puede consolidar el JSON final; faltan: " + ", ".join(faltantes)
+        )
+
+    datos = json.loads(provisional.read_text(encoding="utf-8"))
+    lean = json.loads(lean_path.read_text(encoding="utf-8"))
+    prolog = json.loads(prolog_path.read_text(encoding="utf-8"))
+    audit = json.loads(audit_path.read_text(encoding="utf-8"))
+    nodos = datos.get("nodes", [])
+    por_id = {n.get("id"): n for n in nodos if n.get("id")}
+    alcanzables = set(audit.get("reachable_nodes", []))
+    nodo_lean = lean.get("result_json_node")
+
+    pendientes_con_antecedentes = []
+    for nodo in nodos:
+        proof = nodo.get("proof") if isinstance(nodo.get("proof"), dict) else {}
+        source_demonstrated = bool(proof and proof.get("status") in {"declared", "verified"})
+        nodo["source_status"] = "demonstrated" if source_demonstrated else "stated"
+        nodo["prolog_status"] = "reachable" if nodo.get("id") in alcanzables else "not_reached"
+        nodo["lean_status"] = (
+            "verified" if lean.get("passed") is True and nodo.get("id") == nodo_lean
+            else "not_individually_verified"
+        )
+
+        status = str(proof.get("status", "")).lower()
+        deps = [por_id.get(dep) for dep in nodo.get("deps", [])]
+        deps_demostradas = bool(deps) and all(
+            dep and isinstance(dep.get("proof"), dict)
+            and dep["proof"].get("status") in {"declared", "verified"}
+            for dep in deps
+        )
+        if status in {"pending", "not_evaluated", "pendiente"} and deps_demostradas:
+            pendientes_con_antecedentes.append({
+                "node": nodo.get("id"),
+                "dependencies": list(nodo.get("deps", [])),
+                "reason": "Marcado pendiente pese a tener antecedentes demostrados en la fuente.",
+            })
+
+    datos["artifact_stage"] = "validation_complete"
+    datos["lean_verification"] = lean
+    datos["prolog_verification"] = prolog
+    datos["closure_audit"] = audit
+    datos["pending_consistency_check"] = {
+        "passed": not pendientes_con_antecedentes,
+        "contradictions": pendientes_con_antecedentes,
+    }
+    datos["final_verdict"] = audit.get("verdict")
+    datos.pop("formal_verification", None)
+
+    temporal = definitivo.with_suffix(".json.tmp")
+    temporal.write_text(
+        json.dumps(datos, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    json.loads(temporal.read_text(encoding="utf-8"))
+    os.replace(temporal, definitivo)
+    provisional.unlink()
+    print(f"  JSON final consolidado: {definitivo.name}")
+    print("  JSON provisional eliminado correctamente.")
+    print(
+        "  Pendientes contradichos por antecedentes demostrados: "
+        f"{len(pendientes_con_antecedentes)}"
+    )
+    return definitivo
 
 
 # ============================================================
@@ -834,6 +1058,7 @@ if __name__ == "__main__":
 
     if TEST & 1 or TEST & 2:
         print(f"TEST{TEST}: Procesando documentos...")
+        errores_derivados = []
         for md_obj in md_objects:
             doc = md_obj.documento
             tipo = type(doc).__name__
@@ -891,6 +1116,28 @@ if __name__ == "__main__":
                 print(f"  [ERROR] Error en la lista de documentos: {e}")
                 import traceback
                 traceback.print_exc()
+                nombre_fallido = Path(doc.nombre).with_suffix("").name
+                errores_derivados.append((nombre_fallido, e))
+
+        if errores_derivados:
+            for nombre_fallido, _ in errores_derivados:
+                for carpeta, extension in (
+                    ("json", ".json"),
+                    ("lean", ".lean"),
+                    ("prolog", ".pl"),
+                ):
+                    provisional = PROJECT_ROOT / carpeta / f"{nombre_fallido}{extension}"
+                    if provisional.is_file():
+                        provisional.unlink()
+                        print(f"  [LIMPIADO] Derivado provisional: {provisional}")
+            for project_name in list(MARKDOWNS_DEMOSTRACIONES_WEB_PREPARADOS):
+                _restaurar_markdown_preparado(project_name)
+            print(
+                "\n[RECHAZADO] La generacion de derivados no termino. "
+                "No se evaluara ni publicara ningun proyecto."
+            )
+            sys.exit(1)
+
         print(f"\n[OK] Procesamiento de documentos completado. Total: {len(md_objects)} archivos.")
 
     # KDP
@@ -1047,5 +1294,9 @@ if __name__ == "__main__":
                 forzado=True
             )
             wp_demo.sync()
+
+        # Solo despues de aprobar Lean/Prolog/auditoria y completar la subida
+        # se devuelven las fuentes verificadas a su proyecto de procedencia.
+        devolver_fuentes_verificadas(proyectos_pendientes)
 
     print("\n[OK] Proceso completado.")

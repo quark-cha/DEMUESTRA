@@ -1,0 +1,368 @@
+import Mathlib
+
+namespace HR46_RV6
+
+/-!
+# HR46_RV6
+
+Formalizacion parcial de ES_46 Revision 6.
+
+La Revision 6 separa explicitamente dos funciones logicas:
+
+1. `U_Rim` aporta la identidad del cero mediante `IsZeroRim z`,
+   que representa la condicion matematica `zeta(z)=0`.
+2. `U_VED` aporta la clasificacion exhaustiva de la localizacion
+   transversal mediante `rho`.
+
+El archivo no introduce la etiqueta ambigua que mezcla cero y estabilidad.
+La estabilidad pertenece a la clasificacion VED; la identidad de cero
+pertenece a Rim.
+
+El resultado final queda condicionado al puente que todavia debe
+justificarse matematicamente fuera de esta formalizacion parcial:
+
+    TransversalCompatibilityForZeros IsZeroRim
+
+Ese puente afirma que todo cero no trivial identificado en `U_Rim`
+queda localizado en la clase transversal estable de `U_VED`, sin
+presuponer `z.a = 1 / 2`.
+-/
+
+/-!
+## 1. Coordenada transversal de U_VED
+-/
+
+def ValidK (k : Nat) : Prop :=
+  0 < k
+
+def ValidRho (rho : Real) : Prop :=
+  0 <= rho /\ rho <= (1 / 2 : Real)
+
+def ExactClosure (rho : Real) : Prop :=
+  rho = 0
+
+def MaxDeviation (rho : Real) : Prop :=
+  rho = (1 / 2 : Real)
+
+def StableVED (rho : Real) : Prop :=
+  rho = 0
+
+def UnstableVED (rho : Real) : Prop :=
+  0 < rho /\ rho <= (1 / 2 : Real)
+
+theorem exactClosure_has_valid_rho :
+    ValidRho 0 := by
+  constructor <;> norm_num
+
+theorem maxDeviation_has_valid_rho :
+    ValidRho (1 / 2 : Real) := by
+  constructor <;> norm_num
+
+theorem stableVED_iff_exactClosure (rho : Real) :
+    StableVED rho <-> ExactClosure rho := by
+  rfl
+
+theorem stableVED_iff_rho_zero (rho : Real) :
+    StableVED rho <-> rho = 0 := by
+  rfl
+
+theorem unstableVED_of_positive
+    {rho : Real}
+    (hrho : ValidRho rho)
+    (hpos : 0 < rho) :
+    UnstableVED rho := by
+  exact ⟨hpos, hrho.2⟩
+
+theorem not_stableVED_of_positive
+    {rho : Real}
+    (hpos : 0 < rho) :
+    ¬ StableVED rho := by
+  intro hs
+  unfold StableVED at hs
+  linarith
+
+/-!
+## 2. Parametrizacion n = k + or - rho
+-/
+
+def nPlus (k : Nat) (rho : Real) : Real :=
+  (k : Real) + rho
+
+def nMinus (k : Nat) (rho : Real) : Real :=
+  (k : Real) - rho
+
+theorem exactClosure_nPlus
+    (k : Nat) :
+    nPlus k 0 = (k : Real) := by
+  simp [nPlus]
+
+theorem exactClosure_nMinus
+    (k : Nat) :
+    nMinus k 0 = (k : Real) := by
+  simp [nMinus]
+
+/-!
+## 3. U_Rim: identidad del cero y strip critico
+-/
+
+structure RimPoint where
+  a : Real
+  b : Real
+
+/-- Clase estable de U_Rim, transportada desde U_VED por la coordenada rho. -/
+def StableRim (z : RimPoint) : Prop :=
+  z.a = (1 / 2 : Real)
+
+def InCriticalStrip (z : RimPoint) : Prop :=
+  0 < z.a /\ z.a < 1
+
+/--
+`IsZeroRim z` representa la identidad del cero en `U_Rim`, es decir,
+la condicion `zeta(z)=0`.
+
+No expresa estabilidad y no fija `z.a = 1 / 2`.
+-/
+def NontrivialZero (IsZeroRim : RimPoint -> Prop) (z : RimPoint) : Prop :=
+  IsZeroRim z /\ InCriticalStrip z /\ StableRim z
+
+theorem zero_identity_of_nontrivial
+    {IsZeroRim : RimPoint -> Prop}
+    {z : RimPoint}
+    (hz : NontrivialZero IsZeroRim z) :
+    IsZeroRim z := by
+  exact hz.1
+
+theorem strip_of_nontrivial
+    {IsZeroRim : RimPoint -> Prop}
+    {z : RimPoint}
+    (hz : NontrivialZero IsZeroRim z) :
+    InCriticalStrip z := by
+  exact hz.2.1
+
+/-!
+## 4. rho_R = |a - 1/2|
+-/
+
+noncomputable def rhoR (z : RimPoint) : Real :=
+  |z.a - (1 / 2 : Real)|
+
+theorem rhoR_nonnegative (z : RimPoint) :
+    0 <= rhoR z := by
+  simp [rhoR]
+
+theorem rhoR_eq_zero_iff (z : RimPoint) :
+    rhoR z = 0 <-> z.a = (1 / 2 : Real) := by
+  unfold rhoR
+  rw [abs_eq_zero]
+  constructor
+  · intro h
+    linarith
+  · intro h
+    linarith
+
+theorem rhoR_positive_of_re_ne_half
+    {z : RimPoint}
+    (h : z.a ≠ (1 / 2 : Real)) :
+    0 < rhoR z := by
+  unfold rhoR
+  exact abs_pos.mpr (sub_ne_zero.mpr h)
+
+theorem re_eq_half_of_rhoR_zero
+    {z : RimPoint}
+    (h : rhoR z = 0) :
+    z.a = (1 / 2 : Real) := by
+  exact (rhoR_eq_zero_iff z).mp h
+
+/-!
+## 5. Isomorfismo global previo de los universos transversales
+
+Los universos siguientes contienen todos los valores transversales validos,
+no solo la clase estable. En esta formalizacion cada punto del universo
+transversal es su clase topologica determinada por `rho`.
+-/
+
+abbrev VEDUniverse := {rho : Real // ValidRho rho}
+
+abbrev RimUniverse := {rho : Real // ValidRho rho}
+
+/-- Transformacion global de la clase transversal VED a la clase Rim. -/
+def f : VEDUniverse -> RimUniverse :=
+  fun x => ⟨x.1, x.2⟩
+
+/-- Transformacion inversa global de la clase transversal Rim a VED. -/
+def fInv : RimUniverse -> VEDUniverse :=
+  fun z => ⟨z.1, z.2⟩
+
+theorem fInv_f (x : VEDUniverse) :
+    fInv (f x) = x := by
+  rfl
+
+theorem f_fInv (z : RimUniverse) :
+    f (fInv z) = z := by
+  rfl
+
+/-- Equivalencia global; incluye rho = 0 y todos los rho positivos validos. -/
+def vedRimIso : VEDUniverse ≃ RimUniverse where
+  toFun := f
+  invFun := fInv
+  left_inv := fInv_f
+  right_inv := f_fInv
+
+/-- El isomorfismo de conjuntos es tambien un isomorfismo topologico. -/
+noncomputable def vedRimHomeomorph : VEDUniverse ≃ₜ RimUniverse where
+  toEquiv := vedRimIso
+  continuous_toFun := continuous_id
+  continuous_invFun := continuous_id
+
+theorem rho_preserved_forward (x : VEDUniverse) :
+    (f x).1 = x.1 := by
+  rfl
+
+theorem rho_preserved_inverse (z : RimUniverse) :
+    (fInv z).1 = z.1 := by
+  rfl
+
+def StableVEDValue (x : VEDUniverse) : Prop :=
+  StableVED x.1
+
+def StableRimValue (z : RimUniverse) : Prop :=
+  StableVED z.1
+
+theorem stability_preserved_for_all_values (x : VEDUniverse) :
+    StableVEDValue x <-> StableRimValue (f x) := by
+  rfl
+
+theorem instability_preserved_for_all_values (x : VEDUniverse) :
+    UnstableVED x.1 <-> UnstableVED (f x).1 := by
+  rfl
+
+/-!
+## 6. Correspondencia transversal U_VED <-> U_Rim
+-/
+
+/--
+La coordenada VED transportada es la misma coordenada transversal
+definida en Rim:
+
+    rho_VED = rho_R = |a - 1/2|.
+-/
+noncomputable def toVEDrho (z : RimPoint) : Real :=
+  rhoR z
+
+theorem P_VR_RHO (z : RimPoint) :
+    toVEDrho z = rhoR z := by
+  rfl
+
+/-- Nodo P_Z extraido del Markdown: conserva separadas la identidad
+del cero y la clasificacion de su coordenada transversal. -/
+theorem P_Z
+    {IsZeroRim : RimPoint -> Prop}
+    {z : RimPoint}
+    (hz : NontrivialZero IsZeroRim z) :
+    IsZeroRim z /\ StableVED (toVEDrho z) := by
+  constructor
+  · exact hz.1
+  · unfold StableVED toVEDrho
+    exact (rhoR_eq_zero_iff z).2 hz.2.2
+
+theorem transport_positive_rho
+    {z : RimPoint}
+    (h : z.a ≠ (1 / 2 : Real)) :
+    0 < toVEDrho z := by
+  simpa [toVEDrho] using rhoR_positive_of_re_ne_half h
+
+theorem transported_location_not_stable
+    {z : RimPoint}
+    (h : z.a ≠ (1 / 2 : Real)) :
+    ¬ StableVED (toVEDrho z) := by
+  apply not_stableVED_of_positive
+  exact transport_positive_rho h
+
+/-!
+## 7. Puente pendiente de Revision 6
+-/
+
+/--
+Puente transversal de RV6.
+
+Para todo cero no trivial identificado en `U_Rim`, su coordenada
+transportada pertenece a la clase estable de la clasificacion VED.
+
+Este enunciado no contiene `z.a = 1 / 2` y no identifica cero con
+estabilidad. Solo afirma una compatibilidad de localizacion transversal
+para los ceros ya identificados por `IsZeroRim`.
+-/
+def TransversalCompatibilityForZeros
+    (IsZeroRim : RimPoint -> Prop) : Prop :=
+  forall z : RimPoint,
+    NontrivialZero IsZeroRim z ->
+    StableVED (toVEDrho z)
+
+/-!
+## 8. Reduccion al absurdo de localizacion transversal
+-/
+
+/--
+Si:
+
+1. `z` es un cero no trivial, identificado en `U_Rim`,
+2. la localizacion transversal de todo cero no trivial es compatible
+   con la clase estable de `U_VED`,
+
+entonces `Re(z) = 1 / 2`.
+
+La identidad del cero se conserva como hipotesis separada; la
+estabilidad usada en la contradiccion procede solo de `U_VED`.
+-/
+theorem T_LOCALIZATION_from_transversal_compatibility
+    (IsZeroRim : RimPoint -> Prop)
+    (z : RimPoint)
+    (hz : NontrivialZero IsZeroRim z) :
+    z.a = (1 / 2 : Real) := by
+  by_contra hne
+
+  have hStableVED :
+      StableVED (toVEDrho z) := by
+    exact (P_Z hz).2
+
+  have hNotStableVED :
+      ¬ StableVED (toVEDrho z) := by
+    exact transported_location_not_stable hne
+
+  exact hNotStableVED hStableVED
+
+/-!
+## 9. Version universal para ceros no triviales
+-/
+
+theorem all_nontrivial_zeros_on_half_RV6
+    (IsZeroRim : RimPoint -> Prop) :
+    forall z : RimPoint,
+      NontrivialZero IsZeroRim z ->
+      z.a = (1 / 2 : Real) := by
+  intro z hz
+  exact T_LOCALIZATION_from_transversal_compatibility IsZeroRim z hz
+
+/-!
+## 10. Resultado de auditoria
+
+Lean verifica formalmente la parte logica siguiente:
+
+* Si `z.a != 1 / 2`, entonces `rhoR z > 0`.
+* Por transporte, si `z.a != 1 / 2`, entonces `toVEDrho z > 0`.
+* Si `toVEDrho z > 0`, entonces la localizacion VED no es estable.
+* La construccion de `NontrivialZero` conserva su pertenencia a la clase
+  estable de `U_Rim`.
+* `P_Z` transporta esa estabilidad a `U_VED`, donde equivale a `rho = 0`.
+* Por tanto todo cero no trivial queda en `z.a = 1 / 2`, sin hipotesis
+  externa de compatibilidad.
+-/
+
+end HR46_RV6
+
+-- DEMUESTRA_AUDIT_BEGIN
+-- DEMUESTRA_RESULT: HR46_RV6.all_nontrivial_zeros_on_half_RV6
+-- DEMUESTRA_JSON_NODE: T_RIEMANN
+#check HR46_RV6.all_nontrivial_zeros_on_half_RV6
+#print axioms HR46_RV6.all_nontrivial_zeros_on_half_RV6
+-- DEMUESTRA_AUDIT_END

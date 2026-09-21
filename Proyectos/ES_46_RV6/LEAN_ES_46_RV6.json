@@ -1,22 +1,20 @@
 {
   "project": "ES_46_RV6",
   "tool": "Lean 4",
-  "generated_on": "2026-09-19T17:24:44+00:00",
-  "verdict": "APROBADO",
-  "passed": true,
-  "exit_code": 0,
-  "failure_type": null,
-  "diagnosis": "Lean compilo correctamente todos los archivos evaluados.",
-  "action_required": "No se requiere ninguna accion.",
+  "generated_on": "2026-09-20T20:29:36+00:00",
+  "verdict": "RECHAZADO",
+  "passed": false,
+  "exit_code": 1,
+  "failure_type": "compilacion",
+  "diagnosis": "Lean termino y devolvio errores de compilacion o demostracion.",
+  "action_required": "Revisar en el log los mensajes de Lean con archivo, linea y columna.",
   "lean_files": [
     "ES_46_RV6.lean"
   ],
-  "result_theorem": "HR46_RV6.all_nontrivial_zeros_on_half_RV6",
+  "result_theorem": "ES_46_RV6.derive_T_RIEMANN",
   "result_json_node": "T_RIEMANN",
   "log": "logs\\LEAN_ES_46_RV6.log",
   "scope": "Lean 4 solo certifica las definiciones, teoremas e inferencias formalizadas en los archivos Lean evaluados.",
   "adec": "Evaluacion manual; no automatizada hasta que ADEC admita url_json.",
-  "verified_json_nodes": [
-    "T_RIEMANN"
-  ]
+  "verified_json_nodes": []
 }

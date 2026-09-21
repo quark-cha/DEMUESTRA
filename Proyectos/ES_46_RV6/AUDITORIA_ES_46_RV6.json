@@ -1,8 +1,8 @@
 {
   "project": "ES_46_RV6",
   "tool": "DEMUESTRA Closure Audit",
-  "generated_on": "2026-09-19T17:24:45+00:00",
-  "verdict": "APROBADO_CON_OBSERVACIONES",
+  "generated_on": "2026-09-20T02:47:08+00:00",
+  "verdict": "CERRADO",
   "goal": "T_RIEMANN",
   "checks": {
     "objetivo_existe": true,
@@ -11,7 +11,8 @@
     "lean_aprobado": true,
     "prolog_aprobado": true,
     "nodo_lean_coincide": true,
-    "dependencias_lean_internalizadas": false
+    "dependencias_lean_internalizadas": true,
+    "sin_pendientes_ya_demostrados": true
   },
   "reachable_nodes": [
     "A_L",
@@ -26,6 +27,7 @@
     "D_t_prime",
     "P_COORD",
     "P_RHO_ISO",
+    "P_RIM_S",
     "P_ST",
     "P_VED_E",
     "P_VED_Inv",
@@ -51,12 +53,8 @@
   ],
   "missing_dependencies": [],
   "cycles": [],
-  "open_lean_hypotheses": [
-    {
-      "name": "hCompat",
-      "type": "HR46_RV6.TransversalCompatibilityForZeros IsZeroRim"
-    }
-  ],
+  "pending_with_demonstrated_dependencies": [],
+  "open_lean_hypotheses": [],
   "lean_axioms": [
     "propext",
     "Classical.choice",

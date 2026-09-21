@@ -2,13 +2,13 @@
 
 ## Veredicto
 
-**APROBADO**
+**RECHAZADO**
 
-Fecha UTC: `2026-09-19T17:24:44+00:00`
-Codigo de salida: `0`
+Fecha UTC: `2026-09-20T20:29:36+00:00`
+Codigo de salida: `1`
 Salida completa: `logs\LEAN_ES_46_RV6.log`
-Diagnostico: Lean compilo correctamente todos los archivos evaluados.
-Accion: No se requiere ninguna accion.
+Diagnostico: Lean termino y devolvio errores de compilacion o demostracion.
+Accion: Revisar en el log los mensajes de Lean con archivo, linea y columna.
 
 ## Archivos Lean evaluados
 
@@ -16,7 +16,7 @@ Accion: No se requiere ninguna accion.
 
 ## Teorema resultado
 
-`HR46_RV6.all_nontrivial_zeros_on_half_RV6`
+`ES_46_RV6.derive_T_RIEMANN`
 
 ## Alcance
 

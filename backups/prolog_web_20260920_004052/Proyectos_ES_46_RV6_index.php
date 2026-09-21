@@ -1,0 +1,179 @@
+<?php
+// Plantilla unica: funciona como indice en /proyectos/ y como ficha al copiarse
+// dentro de /proyectos/NOMBRE/. Se mantiene en DEMUESTRA/Proyectos/index.php.
+$dir = __DIR__;
+$directoryName = basename($dir);
+
+const ADEC_BASE_URL = 'https://sites.google.com/view/numeriprimi-teoremiecongetture/adec-engine/v0-8-6';
+const ADEC_ANCHOR = '#h.4q0y44bfwvi3';
+
+function h($value) { return htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); }
+function starts_with($value, $prefix) { return substr((string) $value, 0, strlen($prefix)) === $prefix; }
+function public_file_url($file) {
+    $https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
+    $scheme = $https ? 'https' : 'http';
+    $host = $_SERVER['HTTP_HOST'] ?? '';
+    $path = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '')), '/');
+    $encoded = implode('/', array_map('rawurlencode', explode('/', str_replace('\\', '/', $file))));
+    return $scheme . '://' . $host . ($path ? $path : '') . '/' . $encoded;
+}
+function adec_url_for_json($jsonFile, $version = null) {
+    $url = public_file_url($jsonFile);
+    if ($version !== null) $url .= '?v=' . rawurlencode((string) $version);
+    return ADEC_BASE_URL . '?json_url=' . rawurlencode($url) . '&authuser=0' . ADEC_ANCHOR;
+}
+function read_json($path) {
+    if (!is_file($path)) return [];
+    $data = json_decode((string) file_get_contents($path), true);
+    return is_array($data) ? $data : [];
+}
+function file_if_exists($directory, $name) { return is_file($directory . DIRECTORY_SEPARATOR . $name) ? $name : null; }
+function first_file($directory, $names) {
+    foreach ($names as $name) if (is_file($directory . DIRECTORY_SEPARATOR . $name)) return $name;
+    return null;
+}
+function text_viewer_url($prefix, $file) {
+    $index = $prefix === '' ? 'index.php' : rtrim($prefix, '/') . '/index.php';
+    return $index . '?view=' . rawurlencode($file);
+}
+
+// Nginx puede bloquear las extensiones .log y .lean aunque existan. Esta
+// vista sirve solo archivos de texto permitidos del directorio actual.
+if (isset($_GET['view'])) {
+    $requested = (string) $_GET['view'];
+    $extension = strtolower(pathinfo($requested, PATHINFO_EXTENSION));
+    $validName = basename($requested) === $requested
+        && preg_match('/\A[A-Za-z0-9_.-]+\z/', $requested)
+        && in_array($extension, ['log', 'lean', 'pl'], true);
+    $candidate = $validName ? realpath($dir . DIRECTORY_SEPARATOR . $requested) : false;
+    $validPath = $candidate !== false
+        && is_file($candidate)
+        && realpath(dirname($candidate)) === realpath($dir);
+
+    if (!$validPath) {
+        http_response_code(404);
+        header('Content-Type: text/plain; charset=UTF-8');
+        echo "Archivo no disponible.\n";
+        exit;
+    }
+
+    header('Content-Type: text/plain; charset=UTF-8');
+    header('Content-Disposition: inline; filename="' . basename($candidate) . '"');
+    header('X-Content-Type-Options: nosniff');
+    readfile($candidate);
+    exit;
+}
+
+function project_info($directory, $base, $urlPrefix = '') {
+    $jsonName = $base . '.json';
+    if (!is_file($directory . DIRECTORY_SEPARATOR . $jsonName)) return null;
+    $data = read_json($directory . DIRECTORY_SEPARATOR . $jsonName);
+    $leanEvalName = 'LEAN_' . $base . '.json';
+    $leanEval = read_json($directory . DIRECTORY_SEPARATOR . $leanEvalName);
+    $prologEvalName = 'PROLOG_' . $base . '.json';
+    $prologEval = read_json($directory . DIRECTORY_SEPARATOR . $prologEvalName);
+    $auditName = 'AUDITORIA_' . $base . '.json';
+    $audit = read_json($directory . DIRECTORY_SEPARATOR . $auditName);
+    $prefix = $urlPrefix === '' ? '' : rtrim($urlPrefix, '/') . '/';
+    return [
+        'base' => $base,
+        'url' => $urlPrefix === '' ? './' : $urlPrefix . '/',
+        'title' => $data['title'] ?? $base,
+        'subtitle' => $data['subtitle'] ?? null,
+        'revision' => $data['revision'] ?? null,
+        'image' => first_file($directory, [$base . '.jpg', $base . '.jpeg', $base . '.png', $base . '.webp']),
+        'pdf' => file_if_exists($directory, $base . '.pdf') ? $prefix . $base . '.pdf' : null,
+        'md' => file_if_exists($directory, $base . '.md') ? $prefix . $base . '.md' : null,
+        'json' => $prefix . $jsonName,
+        'json_version' => filemtime($directory . DIRECTORY_SEPARATOR . $jsonName) ?: null,
+        'lean_source' => file_if_exists($directory, $base . '.lean') ? text_viewer_url($urlPrefix, $base . '.lean') : null,
+        'lean_md' => file_if_exists($directory, 'LEAN_' . $base . '.md') ? $prefix . 'LEAN_' . $base . '.md' : null,
+        'lean_json' => file_if_exists($directory, $leanEvalName) ? $prefix . $leanEvalName : null,
+        'lean_log' => file_if_exists($directory, 'LEAN_' . $base . '.log') ? text_viewer_url($urlPrefix, 'LEAN_' . $base . '.log') : null,
+        'lean_verdict' => $leanEval['verdict'] ?? null,
+        'lean_passed' => array_key_exists('passed', $leanEval) ? (bool) $leanEval['passed'] : null,
+        'prolog_source' => file_if_exists($directory, $base . '.pl') ? text_viewer_url($urlPrefix, $base . '.pl') : null,
+        'prolog_md' => file_if_exists($directory, 'PROLOG_' . $base . '.md') ? $prefix . 'PROLOG_' . $base . '.md' : null,
+        'prolog_json' => file_if_exists($directory, $prologEvalName) ? $prefix . $prologEvalName : null,
+        'prolog_log' => file_if_exists($directory, 'PROLOG_' . $base . '.log') ? text_viewer_url($urlPrefix, 'PROLOG_' . $base . '.log') : null,
+        'prolog_verdict' => $prologEval['verdict'] ?? null,
+        'audit_md' => file_if_exists($directory, 'AUDITORIA_' . $base . '.md') ? $prefix . 'AUDITORIA_' . $base . '.md' : null,
+        'audit_json' => file_if_exists($directory, $auditName) ? $prefix . $auditName : null,
+        'audit_log' => file_if_exists($directory, 'AUDITORIA_' . $base . '.log') ? text_viewer_url($urlPrefix, 'AUDITORIA_' . $base . '.log') : null,
+        'audit_verdict' => $audit['verdict'] ?? null,
+    ];
+}
+
+$currentProject = project_info($dir, $directoryName);
+$isProjectPage = $currentProject !== null;
+$projects = [];
+if ($isProjectPage) {
+    $projects[] = $currentProject;
+} else {
+    foreach (glob($dir . DIRECTORY_SEPARATOR . '*', GLOB_ONLYDIR) ?: [] as $projectDir) {
+        $base = basename($projectDir);
+        $project = project_info($projectDir, $base, rawurlencode($base));
+        if ($project !== null) $projects[] = $project;
+    }
+    usort($projects, fn($a, $b) => strcasecmp($a['base'], $b['base']));
+}
+?>
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title><?= $isProjectPage ? h($currentProject['base']) . ' - DEMUESTRA' : 'DEMUESTRA - Proyectos' ?></title>
+<style>
+:root{color-scheme:light;--bg:#f5f7f6;--panel:#fff;--text:#172126;--muted:#647178;--line:#d5deda;--accent:#126783;--ok:#247047;--bad:#a33838;--warn:#8a6414}*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--text)}header{background:#fff;border-bottom:1px solid var(--line)}.wrap{width:min(1120px,calc(100% - 32px));margin:auto}.top{padding:26px 0 22px;display:flex;justify-content:space-between;align-items:end;gap:20px}h1{margin:0;font-size:clamp(28px,5vw,48px);line-height:1;letter-spacing:0}.muted{color:var(--muted)}main{padding:26px 0 48px}.back{display:inline-block;margin-bottom:18px;color:var(--accent);font-weight:700;text-decoration:none}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:18px}.project-page .grid{grid-template-columns:1fr}article{display:grid;grid-template-rows:auto 1fr auto;border:1px solid var(--line);border-radius:8px;background:var(--panel);overflow:hidden}.project-page article{grid-template-columns:minmax(260px,.8fr) minmax(320px,1.2fr);grid-template-rows:1fr auto}.image{aspect-ratio:16/9;background:#e8edeb;border-bottom:1px solid var(--line)}.project-page .image{grid-row:1/span 2;aspect-ratio:auto;border:0;border-right:1px solid var(--line)}.image img{width:100%;height:100%;object-fit:cover;display:block}.body{padding:18px}.meta{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;color:var(--muted);font-size:13px}.badge{border:1px solid var(--line);border-radius:999px;padding:3px 9px;font-weight:700}.approved{color:var(--ok);border-color:#a8cfb8;background:#f2faf5}.rejected{color:var(--bad);border-color:#dfb0b0;background:#fff5f5}.pending{color:var(--warn)}h2{margin:0 0 9px;font-size:22px;line-height:1.2;letter-spacing:0}p{margin:0;color:var(--muted);line-height:1.5}.actions{display:flex;flex-wrap:wrap;gap:8px;padding:0 18px 18px}.actions a{display:inline-flex;align-items:center;justify-content:center;min-height:37px;padding:8px 12px;border:1px solid var(--accent);border-radius:6px;color:var(--accent);background:#fff;text-decoration:none;font-size:14px;font-weight:700}.actions a.primary{background:var(--accent);color:#fff}.actions a.lean{border-color:var(--ok);color:var(--ok)}.actions a.lean.primary{background:var(--ok);color:#fff}.actions a.disabled{pointer-events:none;border-color:#aaa;color:#777;background:#eee}.enter{margin-left:auto}.empty{padding:28px;border:1px dashed var(--line);background:#fff;border-radius:8px;color:var(--muted)}.prolog-help{margin-top:18px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:#fff}.prolog-help summary{cursor:pointer;padding:15px 0;font-weight:750;color:var(--accent)}.prolog-help .help-body{padding:0 0 18px;display:grid;gap:10px}.prolog-help p{color:var(--text)}.prolog-help code{display:block;overflow-wrap:anywhere;padding:9px 11px;background:#eef2f0;border-left:3px solid var(--ok);font-family:ui-monospace,"Cascadia Code",monospace;font-size:13px}.prolog-help a{color:var(--accent);font-weight:700}@media(max-width:720px){.top{display:block}.top .muted{display:block;margin-top:9px}.project-page article{grid-template-columns:1fr;grid-template-rows:auto 1fr auto}.project-page .image{grid-row:auto;aspect-ratio:16/9;border-right:0;border-bottom:1px solid var(--line)}.enter{margin-left:0}}
+</style></head>
+<body class="<?= $isProjectPage ? 'project-page' : 'projects-page' ?>">
+<header><div class="wrap top"><h1>DEMUESTRA</h1><span class="muted"><?= $isProjectPage ? h($currentProject['base']) : count($projects) . ' proyecto' . (count($projects) === 1 ? '' : 's') ?></span></div></header>
+<main class="wrap">
+<?php if ($isProjectPage): ?><a class="back" href="../">← Todos los proyectos</a><?php endif; ?>
+<?php if (!$projects): ?><div class="empty">No hay proyectos publicados todavía.</div><?php else: ?>
+<section class="grid" aria-label="Proyectos DEMUESTRA">
+<?php foreach ($projects as $project): ?>
+<?php $verdictClass = $project['lean_passed'] === true ? 'approved' : ($project['lean_passed'] === false ? 'rejected' : 'pending'); ?>
+<article>
+<div class="image"><?php if ($project['image']): ?><img src="<?= h(($isProjectPage ? '' : rawurlencode($project['base']) . '/') . $project['image']) ?>" alt="<?= h($project['title']) ?>"><?php endif; ?></div>
+<div class="body"><div class="meta"><strong><?= h($project['base']) ?></strong><?php if ($project['revision']): ?><span>rev. <?= h($project['revision']) ?></span><?php endif; ?><span class="badge <?= h($verdictClass) ?>">Lean: <?= h($project['lean_verdict'] ?? 'SIN EVALUAR') ?></span><span class="badge">Prolog: <?= h($project['prolog_verdict'] ?? 'SIN EVALUAR') ?></span><span class="badge">Auditoría: <?= h($project['audit_verdict'] ?? 'SIN EVALUAR') ?></span></div><h2><?= h($project['title']) ?></h2><?php if ($project['subtitle']): ?><p><?= h($project['subtitle']) ?></p><?php endif; ?></div>
+<div class="actions">
+<?php if ($project['pdf']): ?><a class="primary" href="<?= h($project['pdf']) ?>">PDF</a><?php endif; ?>
+<?php if ($project['md']): ?><a href="<?= h($project['md']) ?>">MD</a><?php endif; ?>
+<?php if ($project['json']): ?><a href="<?= h($project['json']) ?>">JSON</a><a href="<?= h(adec_url_for_json($project['json'], $project['json_version'])) ?>" target="_blank" rel="noopener noreferrer">ADEC</a><?php endif; ?>
+<?php if ($project['lean_md']): ?><a class="lean primary" href="<?= h($project['lean_md']) ?>">Evaluación Lean</a><?php else: ?><a class="disabled">Lean sin evaluar</a><?php endif; ?>
+<?php if ($project['lean_json']): ?><a class="lean" href="<?= h($project['lean_json']) ?>">Veredicto JSON</a><?php endif; ?>
+<?php if ($project['lean_log']): ?><a class="lean" href="<?= h($project['lean_log']) ?>">Salida Lean</a><?php endif; ?>
+<?php if ($project['lean_source']): ?><a href="<?= h($project['lean_source']) ?>">Código Lean</a><?php endif; ?>
+<?php if ($project['prolog_md']): ?><a class="lean primary" href="<?= h($project['prolog_md']) ?>">Evaluación Prolog</a><?php endif; ?>
+<?php if ($project['prolog_json']): ?><a href="<?= h($project['prolog_json']) ?>">Prolog JSON</a><?php endif; ?>
+<?php if ($project['prolog_log']): ?><a href="<?= h($project['prolog_log']) ?>">Salida Prolog</a><?php endif; ?>
+<?php if ($project['prolog_source']): ?><a href="<?= h($project['prolog_source']) ?>">Código Prolog</a><?php endif; ?>
+<?php if ($project['audit_md']): ?><a class="primary" href="<?= h($project['audit_md']) ?>">Auditoría final</a><?php endif; ?>
+<?php if ($project['audit_json']): ?><a href="<?= h($project['audit_json']) ?>">Auditoría JSON</a><?php endif; ?>
+<?php if ($project['audit_log']): ?><a href="<?= h($project['audit_log']) ?>">Salida auditoría</a><?php endif; ?>
+<?php if (!$isProjectPage): ?><a class="enter" href="<?= h($project['url']) ?>">Entrar al proyecto →</a><?php endif; ?>
+</div></article>
+<?php endforeach; ?>
+</section>
+<?php if ($isProjectPage && $currentProject['prolog_source']): ?>
+<details class="prolog-help">
+<summary>Instalar y comprobar SWI-Prolog</summary>
+<div class="help-body">
+<p>Instala <a href="https://www.swi-prolog.org/Download.html" target="_blank" rel="noopener noreferrer">SWI-Prolog</a> y comprueba que el ejecutable está disponible:</p>
+<code>winget install SWI-Prolog.SWI-Prolog</code>
+<code>swipl --version</code>
+<p>Descarga el código Prolog del proyecto y ejecútalo en su directorio:</p>
+<code>swipl -q -s <?= h($currentProject['base']) ?>.pl</code>
+<p>Una ejecución correcta muestra <strong>RESULTADO PROLOG: APROBADO</strong>, el objetivo demostrado y la cadena deductiva en sintaxis Prolog.</p>
+<p><strong>Lectura rápida de las reglas:</strong></p>
+<code>a :- b, c. &nbsp; significa: a es cierta si b Y c son ciertas.</code>
+<code>a :- (b ; c). &nbsp; significa: a es cierta si b O c es cierta.</code>
+<code>a :- b, c, !. &nbsp; significa: alcanzadas b y c, se acepta esa rama y no se prueban alternativas posteriores para a.</code>
+<p>El símbolo <code style="display:inline;padding:2px 5px;border:0">!</code> es el corte. Si se escribe otra condición después del corte, por ejemplo <code style="display:inline;padding:2px 5px;border:0">a :- b, c, !, d.</code>, Prolog todavía debe demostrar <code style="display:inline;padding:2px 5px;border:0">d</code>.</p>
+<p>DEMUESTRA parte del objetivo final y comprueba conjuntamente todas las dependencias alcanzables de su árbol deductivo. El resultado sólo es aprobado cuando puede cerrar el objetivo completo.</p>
+</div>
+</details>
+<?php endif; ?>
+<?php endif; ?>
+</main></body></html>

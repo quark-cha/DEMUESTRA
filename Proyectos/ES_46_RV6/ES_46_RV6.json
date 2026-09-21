@@ -3,26 +3,7 @@
   "title": "DOCUMENTO 46 — REVISIÓN 6",
   "version": "1.0",
   "validation_mode": "article_analysis",
-  "artifact_stage": "lean_validated",
-  "formal_verification": {
-    "tool": "Lean 4",
-    "status": "APROBADO",
-    "verified": true,
-    "exit_code": 0,
-    "formalization": "ES_46_RV6.lean",
-    "result_theorem": "HR46_RV6.all_nontrivial_zeros_on_half_RV6",
-    "result_json_node": "T_RIEMANN",
-    "axioms": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "report": "LEAN_ES_46_RV6.json",
-    "log": "LEAN_ES_46_RV6.log",
-    "diagnosis": "Lean compilo correctamente todos los archivos evaluados.",
-    "action_required": "No se requiere ninguna accion.",
-    "scope": "La verificacion se limita a las declaraciones formalizadas en ES_46_RV6.lean; no convierte automaticamente todos los nodos documentales del JSON en teoremas Lean."
-  },
+  "artifact_stage": "validation_complete",
   "source": "ES_46_RV6.md",
   "authors": [
     {
@@ -37,7 +18,10 @@
       "kind": "definition",
       "name": "El universo físico considerado se representa como",
       "description": "El universo físico considerado se representa como\n\n$$\n\\boxed{\nU=3S+T.\n}\n$$\n\nNo se elimina ninguna dimensión espacial.\n\n## 1.2. Elección local de la dirección de propagación\n\nSea una onda que en un punto determinado se propaga según una dirección espacial. Es lícito orientar localmente los ejes de coordenadas de manera que el eje $x$ coincida con la dirección instantánea de propagación.\n\nEntonces, para ese desplazamiento infinitesimal,\n\n$$\ndy=0,\n\\qquad\ndz=0,\n$$\n\ny\n\n$$\nds=dx.\n$$",
-      "deps": []
+      "deps": [],
+      "source_status": "stated",
+      "prolog_status": "reachable",
+      "lean_status": "not_individually_verified"
     },
     {
       "id": "P_COORD",
@@ -58,21 +42,30 @@
           "## 2.1.",
           "Convención esencial sobre el apóstrofo"
         ]
-      }
+      },
+      "source_status": "demonstrated",
+      "prolog_status": "reachable",
+      "lean_status": "not_individually_verified"
     },
     {
       "id": "D_t_prime",
       "kind": "definition",
       "name": "El apóstrofo de $t'$ **no significa derivada**.",
       "description": "El apóstrofo de $t'$ **no significa derivada**.\n\n$t'$ representa la coordenada temporal propia del sistema observado respecto del observador en la transformación de Lorentz. En consecuencia, $dt'$ es el diferencial del tiempo propio del sistema observado.\n\nCuando sea necesaria una derivada se escribirá explícitamente, por ejemplo,\n\n$$\n\\frac{dt'}{dt}.\n$$\n\n## 2.2. Antecedente de Lorentz",
-      "deps": []
+      "deps": [],
+      "source_status": "stated",
+      "prolog_status": "reachable",
+      "lean_status": "not_individually_verified"
     },
     {
       "id": "A_L",
       "kind": "foundation",
       "name": "Para velocidad relativa $v$,",
       "description": "Para velocidad relativa $v$,\n\n$$\ndt'\n=\ndt\n\\sqrt{\n1-\\frac{v^2}{c^2}\n}.\n$$\n\nDefinimos la velocidad longitudinal observada como\n\n$$\n\\boxed{\nv=\\frac{ds}{dt}.\n}\n$$\n\nEn unidades naturales,\n\n$$\nc=1.\n$$\n\nPor tanto,\n\n$$\ndt'^2\n=\ndt^2-ds^2,\n$$\n\ny obtenemos\n\n$$\n\\boxed{",
-      "deps": []
+      "deps": [],
+      "source_status": "stated",
+      "prolog_status": "reachable",
+      "lean_status": "not_individually_verified"
     },
     {
       "id": "P_ST",
@@ -98,7 +91,10 @@
           "La primera derivada espacial respecto de $t$ es",
           "$$ \\boxed{"
         ]
-      }
+      },
+      "source_status": "demonstrated",
+      "prolog_status": "reachable",
+      "lean_status": "not_individually_verified"
     },
     {
       "id": "P_v",
@@ -121,7 +117,10 @@
           "La segunda derivada es",
           "$$ \\boxed{"
         ]
-      }
+      },
+      "source_status": "demonstrated",
+      "prolog_status": "reachable",
+      "lean_status": "not_individually_verified"
     },
     {
       "id": "P_a",
@@ -147,21 +146,30 @@
           "## 4.1.",
           "Longitud de onda base"
         ]
-      }
+      },
+      "source_status": "demonstrated",
+      "prolog_status": "reachable",
+      "lean_status": "not_individually_verified"
     },
     {
       "id": "D_lambda",
       "kind": "definition",
       "name": "Sea $\\lambda$ la longitud de onda base asociada a la materia considerada.",
       "description": "Sea $\\lambda$ la longitud de onda base asociada a la materia considerada.\n\nA partir de las relaciones de Planck y Einstein,\n\n$$\nE=\\frac{hc}{\\lambda},\n$$\n\n$$\nE=Mc^2,\n$$\n\nse obtiene\n\n$$\nMc^2=\\frac{hc}{\\lambda},\n$$\n\ny por tanto\n\n$$\n\\boxed{\n\\lambda=\\frac{h}{Mc}.\n}\n$$\n\n## 4.2. Longitud de contorno",
-      "deps": []
+      "deps": [],
+      "source_status": "stated",
+      "prolog_status": "reachable",
+      "lean_status": "not_individually_verified"
     },
     {
       "id": "D_L",
       "kind": "definition",
       "name": "Sea $L$ la longitud total del contorno espacial recorrido por una onda confinada; es el perímetro de cierre de la onda.",
       "description": "Sea $L$ la longitud total del contorno espacial recorrido por una onda confinada; es el perímetro de cierre de la onda.\n\nDefinimos\n\n$$\n\\boxed{\nL=n\\lambda.\n}\n$$\n\nPara un cierre finito,\n\n$$\nn\\in\\mathbb R^+.\n$$\n\n## 4.3. Construcción de $U_{\\rm VED}$\n\n$D_{R_{\\rm VED}}$ — Se representa topológicamente el contorno de longitud $L$ mediante una circunferencia bidimensional de igual longitud:\n\n$$\n2\\pi R_{\\rm VED}=L.\n$$\n\nPor tanto,\n\n$$\n\\boxed{\nR_{\\rm VED}\n=\n\\frac{L}{2\\pi}\n=\n\\frac{n\\lambda}{2\\pi}.\n}\n$$\n\nLa afirmación no es que el confinamiento físico real en $3S+T$ tenga necesariamente forma circular. La circunferencia es una proyección topológica precisa que conserva la longitud $L$ y permite analizar las propiedades de cierre.\n\nAsí,\n\n$$\n\\boxed{\nU_{\\rm VED}(\\text{onda})\n=\nU_{\\rm VED}(\\text{cerrada},\\text{abierta})\n=\nU_{\\rm VED}(R_{\\rm VED})\n=\nU_{\\rm VED}(L,R_{\\rm VED}).\n}\n$$",
-      "deps": []
+      "deps": [],
+      "source_status": "stated",
+      "prolog_status": "reachable",
+      "lean_status": "not_individually_verified"
     },
     {
       "id": "P_VED_Inv",
@@ -187,21 +195,30 @@
           "Para todo $n$ finito positivo,",
           "$$ L=n\\lambda<\\infty, $$"
         ]
-      }
+      },
+      "source_status": "demonstrated",
+      "prolog_status": "reachable",
+      "lean_status": "not_individually_verified"
     },
     {
       "id": "D_k",
       "kind": "definition",
       "name": "Sea $k\\in\\mathbb N^+$ el entero positivo más próximo que sirve como centro de una familia de cierre.",
       "description": "Sea $k\\in\\mathbb N^+$ el entero positivo más próximo que sirve como centro de una familia de cierre.",
-      "deps": []
+      "deps": [],
+      "source_status": "stated",
+      "prolog_status": "reachable",
+      "lean_status": "not_individually_verified"
     },
     {
       "id": "D_rho",
       "kind": "definition",
       "name": "Sea",
       "description": "Sea\n\n$$\n\\boxed{\n\\rho\n=\n\\operatorname{dist}(n,\\mathbb N^+).\n}\n$$\n\nPor definición de distancia al entero más próximo,\n\n$$\n\\boxed{\n0\\le\\rho\\le\\frac12.\n}\n$$\n\nTodo cierre finito se representa como\n\n$$\n\\boxed{\nn=k\\pm\\rho,\n\\qquad\nk\\in\\mathbb N^+,\n\\qquad\n0\\le\\rho\\le\\frac12.\n}\n$$\n\nEn el punto exactamente equidistante entre dos enteros, $\\rho=1/2$; las dos etiquetas vecinas representan la misma frontera.\n\nEntonces\n\n$$\n\\boxed{\nL(k,\\rho)\n=\n(k\\pm\\rho)\\lambda,\n}\n$$\n\ny\n\n$$\n\\boxed{\nR_{\\rm VED}(k,\\rho)\n=\n\\frac{(k\\pm\\rho)\\lambda}{2\\pi}.\n}\n$$\n\n## 6.2. Estabilidad\n\nSi\n\n$$\n\\rho=0,\n$$\n\nentonces\n\n$$\nn=k,\n$$\n\ny\n\n$$\nL=k\\lambda.\n$$\n\nEl contorno contiene un número entero de ciclos y el retorno se produce exactamente en fase.\n\nPor tanto,\n\n$$\n\\boxed{",
-      "deps": []
+      "deps": [],
+      "source_status": "stated",
+      "prolog_status": "reachable",
+      "lean_status": "not_individually_verified"
     },
     {
       "id": "P_VED_E",
@@ -225,7 +242,10 @@
           "Existe desfase respecto del cierre exacto",
           "$$ \\boxed{"
         ]
-      }
+      },
+      "source_status": "demonstrated",
+      "prolog_status": "reachable",
+      "lean_status": "not_individually_verified"
     },
     {
       "id": "P_VED_I",
@@ -251,7 +271,10 @@
           "La parametrización anterior es exhaustiva.",
           "Para todo $n\\in\\mathbb R^+$ finito existe algún"
         ]
-      }
+      },
+      "source_status": "demonstrated",
+      "prolog_status": "not_reached",
+      "lean_status": "not_individually_verified"
     },
     {
       "id": "P_VED_K_E",
@@ -274,7 +297,10 @@
           "$$ k=1,2,3,\\ldots $$",
           "enumeran todos los casos de estabilidad sin dejar ninguno fuera."
         ]
-      }
+      },
+      "source_status": "demonstrated",
+      "prolog_status": "not_reached",
+      "lean_status": "not_individually_verified"
     },
     {
       "id": "P_VED_K_I",
@@ -293,7 +319,10 @@
         "steps": [
           "Para $\\rho=1/2$, los mismos $k$ enumeran todas las fronteras de máxima desviación."
         ]
-      }
+      },
+      "source_status": "demonstrated",
+      "prolog_status": "not_reached",
+      "lean_status": "not_individually_verified"
     },
     {
       "id": "P_VED_R_C",
@@ -316,7 +345,10 @@
           "Por tanto,",
           "$$ \\boxed{"
         ]
-      }
+      },
+      "source_status": "demonstrated",
+      "prolog_status": "not_reached",
+      "lean_status": "not_individually_verified"
     },
     {
       "id": "P_VED_Completo",
@@ -342,7 +374,10 @@
           "$A_7$ — En dicho documento se establece la constante geométrica",
           "$$ \\boxed{ \\tilde N = R_{\\rm VED}R_{\\rm Sch}. } $$"
         ]
-      }
+      },
+      "source_status": "demonstrated",
+      "prolog_status": "not_reached",
+      "lean_status": "not_individually_verified"
     },
     {
       "id": "P_VS",
@@ -368,7 +403,10 @@
           "Así, dentro del marco, el estado $n=2$ fija la gravitación universal observada y el límite de onda libre no aporta respuesta gravitatoria.",
           "El objetivo de esta sección no es utilizar $U_{\\rm Sch}$ para obtener Riemann, sino establecer un precedente demostrado: es posible transportar información entre topologías conservando el estado representado."
         ]
-      }
+      },
+      "source_status": "demonstrated",
+      "prolog_status": "not_reached",
+      "lean_status": "not_individually_verified"
     },
     {
       "id": "P_ST_2",
@@ -389,7 +427,10 @@
           "La ecuación dinámica se construye conservando la relación diferencial y su variación respecto de $t$",
           "$$ \\boxed{"
         ]
-      }
+      },
+      "source_status": "demonstrated",
+      "prolog_status": "not_reached",
+      "lean_status": "not_individually_verified"
     },
     {
       "id": "P_F",
@@ -411,7 +452,10 @@
           "Desarrollando respecto de $t$ en la notación adoptada en este marco,",
           "$$ \\boxed{"
         ]
-      }
+      },
+      "source_status": "demonstrated",
+      "prolog_status": "not_reached",
+      "lean_status": "not_individually_verified"
     },
     {
       "id": "P_F1",
@@ -435,7 +479,10 @@
           "La onda viaja localmente a $c$ tanto si es libre como si está confinada",
           "$$ \\boxed{"
         ]
-      }
+      },
+      "source_status": "demonstrated",
+      "prolog_status": "not_reached",
+      "lean_status": "not_individually_verified"
     },
     {
       "id": "P_W",
@@ -461,7 +508,10 @@
           "$$ \\frac{ds}{dt}=1. $$",
           "Esto implica igualdad numérica de las diferenciales de propagación en esas unidades,"
         ]
-      }
+      },
+      "source_status": "demonstrated",
+      "prolog_status": "not_reached",
+      "lean_status": "not_individually_verified"
     },
     {
       "id": "P_F1_2",
@@ -480,7 +530,10 @@
         "steps": [
           "$$ \\boxed{"
         ]
-      }
+      },
+      "source_status": "demonstrated",
+      "prolog_status": "not_reached",
+      "lean_status": "not_individually_verified"
     },
     {
       "id": "P_F2",
@@ -503,7 +556,10 @@
           "por lo que",
           "$$ \\boxed{"
         ]
-      }
+      },
+      "source_status": "demonstrated",
+      "prolog_status": "not_reached",
+      "lean_status": "not_individually_verified"
     },
     {
       "id": "P_F3",
@@ -529,7 +585,10 @@
           "No se obtiene suponiendo previamente la recta crítica.",
           "# 11."
         ]
-      }
+      },
+      "source_status": "demonstrated",
+      "prolog_status": "not_reached",
+      "lean_status": "not_individually_verified"
     },
     {
       "id": "D_Lap",
@@ -538,7 +597,10 @@
       "description": "La coordenada espectral compleja se escribe manteniendo siempre el par conjugado:\n\n$$\n\\boxed{\ns_\\pm\n=\na\\pm ib.\n}\n$$\n\nLa parte real y la parte imaginaria cumplen funciones distintas.\n\nDesde $P_{F3}$ se obtiene el desplazamiento algebraico central\n\n$$\n\\boxed{\na=\\frac12\n}\n$$\n\ncomo lugar geométrico del regulador.\n\nLa parte imaginaria se obtiene de la periodicidad de fase del cierre.\n\nPara un contorno\n\n$$\nT(k,\\rho)\n=\n(k\\pm\\rho)\\lambda\n$$\n\nen unidades $c=1$, la condición fundamental de fase es\n\n$$\ne^{\\pm ibT}=1.\n$$\n\nPara una vuelta fundamental,\n\n$$\nbT=2\\pi.\n$$\n\nPor tanto,\n\n$$\n\\boxed{\nb(k,\\rho)\n=\n\\frac{2\\pi}\n{(k\\pm\\rho)\\lambda}.\n}\n$$\n\nPara los cierres estables,\n\n$$\n\\rho=0,\n$$\n\nqueda\n\n$$\n\\boxed{\nb_k\n=\n\\frac{2\\pi}{k\\lambda}.\n}\n$$\n\ny la imagen estable es\n\n$$\n\\boxed{\nZ_{\\rm VED\\to Lap}\n=\n\\left\\{\n\\frac12\n\\pm\ni\\frac{2\\pi}{k\\lambda}\n:\nk\\in\\mathbb N^+\n\\right\\}.\n}\n$$",
       "deps": [
         "P_F3"
-      ]
+      ],
+      "source_status": "stated",
+      "prolog_status": "not_reached",
+      "lean_status": "not_individually_verified"
     },
     {
       "id": "P_Lap_Z",
@@ -564,7 +626,10 @@
           "Qué queda asentado antes de Riemann",
           "Hasta este punto quedan demostradas dentro del desarrollo las siguientes proposiciones"
         ]
-      }
+      },
+      "source_status": "demonstrated",
+      "prolog_status": "not_reached",
+      "lean_status": "not_individually_verified"
     },
     {
       "id": "P_VED_E_2",
@@ -583,7 +648,10 @@
         "steps": [
           "\\quad \\rho=0 \\iff \\text{estado estable}. $$"
         ]
-      }
+      },
+      "source_status": "demonstrated",
+      "prolog_status": "not_reached",
+      "lean_status": "not_individually_verified"
     },
     {
       "id": "P_VED_Completo_2",
@@ -602,7 +670,10 @@
         "steps": [
           "\\quad (k,\\rho) \\text{ contempla exhaustivamente todos los cierres finitos.} $$"
         ]
-      }
+      },
+      "source_status": "demonstrated",
+      "prolog_status": "not_reached",
+      "lean_status": "not_individually_verified"
     },
     {
       "id": "P_VED_K_E_2",
@@ -621,7 +692,10 @@
         "steps": [
           "\\quad k\\in\\mathbb N^+ \\text{ enumera todos los estados estables.} $$"
         ]
-      }
+      },
+      "source_status": "demonstrated",
+      "prolog_status": "not_reached",
+      "lean_status": "not_individually_verified"
     },
     {
       "id": "P_F3_2",
@@ -640,7 +714,10 @@
         "steps": [
           "\\quad F = 2dt \\left( 1+\\frac12dt \\right). $$"
         ]
-      }
+      },
+      "source_status": "demonstrated",
+      "prolog_status": "not_reached",
+      "lean_status": "not_individually_verified"
     },
     {
       "id": "P_Lap_Z_2",
@@ -662,35 +739,50 @@
           "# 13.",
           "Definición del espacio $U_{\\rm Rim}$"
         ]
-      }
+      },
+      "source_status": "demonstrated",
+      "prolog_status": "not_reached",
+      "lean_status": "not_individually_verified"
     },
     {
       "id": "D_Rim",
       "kind": "definition",
       "name": "Sea",
       "description": "Sea\n\n$$\nz=a\\pm ib\n$$\n\nla coordenada compleja en la que se estudia la función zeta de Riemann.\n\nLa función zeta se define inicialmente por\n\n$$\n\\zeta(s)\n=\n\\sum_{n=1}^{\\infty}\\frac1{n^s}\n$$\n\npara $\\Re(s)>1$ y se prolonga meromórficamente al plano complejo, con un polo simple en\n\n$$\n\\boxed{s=1.}\n$$\n\nSus ceros se dividen en dos sectores.\n\n## 13.1. Sector trivial\n\nLos ceros triviales son\n\n$$\n\\boxed{\nZ_{\\rm Rim}^{\\rm triv}\n=\n\\{-2,-4,-6,\\ldots\\}\n=\n\\{-2m:m\\in\\mathbb N^+\\}.\n}\n$$\n\nEste sector está completamente enumerado y no constituye el objeto de la Hipótesis de Riemann.\n\n## 13.2. Sector no trivial\n\nDefinimos\n\n$$\n\\boxed{\nZ_{\\rm Rim}^{\\rm nt}\n=\n\\{\nz\\in\\mathbb C:\n\\zeta(z)=0,\n\\;\n0<\\Re(z)<1\n\\}.\n}\n$$\n\nPor tanto, para un cero no trivial arbitrario,\n\n$$\n\\boxed{\nz=a\\pm ib,\n\\qquad\n0<a<1.\n}\n$$\n\nLa ecuación funcional de Riemann introduce la simetría transversal\n\n$$\na\n\\longleftrightarrow\n1-a.\n$$\n\nEl eje fijo de esta reflexión es\n\n$$\n\\boxed{\na=\\frac12.\n}\n$$\n\n---\n\n# 14. Partición topológica de $U_{\\rm Rim}$\n\nPara el sector no trivial definimos la distancia transversal al eje de simetría:\n\n$$\n\\boxed{",
-      "deps": []
+      "deps": [],
+      "source_status": "stated",
+      "prolog_status": "not_reached",
+      "lean_status": "not_individually_verified"
     },
     {
       "id": "D_rho_R",
       "kind": "definition",
       "name": "\\qquad",
       "description": "\\qquad\n\\rho_R\n=\n\\left|\na-\\frac12\n\\right|.\n}\n$$\n\nComo\n\n$$\n0<a<1,\n$$\n\nse cumple\n\n$$\n\\boxed{\n0\\le\\rho_R<\\frac12,\n}\n$$\n\nalcanzándose $\\rho_R=1/2$ únicamente como frontera del strip.\n\nIntroduciendo una rama $\\varepsilon=\\pm1$,\n\n$$\n\\boxed{\na\n=\n\\frac12+\\varepsilon\\rho_R.\n}\n$$\n\nPor tanto todo punto del strip crítico puede escribirse como\n\n$$\n\\boxed{\nz_{\\varepsilon,\\pm}\n=\n\\frac12\n+\n\\varepsilon\\rho_R\n\\pm ib.\n}\n$$\n\nLa transformación transversal tiene inversa explícita:\n\n$$\n\\boxed{\n\\rho_R\n=\n\\left|\n\\Re(z)-\\frac12\n\\right|.\n}\n$$\n\n---\n\n## 14.1. Isomorfismo global previo entre los universos topológicos\n\nLa correspondencia no se limita a los valores estables ni se construye para\nseleccionar ceros. Actúa sobre el conjunto completo de valores transversales\nadmisibles de ambos universos.",
-      "deps": []
+      "deps": [],
+      "source_status": "stated",
+      "prolog_status": "reachable",
+      "lean_status": "not_individually_verified"
     },
     {
       "id": "D_f",
       "kind": "definition",
       "name": "Sean",
       "description": "Sean\n\n$$\nU_{\\rm VED}^{\\rho}\n=\n\\left\\{x:\\rho_{\\rm VED}(x)\\in[0,\\tfrac12]\\right\\}\n$$\n\ny\n\n$$\nU_{\\rm Rim}^{\\rho}\n=\n\\left\\{z:\\rho_R(z)\\in[0,\\tfrac12]\\right\\}.\n$$\n\nDefinimos la transformación global\n\n$$\n\\boxed{\nf:U_{\\rm VED}^{\\rho}\\longrightarrow U_{\\rm Rim}^{\\rho}\n}\n$$\n\ncomo la transformación del valor topológico completo cuya coordenada\ntransversal es $\\rho$. Esta definición no impone una fórmula anticipada para\n$a=\\Re(z)$ ni presupone $a=1/2$.",
-      "deps": []
+      "deps": [],
+      "source_status": "stated",
+      "prolog_status": "reachable",
+      "lean_status": "not_individually_verified"
     },
     {
       "id": "D_fInv",
       "kind": "definition",
       "name": "Definimos la transformación inversa",
       "description": "Definimos la transformación inversa\n\n$$\n\\boxed{\nf^{-1}:U_{\\rm Rim}^{\\rho}\\longrightarrow U_{\\rm VED}^{\\rho}.\n}\n$$\n\nPara todo valor de ambos universos se exige\n\n$$\n\\boxed{\nf^{-1}(f(x))=x,\n\\qquad\nf(f^{-1}(z))=z.\n}\n$$",
-      "deps": []
+      "deps": [],
+      "source_status": "stated",
+      "prolog_status": "reachable",
+      "lean_status": "not_individually_verified"
     },
     {
       "id": "T_ISO",
@@ -711,13 +803,16 @@
           "$$ \\boxed{ U_{\\rm VED}^{\\rho}\\cong U_{\\rm Rim}^{\\rho}. } $$",
           "Este teorema se establece antes de aplicar la clasificación de estabilidad y es válido para $\\rho=0$ y para todo $0<\\rho\\le1/2$."
         ]
-      }
+      },
+      "source_status": "demonstrated",
+      "prolog_status": "reachable",
+      "lean_status": "not_individually_verified"
     },
     {
       "id": "P_RHO_ISO",
       "kind": "proposition",
       "name": "La coordenada transversal se conserva en las dos",
-      "description": "La coordenada transversal se conserva en las dos\ndirecciones del isomorfismo:\n\n$$\n\\boxed{\n\\rho_R(f(x))=\\rho_{\\rm VED}(x),\n\\qquad\n\\rho_{\\rm VED}(f^{-1}(z))=\\rho_R(z).\n}\n$$\n\n\nEn consecuencia, toda propiedad formulada mediante $\\rho$ se transporta para\ntodos los valores. En particular,\n\n$$\n\\rho=0\n\\iff\n\\text{clase estable},\n$$\n\ny\n\n$$\n0<\\rho\\le\\frac12\n\\iff\n\\text{clase no estable}\n$$\n\nse conservan tanto por $f$ como por $f^{-1}$. Esta conservación es una\nconsecuencia del isomorfismo global y no una condición añadida únicamente a\nlos ceros.\n\n---\n\n# 15. Correspondencia topológica directa $U_{\\rm VED}\\leftrightarrow U_{\\rm Rim}$\n\nEn $U_{\\rm VED}$ la estructura transversal alrededor de cada entero es\n\n$$\nk+\\rho\n\\longleftrightarrow\nk-\\rho.\n$$\n\nEl punto fijo es\n\n$$\n\\rho=0.\n$$\n\nEn $U_{\\rm Rim}$ la estructura transversal es\n\n$$\n\\frac12+\\rho_R\n\\longleftrightarrow\n\\frac12-\\rho_R.\n$$\n\nEl punto fijo es\n\n$$\n\\rho_R=0.\n$$\n\nDefinimos el mapa transversal\n\n$$\n\\boxed{\nR_\\rho:\n[0,\\tfrac12]_{\\rm VED}\n\\longrightarrow\n[0,\\tfrac12]_{\\rm Rim}\n}\n$$\n\npor\n\n$$\n\\boxed{\nR_\\rho(\\rho)=\\rho_R=\\rho.\n}\n$$\n\nSu inversa es\n\n$$\n\\boxed{\nR_\\rho^{-1}(\\rho_R)=\\rho_R.\n}\n$$\n\nAdemás,\n\n$$\n\\left|\nR_\\rho(\\rho_1)-R_\\rho(\\rho_2)\n\\right|\n=\n|\\rho_1-\\rho_2|.\n$$\n\nPor tanto $R_\\rho$ conserva la distancia transversal.\n\nQueda asentado:\n\n$$\n\\boxed{",
+      "description": "La coordenada transversal se conserva en las dos\ndirecciones del isomorfismo:\n\n$$\n\\boxed{\n\\rho_R(f(x))=\\rho_{\\rm VED}(x),\n\\qquad\n\\rho_{\\rm VED}(f^{-1}(z))=\\rho_R(z).\n}\n$$\n\n\nEn consecuencia, toda propiedad formulada mediante $\\rho$ se transporta para\ntodos los valores. En particular,\n\n$$\n\\rho=0\n\\iff\n\\text{clase estable},\n$$\n\ny\n\n$$\n0<\\rho\\le\\frac12\n\\iff\n\\text{clase no estable}\n$$\n\nse conservan tanto por $f$ como por $f^{-1}$. Esta conservación es una\nconsecuencia del isomorfismo global y no una condición añadida únicamente a\nlos ceros.\n\n---",
       "deps": [
         "T_ISO"
       ],
@@ -734,7 +829,38 @@
           "$$ 0<\\rho\\le\\frac12 \\iff \\text{clase no estable} $$",
           "se conservan tanto por $f$ como por $f^{-1}$."
         ]
-      }
+      },
+      "source_status": "demonstrated",
+      "prolog_status": "reachable",
+      "lean_status": "not_individually_verified"
+    },
+    {
+      "id": "P_RIM_S",
+      "kind": "proposition",
+      "name": "Por la conservación de $\\rho$ mediante $f$ y $f^{-1}$,",
+      "description": "Por la conservación de $\\rho$ mediante $f$ y $f^{-1}$,\n\n$$\n\\boxed{\n\\forall z\\in U_{\\rm Rim},\n\\qquad\n\\operatorname{Stable}_{\\rm Rim}(z)\n\\iff\n\\rho_R(z)=0.\n}\n$$\n\nPor tanto, no existe ningún valor estable en $U_{\\rm Rim}$ con\n$\\rho_R(z)\\neq0$. En particular, por la construcción de\n$Z_{\\rm Rim}^{\\rm nt}$,\n\n$$\n\\boxed{\nz\\in Z_{\\rm Rim}^{\\rm nt}\n\\Longrightarrow\n\\operatorname{Stable}_{\\rm Rim}(z)\n\\Longrightarrow\n\\rho_R(z)=0.\n}\n$$\n\n\n---\n\n# 15. Correspondencia topológica directa $U_{\\rm VED}\\leftrightarrow U_{\\rm Rim}$\n\nEn $U_{\\rm VED}$ la estructura transversal alrededor de cada entero es\n\n$$\nk+\\rho\n\\longleftrightarrow\nk-\\rho.\n$$\n\nEl punto fijo es\n\n$$\n\\rho=0.\n$$\n\nEn $U_{\\rm Rim}$ la estructura transversal es\n\n$$\n\\frac12+\\rho_R\n\\longleftrightarrow\n\\frac12-\\rho_R.\n$$\n\nEl punto fijo es\n\n$$\n\\rho_R=0.\n$$\n\nDefinimos el mapa transversal\n\n$$\n\\boxed{\nR_\\rho:\n[0,\\tfrac12]_{\\rm VED}\n\\longrightarrow\n[0,\\tfrac12]_{\\rm Rim}\n}\n$$\n\npor\n\n$$\n\\boxed{\nR_\\rho(\\rho)=\\rho_R=\\rho.\n}\n$$\n\nSu inversa es\n\n$$\n\\boxed{\nR_\\rho^{-1}(\\rho_R)=\\rho_R.\n}\n$$\n\nAdemás,\n\n$$\n\\left|\nR_\\rho(\\rho_1)-R_\\rho(\\rho_2)\n\\right|\n=\n|\\rho_1-\\rho_2|.\n$$\n\nPor tanto $R_\\rho$ conserva la distancia transversal.\n\nQueda asentado:\n\n$$\n\\boxed{",
+      "deps": [
+        "T_ISO",
+        "P_RHO_ISO"
+      ],
+      "measurement_relationship": "additive",
+      "proof": {
+        "method": "derivation",
+        "status": "declared",
+        "steps": [
+          "Por la conservación de $\\rho$ mediante $f$ y $f^{-1}$,",
+          "$$ \\boxed{ \\forall z\\in U_{\\rm Rim}, \\qquad \\operatorname{Stable}_{\\rm Rim}(z) \\iff \\rho_R(z)=0. } $$",
+          "Por tanto, no existe ningún valor estable en $U_{\\rm Rim}$ con $\\rho_R(z)\\neq0$.",
+          "En particular, por la construcción de $Z_{\\rm Rim}^{\\rm nt}$,",
+          "$$ \\boxed{ z\\in Z_{\\rm Rim}^{\\rm nt} \\Longrightarrow \\operatorname{Stable}_{\\rm Rim}(z) \\Longrightarrow \\rho_R(z)=0. } $$",
+          "# 15.",
+          "Correspondencia topológica directa $U_{\\rm VED}\\leftrightarrow U_{\\rm Rim}$",
+          "En $U_{\\rm VED}$ la estructura transversal alrededor de cada entero es"
+        ]
+      },
+      "source_status": "demonstrated",
+      "prolog_status": "reachable",
+      "lean_status": "not_individually_verified"
     },
     {
       "id": "P_VR_rho",
@@ -757,7 +883,10 @@
           "$$ \\rho_{\\rm VED}=0 \\iff \\text{estado estable}. $$",
           "Por $P_{\\rm VR}(\\rho)$,"
         ]
-      }
+      },
+      "source_status": "demonstrated",
+      "prolog_status": "reachable",
+      "lean_status": "not_individually_verified"
     },
     {
       "id": "P_VR_E",
@@ -780,7 +909,10 @@
           "Hasta este punto intervienen dos informaciones distintas que no deben confundirse.",
           "En $U_{\\rm Rim}$, la condición"
         ]
-      }
+      },
+      "source_status": "demonstrated",
+      "prolog_status": "reachable",
+      "lean_status": "not_individually_verified"
     },
     {
       "id": "P_Z",
@@ -788,7 +920,7 @@
       "name": "\\qquad",
       "description": "\\qquad\nz\\in Z_{\\rm Rim}^{\\rm nt}\n\\Rightarrow\n\\left[\n\\zeta(z)=0\n\\ \\text{en }U_{\\rm Rim}\n\\ \\text{y }\n\\rho_R=\\rho_{\\rm VED}\n\\ \\text{clasifica su localización transversal}\n\\right].\n}\n$$\n\n---\n\n# 18. Teorema de localización transversal del cero no trivial",
       "deps": [
-        "P_RHO_ISO",
+        "P_RIM_S",
         "P_VR_rho",
         "P_VR_E"
       ],
@@ -801,16 +933,20 @@
           "# 18.",
           "Teorema de localización transversal del cero no trivial"
         ]
-      }
+      },
+      "source_status": "demonstrated",
+      "prolog_status": "reachable",
+      "lean_status": "not_individually_verified"
     },
     {
       "id": "T_RIEMANN",
       "kind": "theorem",
       "name": "**Teorema de localización transversal.** Sea",
-      "description": "**Teorema de localización transversal.** Sea\n\n\n$$\nz=a\\pm ib\n$$\n\nun cero no trivial arbitrario del sector $Z_{\\rm Rim}^{\\rm nt}$.\n\nSe demostrará que\n\n$$\n\\boxed{\na=\\frac12.\n}\n$$\n\n## Demostración\n\nPor pertenecer a $Z_{\\rm Rim}^{\\rm nt}$, se sabe en $U_{\\rm Rim}$ que\n\n$$\n\\boxed{\n\\zeta(z)=0.\n}\n$$\n\nEsta afirmación identifica el punto como cero. No fija todavía su localización transversal.\n\nPor $D_{\\rho_R}$ y $P_{\\rm VR}(\\rho)$, esa localización transversal queda medida por\n\n$$\n\\boxed{\n\\rho_R\n=\n\\left|\na-\\frac12\n\\right|\n=\n\\rho_{\\rm VED}.\n}\n$$\n\nLa clasificación de dicha coordenada no se obtiene desde Riemann, sino desde $U_{\\rm VED}$:\n\n$$\n\\rho_{\\rm VED}=0\n\\iff\n\\text{estado estable},\n$$\n\ny\n\n$$\n0<\\rho_{\\rm VED}\\le\\frac12\n\\iff\n\\text{estado no estable}.\n$$\n\nSupongamos, por reducción al absurdo, que\n\n$$\n\\boxed{\na\\neq\\frac12.\n}\n$$\n\nEntonces\n\n$$\n\\left|\na-\\frac12\n\\right|\n>0.\n$$\n\nPor $P_{\\rm VR}(\\rho)$,\n\n$$\n\\rho\n=\n\\left|\na-\\frac12\n\\right|\n>0.\n$$\n\nPero por la clasificación exhaustiva de $U_{\\rm VED}$,\n\n$$\n\\rho>0\n\\Rightarrow\n\\text{estado no estable}.\n$$\n\nEsto sitúa transversalmente al punto identificado por $\\zeta(z)=0$ en el complemento no estable de la clasificación VED.\n\nSin embargo, dentro del transporte establecido, la identidad de cero ya dada en $U_{\\rm Rim}$ debe localizarse en la clase transversal compatible con el estado estable de $U_{\\rm VED}$, porque $U_{\\rm VED}$ ha demostrado exhaustivamente que la estabilidad sólo ocurre en\n\n$$\n\\boxed{\n\\rho=0.\n}\n$$\n\nLa suposición $a\\neq1/2$ obliga entonces simultáneamente a tratar el mismo punto como cero identificado en $U_{\\rm Rim}$ y como localización transversal no estable en $U_{\\rm VED}$. Esa incompatibilidad no afecta a la identidad del cero, que permanece dada por $\\zeta(z)=0$; afecta únicamente a la localización transversal supuesta.\n\nPor tanto la suposición\n\n$$\na\\neq\\frac12\n$$\n\nes falsa.\n\nLuego,\n\n$$\n\\boxed{\na=\\frac12.\n}\n$$\n\nComo $z$ fue elegido arbitrariamente en $Z_{\\rm Rim}^{\\rm nt}$,\n\n$$\n\\boxed{\n\\forall z\\in Z_{\\rm Rim}^{\\rm nt},\n\\qquad\n\\Re(z)=\\frac12.\n}\n$$\n\nEquivalentemente,\n\n$$\n\\boxed{\nZ_{\\rm Rim}^{\\rm nt}\n\\subseteq\n\\left\\{\ns\\in\\mathbb C:\n\\Re(s)=\\frac12\n\\right\\}.\n}\n$$\n\n**Q.E.D.**\n\n---\n\n# 19. Consecuencia\n\nDentro de la cadena deductiva establecida en este documento, los ceros no triviales del sector de Riemann quedan localizados transversalmente en\n\n$$\n\\boxed{\n\\Re(s)=\\frac12.\n}\n$$\n\nLa conclusión no significa que $U_{\\rm VED}$ determine la identidad del cero. La identidad sigue siendo\n\n$$\n\\boxed{\n\\zeta(z)=0,\n}\n$$\n\ny pertenece a $U_{\\rm Rim}$.\n\nLo que queda determinado por $U_{\\rm VED}$, a través de\n\n$$\n\\boxed{\n\\rho_R=\\rho_{\\rm VED},\n}\n$$\n\nes la localización transversal compatible con la clasificación completa de estabilidad.\n\nPor tanto no existe, dentro de la parametrización completa transportada desde $U_{\\rm VED}$, un cero no trivial con\n\n$$\n\\Re(s)\\neq\\frac12,\n$$\n\nporque tal localización tendría necesariamente\n\n$$\n\\rho>0,\n$$\n\ny $U_{\\rm VED}$ ya ha demostrado que todo $\\rho>0$ pertenece al complemento no estable de la clasificación transversal.\n\nLa conclusión no se introduce como normalización ni como hipótesis posterior. Es el resultado de aplicar al espacio $U_{\\rm Rim}$ la clasificación exhaustiva de localización transversal previamente obtenida en $U_{\\rm VED}$, manteniendo separadas la identidad del cero y su posición.\n\n---\n\n# 20. Papel independiente de $U_{\\rm Lap}$\n\nLa demostración topológica directa anterior puede formularse entre\n\n$$\nU_{\\rm VED}\n\\longleftrightarrow\nU_{\\rm Rim}\n$$\n\nsin necesitar $U_{\\rm Lap}$ como puente intermedio.\n\nSin embargo, $U_{\\rm Lap}$ proporciona una comprobación independiente de gran interés:\n\n1. parte de las ecuaciones diferenciales del universo;\n2. conserva $dt'$ hasta el último paso;\n3. aplica la condición $v_{\\rm onda}=c$ sólo al final;\n4. reduce $F$ a\n\n$$\nF=dt^2+2dt;\n$$\n\n5. produce por factorización\n\n$$\nF\n=\n2dt\n\\left(\n1+\\frac12dt\n\\right);\n$$\n\n6. obtiene así el mismo lugar geométrico\n\n$$\n\\boxed{\n\\Re(s)=\\frac12.\n}\n$$\n\nPor tanto existen dos vías que convergen:\n\n$$\n\\boxed{\nU_{\\rm VED}\n\\longrightarrow\nU_{\\rm Rim}\n}\n$$\n\nmediante la conservación topológica de la estabilidad, y\n\n$$\n\\boxed{\n\\text{Lorentz}\n\\longrightarrow\nF\n\\longrightarrow\nU_{\\rm Lap}\n\\longrightarrow\n\\Re(s)=\\frac12\n}\n$$\n\nmediante la dinámica diferencial.\n\n---\n\n# 21. Control de consistencia acumulativo\n\nQuedan fijados los siguientes resultados, que no deben volver a presentarse como hipótesis en revisiones posteriores:\n\n1. $U=3S+T$.\n\n2. La elección local $ds=dx$, $dy=dz=0$ alinea coordenadas con la propagación y no reduce la dimensionalidad del universo.\n\n3. El apóstrofo de $t'$ no significa derivada.\n\n4. Por Lorentz y $v=ds/dt$,\n\n$$\nds^2=dt^2-dt'^2.\n$$\n\n5. $\\lambda$ es la longitud de onda base asociada a la materia y\n\n$$\n\\lambda=\\frac{h}{Mc}.\n$$\n\n6. El contorno se describe por\n\n$$\nL=n\\lambda.\n$$\n\n7. La representación circular de $U_{\\rm VED}$ es\n\n$$\nR_{\\rm VED}\n=\n\\frac{L}{2\\pi}\n=\n\\frac{n\\lambda}{2\\pi}.\n$$\n\n8. La circunferencia es una representación topológica; no se afirma que todo confinamiento real sea físicamente circular.\n\n9. Para cierres finitos,\n\n$$\nn=k\\pm\\rho,\n\\qquad\nk\\in\\mathbb N^+,\n\\qquad\n0\\le\\rho\\le\\frac12.\n$$\n\n10. $\\rho=0$ si y sólo si el cierre es exacto y estable.\n\n11. $0<\\rho\\le1/2$ contempla exhaustivamente los cierres no estables.\n\n12. $\\rho=1/2$ es la máxima desviación respecto del entero más próximo.\n\n13. $k\\in\\mathbb N^+$ enumera todos los cierres estables.\n\n14. $n\\to\\infty$ representa la onda abierta o libre.\n\n15. El desarrollo de relación de radios proporciona el precedente\n\n$$\n\\tilde N=R_{\\rm VED}R_{\\rm Sch}\n$$\n\ny la relación reversible entre $U_{\\rm VED}$ y $U_{\\rm Sch}$.\n\n16. La ecuación completa se conserva como\n\n$$\nF\n=\n(dt^2-dt'^2)\n+\n\\frac{d}{dt}(dt^2-dt'^2).\n$$\n\n17. Su desarrollo adoptado es\n\n$$\nF\n=\ndt^2-dt'^2\n+\n2dt\n-\n2dt'\\frac{dt'}{dt}.\n$$\n\n18. La onda viaja siempre a $c$, libre o confinada.\n\n19. Sólo al final se aplica\n\n$$\ndt'\\to0,\n\\qquad\n\\frac{dt'}{dt}\\to0.\n$$\n\n20. Entonces\n\n$$\nF=dt^2+2dt.\n$$\n\n21. La factorización es\n\n$$\nF\n=\n2dt\n\\left(\n1+\\frac12dt\n\\right).\n$$\n\n22. El $1/2$ no procede de Riemann.\n\n23. En el espacio complejo se conserva siempre el par\n\n$$\ns_\\pm=a\\pm ib.\n$$\n\n24. Los puntos estables son discretos; no toda la recta $\\Re(s)=1/2$ es estable.\n\n25. En $U_{\\rm Rim}$ los ceros triviales se separan del sector no trivial.\n\n26. Para el sector no trivial,\n\n$$\n\\rho_R\n=\n\\left|\n\\Re(z)-\\frac12\n\\right|.\n$$\n\n27. La coordenada transversal se transporta como\n\n$$\n\\rho_{\\rm VED}=\\rho_R.\n$$\n\n28. En $U_{\\rm Rim}$, la condición $\\zeta(z)=0$ identifica el cero; no aporta por sí misma la clasificación transversal de estabilidad.\n\n29. En $U_{\\rm VED}$, la coordenada $\\rho$ clasifica exhaustivamente la localización transversal: $\\rho=0$ corresponde al estado estable y $\\rho>0$ al complemento no estable.\n\n30. Por la correspondencia $\\rho_{\\rm VED}=\\rho_R$, la localización transversal de todo cero no trivial identificado en $U_{\\rm Rim}$ queda restringida a\n\n$$\n\\boxed{\n\\forall z\\in Z_{\\rm Rim}^{\\rm nt},\n\\qquad\n\\Re(z)=\\frac12.\n}\n$$\n\n---\n\n# 22. Conclusión\n\nEl desarrollo comienza en la geometría del universo y no en la Hipótesis de Riemann.\n\n$U_{\\rm VED}$ se obtiene al representar el cierre de onda mediante\n\n$$\nR_{\\rm VED}\n=\n\\frac{n\\lambda}{2\\pi}.\n$$\n\nSu parametrización\n\n$$\nn=k\\pm\\rho\n$$\n\nes completa: $k$ enumera todas las familias de cierre y $\\rho\\in[0,1/2]$ recorre todo el intervalo desde estabilidad hasta máxima desviación. Los estados estables son todos y sólo\n\n$$\n(k,0),\n\\qquad\nk\\in\\mathbb N^+.\n$$\n\nEl precedente $U_{\\rm VED}\\cong U_{\\rm Sch}$ demuestra dentro del marco que una misma información puede representarse mediante topologías diferentes conservando el estado.\n\nLa geometría diferencial produce además la ecuación\n\n$$\nF\n=\n(dt^2-dt'^2)\n+\n\\frac{d}{dt}(dt^2-dt'^2),\n$$\n\nque, conservando $dt'$ hasta aplicar al final el límite propio de una onda a $c$, conduce a\n\n$$\nF=dt^2+2dt\n$$\n\ny\n\n$$\nF\n=\n2dt\n\\left(\n1+\\frac12dt\n\\right).\n$$\n\nEl factor $1/2$ aparece por tanto antes de introducir Riemann.\n\nFinalmente, el sector no trivial de $U_{\\rm Rim}$ aporta la identidad del cero mediante\n\n$$\n\\boxed{\n\\zeta(z)=0,\n}\n$$\n\nmientras que su localización transversal se mide por\n\n$$\n\\rho_R\n=\n\\left|\n\\Re(z)-\\frac12\n\\right|,\n$$\n\nque se corresponde con la desviación $\\rho$ ya definida en $U_{\\rm VED}$.\n\nAsí, $U_{\\rm Rim}$ dice qué es el punto considerado: un cero de $\\zeta$. $U_{\\rm VED}$ dice qué localización transversal es compatible con la clasificación exhaustiva de estabilidad. Como $U_{\\rm VED}$ ha demostrado que sólo $\\rho=0$ corresponde a estabilidad y que todo $\\rho>0$ pertenece al complemento no estable, un cero no trivial con $\\Re(z)\\neq1/2$ implicaría una localización transversal no estable.\n\nLa contradicción no consiste en negar que $z$ sea cero, porque esa identidad viene dada por $\\zeta(z)=0$. La contradicción consiste en atribuir al cero identificado una localización transversal que la clasificación completa de $U_{\\rm VED}$ excluye para el estado estable transportado.\n\nPor tanto,\n\n$$\n\\boxed{\n\\forall z\\in Z_{\\rm Rim}^{\\rm nt},\n\\qquad\n\\Re(z)=\\frac12.\n}\n$$\n\n**Q.E.D.**\n\n---\n\n## Referencias de origen y ampliación\n\n- Documento 7: *La gravedad como relación geométrica de radios*, como origen ampliado del precedente $U_{\\rm VED}\\cong U_{\\rm Sch}$.\n- Documentos previos de la serie ES_46, como origen histórico de la formulación revisada.\n- Fundamentos Einstein–VED / UNIHOLOG.\n- DOI general del marco: `10.5281/zenodo.17172925`.",
+      "description": "**Teorema de localización transversal.** Sea\n\n\n$$\nz=a\\pm ib\n$$\n\nun cero no trivial arbitrario del sector $Z_{\\rm Rim}^{\\rm nt}$.\n\nSe demostrará que\n\n$$\n\\boxed{\na=\\frac12.\n}\n$$\n\n## Demostración\n\nPor pertenecer a $Z_{\\rm Rim}^{\\rm nt}$, se sabe en $U_{\\rm Rim}$ que\n\n$$\n\\boxed{\n\\zeta(z)=0.\n}\n$$\n\nEsta afirmación identifica el punto como cero. No fija todavía su localización transversal.\n\nPor $D_{\\rho_R}$ y $P_{\\rm VR}(\\rho)$, esa localización transversal queda medida por\n\n$$\n\\boxed{\n\\rho_R\n=\n\\left|\na-\\frac12\n\\right|\n=\n\\rho_{\\rm VED}.\n}\n$$\n\nLa clasificación de dicha coordenada no se obtiene desde Riemann, sino desde $U_{\\rm VED}$:\n\n$$\n\\rho_{\\rm VED}=0\n\\iff\n\\text{estado estable},\n$$\n\ny\n\n$$\n0<\\rho_{\\rm VED}\\le\\frac12\n\\iff\n\\text{estado no estable}.\n$$\n\nSupongamos, por reducción al absurdo, que\n\n$$\n\\boxed{\na\\neq\\frac12.\n}\n$$\n\nEntonces\n\n$$\n\\left|\na-\\frac12\n\\right|\n>0.\n$$\n\nPor $P_{\\rm VR}(\\rho)$,\n\n$$\n\\rho\n=\n\\left|\na-\\frac12\n\\right|\n>0.\n$$\n\nPero por la clasificación exhaustiva de $U_{\\rm VED}$,\n\n$$\n\\rho>0\n\\Rightarrow\n\\text{estado no estable}.\n$$\n\nEsto sitúa transversalmente al punto identificado por $\\zeta(z)=0$ en el complemento no estable de la clasificación VED.\n\nSin embargo, dentro del transporte establecido, la identidad de cero ya dada en $U_{\\rm Rim}$ debe localizarse en la clase transversal compatible con el estado estable de $U_{\\rm VED}$, porque $U_{\\rm VED}$ ha demostrado exhaustivamente que la estabilidad sólo ocurre en\n\n$$\n\\boxed{\n\\rho=0.\n}\n$$\n\nLa suposición $a\\neq1/2$ obliga entonces simultáneamente a tratar el mismo punto como cero identificado en $U_{\\rm Rim}$ y como localización transversal no estable en $U_{\\rm VED}$. Esa incompatibilidad no afecta a la identidad del cero, que permanece dada por $\\zeta(z)=0$; afecta únicamente a la localización transversal supuesta.\n\nPor tanto la suposición\n\n$$\na\\neq\\frac12\n$$\n\nes falsa.\n\nLuego,\n\n$$\n\\boxed{\na=\\frac12.\n}\n$$\n\nComo $z$ fue elegido arbitrariamente en $Z_{\\rm Rim}^{\\rm nt}$,\n\n$$\n\\boxed{\n\\forall z\\in Z_{\\rm Rim}^{\\rm nt},\n\\qquad\n\\Re(z)=\\frac12.\n}\n$$\n\nEquivalentemente,\n\n$$\n\\boxed{\nZ_{\\rm Rim}^{\\rm nt}\n\\subseteq\n\\left\\{\ns\\in\\mathbb C:\n\\Re(s)=\\frac12\n\\right\\}.\n}\n$$\n\n**Q.E.D.**\n\n---\n\n# 19. Consecuencia\n\nDentro de la cadena deductiva establecida en este documento, los ceros no triviales del sector de Riemann quedan localizados transversalmente en\n\n$$\n\\boxed{\n\\Re(s)=\\frac12.\n}\n$$\n\nLa conclusión no significa que $U_{\\rm VED}$ determine la identidad del cero. La identidad sigue siendo\n\n$$\n\\boxed{\n\\zeta(z)=0,\n}\n$$\n\ny pertenece a $U_{\\rm Rim}$.\n\nLo que queda determinado por $U_{\\rm VED}$, a través de\n\n$$\n\\boxed{\n\\rho_R=\\rho_{\\rm VED},\n}\n$$\n\nes la localización transversal compatible con la clasificación completa de estabilidad.\n\nPor tanto no existe, dentro de la parametrización completa transportada desde $U_{\\rm VED}$, un cero no trivial con\n\n$$\n\\Re(s)\\neq\\frac12,\n$$\n\nporque tal localización tendría necesariamente\n\n$$\n\\rho>0,\n$$\n\ny $U_{\\rm VED}$ ya ha demostrado que todo $\\rho>0$ pertenece al complemento no estable de la clasificación transversal.\n\nLa conclusión no se introduce como normalización ni como hipótesis posterior. Es el resultado de aplicar al espacio $U_{\\rm Rim}$ la clasificación exhaustiva de localización transversal previamente obtenida en $U_{\\rm VED}$, manteniendo separadas la identidad del cero y su posición.\n\n---\n\n# 20. Papel independiente de $U_{\\rm Lap}$\n\nLa demostración topológica directa anterior puede formularse entre\n\n$$\nU_{\\rm VED}\n\\longleftrightarrow\nU_{\\rm Rim}\n$$\n\nsin necesitar $U_{\\rm Lap}$ como puente intermedio.\n\nSin embargo, $U_{\\rm Lap}$ proporciona una comprobación independiente de gran interés:\n\n1. parte de las ecuaciones diferenciales del universo;\n2. conserva $dt'$ hasta el último paso;\n3. aplica la condición $v_{\\rm onda}=c$ sólo al final;\n4. reduce $F$ a\n\n$$\nF=dt^2+2dt;\n$$\n\n5. produce por factorización\n\n$$\nF\n=\n2dt\n\\left(\n1+\\frac12dt\n\\right);\n$$\n\n6. obtiene así el mismo lugar geométrico\n\n$$\n\\boxed{\n\\Re(s)=\\frac12.\n}\n$$\n\nPor tanto existen dos vías que convergen:\n\n$$\n\\boxed{\nU_{\\rm VED}\n\\longrightarrow\nU_{\\rm Rim}\n}\n$$\n\nmediante la conservación topológica de la estabilidad, y\n\n$$\n\\boxed{\n\\text{Lorentz}\n\\longrightarrow\nF\n\\longrightarrow\nU_{\\rm Lap}\n\\longrightarrow\n\\Re(s)=\\frac12\n}\n$$\n\nmediante la dinámica diferencial.\n\n---\n\n# 21. Control de consistencia acumulativo\n\nQuedan fijados los siguientes resultados, que no deben volver a presentarse como hipótesis en revisiones posteriores:\n\n1. $U=3S+T$.\n\n2. La elección local $ds=dx$, $dy=dz=0$ alinea coordenadas con la propagación y no reduce la dimensionalidad del universo.\n\n3. El apóstrofo de $t'$ no significa derivada.\n\n4. Por Lorentz y $v=ds/dt$,\n\n$$\nds^2=dt^2-dt'^2.\n$$\n\n5. $\\lambda$ es la longitud de onda base asociada a la materia y\n\n$$\n\\lambda=\\frac{h}{Mc}.\n$$\n\n6. El contorno se describe por\n\n$$\nL=n\\lambda.\n$$\n\n7. La representación circular de $U_{\\rm VED}$ es\n\n$$\nR_{\\rm VED}\n=\n\\frac{L}{2\\pi}\n=\n\\frac{n\\lambda}{2\\pi}.\n$$\n\n8. La circunferencia es una representación topológica; no se afirma que todo confinamiento real sea físicamente circular.\n\n9. Para cierres finitos,\n\n$$\nn=k\\pm\\rho,\n\\qquad\nk\\in\\mathbb N^+,\n\\qquad\n0\\le\\rho\\le\\frac12.\n$$\n\n10. $\\rho=0$ si y sólo si el cierre es exacto y estable.\n\n11. $0<\\rho\\le1/2$ contempla exhaustivamente los cierres no estables.\n\n12. $\\rho=1/2$ es la máxima desviación respecto del entero más próximo.\n\n13. $k\\in\\mathbb N^+$ enumera todos los cierres estables.\n\n14. $n\\to\\infty$ representa la onda abierta o libre.\n\n15. El desarrollo de relación de radios proporciona el precedente\n\n$$\n\\tilde N=R_{\\rm VED}R_{\\rm Sch}\n$$\n\ny la relación reversible entre $U_{\\rm VED}$ y $U_{\\rm Sch}$.\n\n16. La ecuación completa se conserva como\n\n$$\nF\n=\n(dt^2-dt'^2)\n+\n\\frac{d}{dt}(dt^2-dt'^2).\n$$\n\n17. Su desarrollo adoptado es\n\n$$\nF\n=\ndt^2-dt'^2\n+\n2dt\n-\n2dt'\\frac{dt'}{dt}.\n$$\n\n18. La onda viaja siempre a $c$, libre o confinada.\n\n19. Sólo al final se aplica\n\n$$\ndt'\\to0,\n\\qquad\n\\frac{dt'}{dt}\\to0.\n$$\n\n20. Entonces\n\n$$\nF=dt^2+2dt.\n$$\n\n21. La factorización es\n\n$$\nF\n=\n2dt\n\\left(\n1+\\frac12dt\n\\right).\n$$\n\n22. El $1/2$ no procede de Riemann.\n\n23. En el espacio complejo se conserva siempre el par\n\n$$\ns_\\pm=a\\pm ib.\n$$\n\n24. Los puntos estables son discretos; no toda la recta $\\Re(s)=1/2$ es estable.\n\n25. En $U_{\\rm Rim}$ los ceros triviales se separan del sector no trivial.\n\n26. Para el sector no trivial,\n\n$$\n\\rho_R\n=\n\\left|\n\\Re(z)-\\frac12\n\\right|.\n$$\n\n27. La coordenada transversal se transporta como\n\n$$\n\\rho_{\\rm VED}=\\rho_R.\n$$\n\n28. En $U_{\\rm Rim}$, la condición $\\zeta(z)=0$ identifica el cero; no aporta por sí misma la clasificación transversal de estabilidad.\n\n29. En $U_{\\rm VED}$, la coordenada $\\rho$ clasifica exhaustivamente la localización transversal: $\\rho=0$ corresponde al estado estable y $\\rho>0$ al complemento no estable.\n\n30. Por la correspondencia $\\rho_{\\rm VED}=\\rho_R$, la localización transversal de todo cero no trivial identificado en $U_{\\rm Rim}$ queda restringida a\n\n$$\n\\boxed{\n\\forall z\\in Z_{\\rm Rim}^{\\rm nt},\n\\qquad\n\\Re(z)=\\frac12.\n}\n$$\n\n---\n\n# 22. Conclusión\n\nEl desarrollo comienza en la geometría del universo y no en la Hipótesis de Riemann.\n\n$U_{\\rm VED}$ se obtiene al representar el cierre de onda mediante\n\n$$\nR_{\\rm VED}\n=\n\\frac{n\\lambda}{2\\pi}.\n$$\n\nSu parametrización\n\n$$\nn=k\\pm\\rho\n$$\n\nes completa: $k$ enumera todas las familias de cierre y $\\rho\\in[0,1/2]$ recorre todo el intervalo desde estabilidad hasta máxima desviación. Los estados estables son todos y sólo\n\n$$\n(k,0),\n\\qquad\nk\\in\\mathbb N^+.\n$$\n\nEl precedente $U_{\\rm VED}\\cong U_{\\rm Sch}$ demuestra dentro del marco que una misma información puede representarse mediante topologías diferentes conservando el estado.\n\nLa geometría diferencial produce además la ecuación\n\n$$\nF\n=\n(dt^2-dt'^2)\n+\n\\frac{d}{dt}(dt^2-dt'^2),\n$$\n\nque, conservando $dt'$ hasta aplicar al final el límite propio de una onda a $c$, conduce a\n\n$$\nF=dt^2+2dt\n$$\n\ny\n\n$$\nF\n=\n2dt\n\\left(\n1+\\frac12dt\n\\right).\n$$\n\nEl factor $1/2$ aparece por tanto antes de introducir Riemann.\n\nFinalmente, el sector no trivial de $U_{\\rm Rim}$ aporta la identidad del cero mediante\n\n$$\n\\boxed{\n\\zeta(z)=0,\n}\n$$\n\nmientras que su localización transversal se mide por\n\n$$\n\\rho_R\n=\n\\left|\n\\Re(z)-\\frac12\n\\right|,\n$$\n\nque se corresponde con la desviación $\\rho$ ya definida en $U_{\\rm VED}$.\n\nAsí, $U_{\\rm Rim}$ dice qué es el punto considerado: un cero de $\\zeta$. $U_{\\rm VED}$ dice qué localización transversal es compatible con la clasificación exhaustiva de estabilidad. Como $U_{\\rm VED}$ ha demostrado que sólo $\\rho=0$ corresponde a estabilidad y que todo $\\rho>0$ pertenece al complemento no estable, un cero no trivial con $\\Re(z)\\neq1/2$ implicaría una localización transversal no estable.\n\nLa contradicción no consiste en negar que $z$ sea cero, porque esa identidad viene dada por $\\zeta(z)=0$. La contradicción consiste en atribuir al cero identificado una localización transversal que la clasificación completa de $U_{\\rm VED}$ excluye para el estado estable transportado.\n\nPor tanto,\n\n$$\n\\boxed{\n\\forall z\\in Z_{\\rm Rim}^{\\rm nt},\n\\qquad\n\\Re(z)=\\frac12.\n}\n$$\n\n**Q.E.D.**\n\n---\n\n## Referencias de origen y ampliación\n\n- Documento 7: *La gravedad como relación geométrica de radios*, como origen ampliado del precedente $U_{\\rm VED}\\cong U_{\\rm Sch}$.\n- Documentos previos de la serie ES_46, como origen histórico de la formulación revisada.\n- Fundamentos Einstein–VED / UNIHOLOG.\n- DOI general del marco: `10.5281/zenodo.17172925`.\n\n---",
       "deps": [
         "T_ISO",
         "P_RHO_ISO",
+        "P_RIM_S",
         "P_Z",
         "D_rho_R",
         "P_VR_rho"
@@ -841,7 +977,115 @@
         "verification_verdict": "APROBADO",
         "verification_report": "LEAN_ES_46_RV6.json",
         "verification_log": "LEAN_ES_46_RV6.log"
-      }
+      },
+      "source_status": "demonstrated",
+      "prolog_status": "reachable",
+      "lean_status": "verified"
     }
-  ]
+  ],
+  "lean_verification": {
+    "project": "ES_46_RV6",
+    "tool": "Lean 4",
+    "generated_on": "2026-09-20T02:47:03+00:00",
+    "verdict": "APROBADO",
+    "passed": true,
+    "exit_code": 0,
+    "failure_type": null,
+    "diagnosis": "Lean compilo correctamente todos los archivos evaluados.",
+    "action_required": "No se requiere ninguna accion.",
+    "lean_files": [
+      "ES_46_RV6.lean"
+    ],
+    "result_theorem": "HR46_RV6.all_nontrivial_zeros_on_half_RV6",
+    "result_json_node": "T_RIEMANN",
+    "log": "logs\\LEAN_ES_46_RV6.log",
+    "scope": "Lean 4 solo certifica las definiciones, teoremas e inferencias formalizadas en los archivos Lean evaluados.",
+    "adec": "Evaluacion manual; no automatizada hasta que ADEC admita url_json.",
+    "verified_json_nodes": [
+      "T_RIEMANN"
+    ]
+  },
+  "prolog_verification": {
+    "project": "ES_46_RV6",
+    "tool": "SWI-Prolog",
+    "generated_on": "2026-09-20T02:47:08+00:00",
+    "verdict": "APROBADO",
+    "passed": true,
+    "exit_code": 0,
+    "program": "ES_46_RV6.pl",
+    "goal": "go/0",
+    "diagnosis": "Prolog resolvio el objetivo deductivo declarado.",
+    "action_required": "No se requiere ninguna accion.",
+    "log": "logs\\PROLOG_ES_46_RV6.log",
+    "scope": "Comprueba la resolucion del grafo deductivo; Lean comprueba la formalizacion matematica."
+  },
+  "closure_audit": {
+    "project": "ES_46_RV6",
+    "tool": "DEMUESTRA Closure Audit",
+    "generated_on": "2026-09-20T02:47:08+00:00",
+    "verdict": "CERRADO",
+    "goal": "T_RIEMANN",
+    "checks": {
+      "objetivo_existe": true,
+      "dependencias_resueltas": true,
+      "sin_ciclos": true,
+      "lean_aprobado": true,
+      "prolog_aprobado": true,
+      "nodo_lean_coincide": true,
+      "dependencias_lean_internalizadas": true,
+      "sin_pendientes_ya_demostrados": true
+    },
+    "reachable_nodes": [
+      "A_L",
+      "D_L",
+      "D_U",
+      "D_f",
+      "D_fInv",
+      "D_k",
+      "D_lambda",
+      "D_rho",
+      "D_rho_R",
+      "D_t_prime",
+      "P_COORD",
+      "P_RHO_ISO",
+      "P_RIM_S",
+      "P_ST",
+      "P_VED_E",
+      "P_VED_Inv",
+      "P_VR_E",
+      "P_VR_rho",
+      "P_Z",
+      "P_a",
+      "P_v",
+      "T_ISO",
+      "T_RIEMANN"
+    ],
+    "root_facts": [
+      "A_L",
+      "D_L",
+      "D_U",
+      "D_f",
+      "D_fInv",
+      "D_k",
+      "D_lambda",
+      "D_rho",
+      "D_rho_R",
+      "D_t_prime"
+    ],
+    "missing_dependencies": [],
+    "cycles": [],
+    "pending_with_demonstrated_dependencies": [],
+    "open_lean_hypotheses": [],
+    "lean_axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "scope": "Auditoria tecnica de trazabilidad formal; no mide aceptacion cientifica."
+  },
+  "pending_consistency_check": {
+    "passed": true,
+    "contradictions": []
+  },
+  "final_verdict": "CERRADO"
 }

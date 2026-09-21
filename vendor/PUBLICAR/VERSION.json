@@ -1,0 +1,14 @@
+{
+    "source":  "PUBLICAR/PackPublica",
+    "schema":  1,
+    "synchronized_at":  "2026-09-19T21:40:38.7381977Z",
+    "excludes":  [
+                     "*.env",
+                     "*.conf",
+                     "credentials",
+                     "tokens",
+                     "passwords",
+                     "__pycache__",
+                     "*.bak*"
+                 ]
+}
