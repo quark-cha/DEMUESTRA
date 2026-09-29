@@ -1,14 +1,54 @@
 {
-    "source":  "PUBLICAR/PackPublica",
-    "schema":  1,
-    "synchronized_at":  "2026-09-19T21:40:38.7381977Z",
-    "excludes":  [
-                     "*.env",
-                     "*.conf",
-                     "credentials",
-                     "tokens",
-                     "passwords",
-                     "__pycache__",
-                     "*.bak*"
-                 ]
+  "source": "DEMUESTRA/vendor/PUBLICAR",
+  "destination": "PUBLICAR",
+  "schema": 2,
+  "synchronized_at": "2026-09-26T21:28:37.9974137Z",
+  "file_count": 31,
+  "changed": [
+    "PackPublica\\formal_lean_backend.py"
+  ],
+  "backup": "C:\\Users\\vedq\\Desktop\\desarrollo\\SRC-VED\\PUBLICAR\\PackPublica\\formal_lean_backend.py.bak_no_generic_candidates_20260926_232058",
+  "sha256": {
+    "__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "PackPublica\\articulo.py": "e622c9a6f83ff346da7dc4aba8d91c855610d8ae4537376bd15cd72ab58ebc37",
+    "PackPublica\\base.py": "1c6256b50cd5226f0208c50d9acd3539d034bf588bcab1dc1db176ec3a4e3397",
+    "PackPublica\\config.py": "92a12595eb0d00b0fa09a63a8175b8eaff79d0d29615f63a33ff734b6de617f2",
+    "PackPublica\\documento.py": "6d08318df91e915a95e82f454fd1ebddff37d09ef0bc118602c462769e78bb43",
+    "PackPublica\\docx.py": "239df801b07804e5b990c6e5835027983bed04a13c047af2ab333bce3e7edf71",
+    "PackPublica\\env.py": "7d0451be54bb135415eb3e9e6441651ff2b36edfdaaf4deb94981cf95de94729",
+    "PackPublica\\formal_ast.py": "3cfdec153c3fdd57c83d2c55b12d7c26572ccc12be3e853fab8159de591ec97d",
+    "PackPublica\\formal_compile.py": "ca5d0419d89bacc8820e4af8bfef1cce1af5c22b42e75976d92d3c89cbaaa816",
+    "PackPublica\\formal_lean_backend.py": "c52ee20f8ee82f2a83263e3f6648017b0a4c0835091102965e279de66d93b175",
+    "PackPublica\\formal_roles.py": "9bb336b5f02406783fa22c11a40b3ee0866957166e979321e6675fba86ba075d",
+    "PackPublica\\formal_semantic.py": "72a19ea655ab69974c4fb4629ab090fae79bb95a500f880eeb4c12a116f6d621",
+    "PackPublica\\formal_symbols.py": "2ddc4a6a03b19dbf859314e0eda146d93e4724c04c8a6e7143027ab532f9e526",
+    "PackPublica\\formal.py": "b58eaa64b9f554f787d5542b31a6ad57ff99ddbc34ed0357bdcb69581a532212",
+    "PackPublica\\FTPClient.py": "099adfab67130396eadae7c3aab293d258fa572ff74a5ac112a238cb5ec27ac7",
+    "PackPublica\\html.py": "a6edec0c04559c0b3a239ddc297504a39883fa5de8908b7dea0417727262b4ae",
+    "PackPublica\\json.py": "bad9eda514ac108c36414f41a80b7b226734fcfa065913bb79e6df5dc9cc759b",
+    "PackPublica\\KDP.py": "ab92798c0f1ef32097b2af377d6e0a6dee5907f4b08eabbce16f3d1b13cccbd4",
+    "PackPublica\\lean.py": "09e534a447ade35495cab7a9100ff3424533f375a7537baa20244812744b99c9",
+    "PackPublica\\libro.py": "9f94937f93b484a6a409ddb62efb443e30480bc903cc77505eb6048b217dc774",
+    "PackPublica\\logging.py": "cbb4fbbdb397e50e9e6b397abcb2116f76d934788a6f5c0ac228b2fb5d4d8d3b",
+    "PackPublica\\md.py": "1a777d04c4f0f80be5a1aff1102e3b63f6922e6a231e9e3d425e085fef9168fb",
+    "PackPublica\\odt.py": "6ce37858a5d0381be756b3708c20a78911a974b1812464cb95fee9946280e33a",
+    "PackPublica\\pdf.py": "2a7b7b1b59bcc59ba768645147c68901292a0b1cc01fc6b9077a0303c996907d",
+    "PackPublica\\prolog.py": "269c0e3fbdbdf090d391b64163815e34c220d14ba8420339467db54c5ffda418",
+    "PackPublica\\publicar.py": "01949b37f2ef0bddd115efa2f46b8a518e0f482cb4d31acffc6a154860f40442",
+    "PackPublica\\README.txt": "35a27a839c3a0dafac297a5dd1d3335d725c3c7a75d5a72bb5e1872d92ae2e84",
+    "PackPublica\\trace.py": "cea75797f698cf1ea5bc080d6317be2d7aaee9f67a4b6cecdf6cf03d79c3747d",
+    "PackPublica\\WebPublisher.py": "26b32ffda01be65fece2a6fdbdd2019004c3f7ad7273fe5c53ea0e07bae50533",
+    "PackPublica\\ZenodoClient.py": "ac78dff24e84bb2beae7718a5d8df57761f015e34009deb1d4f8e1a6546f648b",
+    "PackPublica\\ZenodoPublisher.py": "92f64e841150dc38b531272398017adf783fbfda4faea5872551782c8580eef1"
+  },
+  "excludes": [
+    "*.env",
+    "*.conf",
+    "credentials",
+    "tokens",
+    "passwords",
+    "__pycache__",
+    "*.bak*",
+    "*.pyc"
+  ]
 }

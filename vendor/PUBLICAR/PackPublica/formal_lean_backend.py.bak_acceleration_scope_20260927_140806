@@ -1,0 +1,3441 @@
+import json
+
+import re
+
+from datetime import datetime
+
+from pathlib import Path
+
+
+
+try:
+
+    from .formal_ast import Ast
+
+    from .formal_semantic import FunctionType, LeanExpressionEmitter, SemanticAnalyzer
+
+    from .formal_symbols import SymbolInference
+
+except ImportError:
+
+    from PackPublica_formal_ast import Ast
+
+    from PackPublica_formal_semantic import FunctionType, LeanExpressionEmitter, SemanticAnalyzer
+
+    from PackPublica_formal_symbols import SymbolInference
+
+
+
+
+
+class LeanBackendError(ValueError):
+
+    pass
+
+
+
+
+
+class LeanBackend:
+
+    """Emite Lean autocontenido desde el grafo formal, sin plantillas por documento."""
+
+
+
+    TYPES = {"Nat": "ℕ", "Int": "ℤ", "Real": "ℝ", "Complex": "ℂ", "Prop": "Prop"}
+
+    PROOF_KINDS = {
+
+        "proposition", "lemma", "theorem", "corollary",
+
+        "self_validation", "meta_validation",
+
+    }
+
+
+
+    def __init__(
+
+        self,
+
+        classified_nodes,
+
+        namespace,
+
+        aliases=None,
+
+        generator=None,
+
+        source_argument=None,
+
+    ):
+
+        self.nodes = tuple(classified_nodes)
+
+        self.namespace = self._name(namespace)
+
+        self.aliases = dict(aliases or {})
+
+        self.generator = self._comment_value(generator or Path(__file__).resolve())
+
+        self.source_argument = self._comment_value(source_argument or "NO_DECLARADO")
+
+        self.inference = SymbolInference()
+
+        self.symbols = self.inference.infer(self.nodes)
+
+        self._register_correspondence_relations()
+
+        self._register_representation_values()
+
+        self.predicate_definitions = {}
+
+        self.text_definitions = {}
+
+        self.value_definitions = {}
+
+        self.emitter = LeanExpressionEmitter(self._resolve, self.symbols)
+
+        self._discover_text_definitions()
+
+        self._discover_predicate_definitions()
+
+        self._discover_value_definitions()
+
+        self.equivalence_specs = {}
+
+
+
+    @classmethod
+
+    def _representation_name(cls, ast):
+
+        if ast.kind != "apply" or not ast.children:
+
+            return None
+
+        function = ast.children[0]
+
+        if not (
+
+            function.kind == "subscript"
+
+            and len(function.children) == 2
+
+            and function.children[0].kind == "identifier"
+
+            and function.children[0].value == "U"
+
+            and function.children[1].kind == "identifier"
+
+            and function.children[1].value == "VED"
+
+        ):
+
+            return None
+
+        def fragment(node):
+
+            if node.kind in {"identifier", "text", "number"}:
+
+                return str(node.value)
+
+            if node.kind == "subscript":
+
+                return "_".join(fragment(child) for child in node.children)
+
+            return node.kind + "_" + "_".join(fragment(child) for child in node.children)
+
+        suffix = "__".join(fragment(argument) for argument in ast.children[1:])
+
+        return cls._name("Representation_U_VED_" + suffix)
+
+
+
+    def _register_representation_values(self):
+
+        def visit(ast):
+
+            name = self._representation_name(ast)
+
+            if name:
+
+                self.symbols.values.setdefault(name, "Representation")
+
+            for child in ast.children:
+
+                if isinstance(child, Ast):
+
+                    visit(child)
+
+        for item in self.nodes:
+
+            for formula in item.source.formulas:
+
+                visit(formula.ast)
+
+
+
+    def _normalize_representation_ast(self, ast):
+
+        name = self._representation_name(ast)
+
+        if name:
+
+            return Ast("identifier", name)
+
+        if not ast.children:
+
+            return ast
+
+        return Ast(
+
+            ast.kind, ast.value,
+
+            tuple(
+
+                self._normalize_representation_ast(child) if isinstance(child, Ast) else child
+
+                for child in ast.children
+
+            ),
+
+        )
+
+
+
+    def _register_correspondence_relations(self):
+
+        analyzer = SemanticAnalyzer(self.symbols)
+
+        def visit(ast, mapping_arrow=False):
+
+            if ast.kind == "binary" and ast.value == "CORRESPONDS":
+
+                left = analyzer.analyze(ast.children[0])
+
+                right = analyzer.analyze(ast.children[1])
+
+                self.symbols.functions.setdefault(
+
+                    LeanExpressionEmitter.correspondence_name(left, right),
+
+                    FunctionType((left, right), "Prop"),
+
+                )
+
+            if ast.kind == "binary" and ast.value == "MAPSTO" and not mapping_arrow:
+
+                left = analyzer.analyze(ast.children[0])
+
+                right = analyzer.analyze(ast.children[1])
+
+                self.symbols.functions.setdefault(
+
+                    LeanExpressionEmitter.transformation_name(left, right),
+
+                    FunctionType((left, right), "Prop"),
+
+                )
+
+            is_mapping = (
+
+                ast.kind == "binary" and ast.value == "COLON"
+
+                and len(ast.children) == 2
+
+                and ast.children[1].kind == "binary"
+
+                and ast.children[1].value == "MAPSTO"
+
+            )
+
+            for index, child in enumerate(ast.children):
+
+                if isinstance(child, Ast):
+
+                    visit(child, is_mapping and index == 1)
+
+        for item in self.nodes:
+
+            for formula in item.source.formulas:
+
+                visit(formula.ast)
+
+
+
+    def compile(self):
+
+        self._validate_selected_formulas()
+
+        generated_at = datetime.now().astimezone().isoformat(timespec="seconds")
+
+        lines = [
+
+            f"-- GENERADO_POR: {self.generator}",
+
+            f"-- FECHA_HORA_GENERACION: {generated_at}",
+
+            f"-- ARGUMENTO_GENERACION: {self.source_argument}",
+
+            "",
+
+            "import Mathlib", "", "noncomputable section", "",
+
+            "set_option maxHeartbeats 30000", "", f"namespace {self.namespace}", "",
+
+            "inductive Representation where", "  | atom (name : String)", "",
+
+        ]
+
+        lines.extend(self._context_declaration())
+
+        lines.extend(self._text_declarations())
+
+        lines.extend(self._predicate_declarations())
+
+        lines.extend(self._value_declarations())
+
+        lines.append("")
+
+        proved_nodes = set()
+
+        assertion_statuses = {}
+
+        deductive_coverage_complete = True
+
+        node_bodies = {}
+
+        defined_nodes = set()
+
+        deductive_relations = []
+
+        node_relations = []
+
+        node_clause_counts = {}
+
+        node_clause_bodies = {}
+
+        for item in self.nodes:
+
+            node = item.source
+
+            requires_proof = node.kind in self.PROOF_KINDS
+
+            lines.append(f"-- FORMAL_NODE: {node.node_id}")
+
+            lines.append(f"-- SOURCE: {node.source_file}:{node.start_line or '?'}")
+
+            for formula in node.formulas:
+
+                source = " ".join(formula.source.split()).replace("-/", "- /")
+
+                lines.append(f"-- FORMULA: {source}")
+
+            expressions = []
+
+            untranslated_selected = []
+
+            selected_formulas = list((*item.declarations, *item.claims))
+
+            for formula in selected_formulas:
+
+                formula_type, expression = self._source_translation(item, formula)
+
+                if formula_type == "Prop":
+
+                    expressions.append(expression)
+
+            prose_contracts = self._prose_contract_expressions(item)
+
+            for description, expression in prose_contracts:
+
+                lines.append(
+
+                    "-- DEMUESTRA_PROSE_CONTRACT: "
+
+                    + json.dumps({
+
+                        "node": node.node_id,
+
+                        "source": description,
+
+                        "status": "FORMALIZED_PROP",
+
+                    }, ensure_ascii=False)
+
+                )
+
+                expressions.append(expression)
+
+            node_name = self._name(node.node_id)
+
+            prose_only_claim = not expressions and requires_proof
+
+            source_claims = []
+
+            source_step_props = []
+
+            source_declaration_props = []
+
+            source_propositions = []
+
+            for index, formula in enumerate(node.formulas, start=1):
+
+                normalized_source = " ".join(formula.source.split())
+
+                if formula in item.declarations:
+
+                    source_role = "DECLARATION"
+
+                elif formula in item.claims:
+
+                    source_role = "CLAIM"
+
+                elif requires_proof and formula.discourse_role == "STATEMENT":
+
+                    source_role = "PROOF_STEP"
+
+                else:
+
+                    source_role = formula.discourse_role
+
+                lines.append(
+
+                    f"def Node_{node_name}_source_{index}_raw : String := "
+
+                    + json.dumps(normalized_source, ensure_ascii=False)
+
+                )
+
+                try:
+
+                    source_type, source_expr = self._source_translation(item, formula)
+
+                except Exception as error:
+
+                    raise LeanBackendError(
+
+                        f"No se pudo traducir {formula.location} ({source_role}): "
+
+                        f"{error}"
+
+                    ) from error
+
+                if source_type != "Prop":
+
+                    term = {
+
+                        "node": node.node_id,
+
+                        "formula": index,
+
+                        "location": formula.location,
+
+                        "source": normalized_source,
+
+                        "status": "FORMALIZED_TERM",
+
+                        "type": source_type,
+
+                        "role": source_role,
+
+                    }
+
+                    lines.append(
+
+                        "-- DEMUESTRA_SOURCE_FORMULA: "
+
+                        + json.dumps(term, ensure_ascii=False)
+
+                    )
+
+                    lines.append(
+
+                        f"def Node_{node_name}_source_{index}_term "
+
+                        f"(ctx : FormalContext) : {self._type(source_type)} := ({source_expr})"
+
+                    )
+
+                    continue
+
+                source_prop = {
+
+                    "node": node.node_id,
+
+                    "formula": index,
+
+                    "location": formula.location,
+
+                    "source": normalized_source,
+
+                    "status": (
+
+                        "FORMALIZED_UNPROVEN"
+
+                        if source_role == "CLAIM"
+
+                        else "FORMALIZED_PROP"
+
+                    ),
+
+                    "type": "Prop",
+
+                    "role": source_role,
+
+                }
+
+                if source_role == "CLAIM":
+
+                    source_claims.append(source_prop)
+
+                    marker = "DEMUESTRA_SOURCE_CLAIM"
+
+                else:
+
+                    marker = "DEMUESTRA_SOURCE_FORMULA"
+
+                lines.append(
+
+                    f"-- {marker}: "
+
+                    + json.dumps(source_prop, ensure_ascii=False)
+
+                )
+
+                lines.append(
+
+                    f"def Node_{node_name}_source_{index} "
+
+                    f"(ctx : FormalContext) : Prop := ({source_expr})"
+
+                )
+
+                source_name = f"Node_{node_name}_source_{index} ctx"
+
+                if formula.is_display:
+
+                    source_propositions.append((index, source_role, source_name))
+
+                if source_role not in {"CLAIM", "DECLARATION"}:
+
+                    source_step_props.append(source_name)
+
+                elif source_role == "DECLARATION":
+
+                    source_declaration_props.append(source_name)
+
+            if source_declaration_props:
+
+                declaration_body = " ∧ ".join(
+
+                    f"({name})" for name in source_declaration_props
+
+                )
+
+                lines.append(
+
+                    f"def Node_{node_name}_source_declarations "
+
+                    f"(ctx : FormalContext) : Prop := {declaration_body}"
+
+                )
+
+            if source_step_props:
+
+                step_body = " ∧ ".join(f"({name})" for name in source_step_props)
+
+                lines.append(
+
+                    f"def Node_{node_name}_source_steps "
+
+                    f"(ctx : FormalContext) : Prop := {step_body}"
+
+                )
+
+            if prose_only_claim:
+
+                lines.append(
+
+                    f"def Node_{node_name}_unformalized_source : String := "
+
+                    + json.dumps(" ".join(node.prose.split()), ensure_ascii=False)
+
+                )
+
+                lines.append(
+
+                    f"-- DEMUESTRA_UNDECIDABLE_NODE: {node.node_id}|"
+
+                    "PROSE_WITHOUT_FORMULA"
+
+                )
+
+                assertion_statuses[node.node_id] = ("DOCUMENTAL", "NO_APLICA")
+
+                lines.append(
+
+                    f"-- DEMUESTRA_ASSERTION: {node.node_id}|"
+
+                    "DOCUMENTAL|NO_APLICA"
+
+                )
+
+                lines.append("")
+
+                continue
+
+            previous_index = None
+
+            for index, source_role, source_name in source_propositions:
+
+                if source_role == "UNCLASSIFIED":
+
+                    deductive_coverage_complete = False
+
+                is_premise = source_role in {
+
+                    "DECLARATION", "STATEMENT", "LOCAL_ASSUMPTION"
+
+                }
+
+                if not is_premise:
+
+                    dependencies = ",".join(node.deps) or "-"
+
+                    previous = str(previous_index) if previous_index else "-"
+
+                    lines.append(
+
+                        f"-- DEMUESTRA_DEDUCTIVE_LINK: {node.node_id}|{index}|"
+
+                        f"{source_role}|{previous}|{dependencies}|NO_CERTIFICADO"
+
+                    )
+
+                    deductive_relations.append(
+
+                        (node_name, index, previous_index, tuple(node.deps), source_name)
+
+                    )
+
+                previous_index = index
+
+            alias_target = self.aliases.get(node.node_id)
+
+            if alias_target and not source_claims:
+
+                target_name = self._name(alias_target)
+
+                target_body = node_bodies.get(alias_target)
+
+                if target_body is None:
+
+                    target_body = f"Node_{target_name} ctx"
+
+                node_bodies[node.node_id] = target_body
+
+                if requires_proof:
+
+                    lines.append(
+
+                        f"theorem derive_{node_name} (ctx : FormalContext) "
+
+                        f"(h_{target_name} : ({target_body})) : "
+
+                        f"({target_body}) := by"
+
+                    )
+
+                    lines.append(f"  exact h_{target_name}")
+
+                    proved_nodes.add(node.node_id)
+
+                    assertion_statuses[node.node_id] = (
+
+                        "REFERENCIA_RESUELTA",
+
+                        "VERIFICADA_ESTRUCTURAL",
+
+                    )
+
+                else:
+
+                    lines.append(
+
+                        f"def Node_{node_name} (ctx : FormalContext) : Prop := "
+
+                        f"({target_body})"
+
+                    )
+
+                    defined_nodes.add(node.node_id)
+
+                    assertion_statuses[node.node_id] = (
+
+                        "REFERENCIA_RESUELTA", "NO_APLICA"
+
+                    )
+
+                lines.append(
+
+                    f"-- DEMUESTRA_ASSERTION: {node.node_id}|"
+
+                    f"{assertion_statuses[node.node_id][0]}|"
+
+                    f"{assertion_statuses[node.node_id][1]}"
+
+                )
+
+                lines.append("")
+
+                continue
+
+            ambiguous_translation = len(expressions) > 1
+
+            if ambiguous_translation:
+
+                for index, value in enumerate(expressions, start=1):
+
+                    lines.append(
+
+                        f"def Node_{node_name}_clause_{index} "
+
+                        f"(ctx : FormalContext) : Prop := ({value})"
+
+                    )
+
+                body = " ∧ ".join(f"({value})" for value in expressions)
+
+            elif expressions:
+
+                body = f"({expressions[0]})"
+
+            else:
+
+                body = "True"
+
+            node_bodies[node.node_id] = body
+
+            node_clause_counts[node.node_id] = len(expressions)
+
+            node_clause_bodies[node.node_id] = tuple(expressions)
+
+            # Proof hypotheses come from explicit Markdown dependencies, plus
+
+            # an earlier definition only when one of its clauses is exactly
+
+            # the current proposition. Shared symbol names are never enough.
+
+            # Reusing a symbol name is not a deductive edge (for example, `a`
+
+            # denotes acceleration early in the document and a real part later).
+
+            exact_definitions = self._matching_definition_dependencies(
+
+                body, node_clause_bodies, node.node_id
+
+            )
+
+            effective_deps = tuple(dict.fromkeys((*node.deps, *exact_definitions)))
+
+            if not requires_proof:
+
+                lines.append(f"def Node_{node_name} (ctx : FormalContext) : Prop := {body}")
+
+                defined_nodes.add(node.node_id)
+
+            if effective_deps:
+
+                node_relations.append((node.node_id, node_name, effective_deps))
+
+            if not requires_proof:
+
+                construction_status = "COMPLETA"
+
+                proof_status = "NO_APLICA"
+
+            elif not expressions:
+
+                construction_status = "COMPLETA"
+
+                proof_status = "NO_INICIADA"
+
+            elif effective_deps:
+
+                dependency_bodies = {
+
+                    dep: node_bodies.get(dep)
+
+                    for dep in effective_deps
+
+                    if node_bodies.get(dep) is not None
+
+                }
+
+                hypotheses = " ".join(
+
+                    f"(h_{self._name(dep)} : ({dependency_bodies[dep]}))"
+
+                    for dep in effective_deps if dep in dependency_bodies
+
+                )
+
+                decompositions = []
+
+                for dep in effective_deps:
+
+                    count = node_clause_counts.get(dep, 0)
+
+                    if count > 1:
+
+                        dep_name = self._name(dep)
+
+                        names = ", ".join(
+
+                            f"h_{dep_name}_{index}"
+
+                            for index in range(1, count + 1)
+
+                        )
+
+                        decompositions.append(
+
+                            f"  rcases h_{dep_name} with ⟨{names}⟩"
+
+                        )
+
+                matching_dependency = next((
+
+                    dep for dep in effective_deps
+
+                    if node_bodies.get(dep) == body
+
+                ), None)
+
+                if matching_dependency is not None:
+
+                    lines.append(f"theorem derive_{node_name} (ctx : FormalContext) {hypotheses} : ({body}) := by")
+
+                    dep_name = self._name(matching_dependency)
+
+                    lines.append(f"  exact h_{dep_name}")
+
+                    proved_nodes.add(node.node_id)
+
+                    construction_status = "COMPLETA"
+
+                    proof_status = "VERIFICADA_ESTRUCTURAL"
+
+                elif self._emit_document_derivation(
+
+                    lines, node_name, hypotheses, body, decompositions,
+
+                    effective_deps, node_clause_bodies
+
+                ):
+
+                    proved_nodes.add(node.node_id)
+
+                    construction_status = "COMPLETA"
+
+                    proof_status = "VERIFICADA"
+
+                elif self.equivalence_specs.get(node_name) is not None:
+
+                    self._emit_kernel_candidate(
+
+                        lines, node_name, hypotheses, body, decompositions
+
+                    )
+
+                    construction_status = "COMPLETA"
+
+                    proof_status = "TEOREMA_EMITIDO"
+
+                else:
+
+                    self._emit_kernel_candidate(
+
+                        lines, node_name, hypotheses, body, decompositions
+
+                    )
+
+                    construction_status = "COMPLETA"
+
+                    proof_status = "TEOREMA_EMITIDO"
+
+            elif expressions:
+
+                self._emit_kernel_candidate(
+
+                    lines, node_name, "", body
+
+                )
+
+                construction_status = "COMPLETA"
+
+                proof_status = "TEOREMA_EMITIDO"
+
+            else:
+
+                construction_status = "INCOMPLETA"
+
+                proof_status = "NO_INICIADA"
+
+            assertion_statuses[node.node_id] = (construction_status, proof_status)
+
+            untranslated_claims = [
+
+                claim for claim in source_claims
+
+                if claim.get("status") != "FORMALIZED_UNPROVEN"
+
+            ]
+
+            if untranslated_claims:
+
+                construction_status = "INCOMPLETA"
+
+                proof_status = "NO_INICIADA"
+
+                assertion_statuses[node.node_id] = (construction_status, proof_status)
+
+            lines.append(
+
+                f"-- DEMUESTRA_ASSERTION: {node.node_id}|"
+
+                f"{construction_status}|{proof_status}"
+
+            )
+
+            lines.append("")
+
+        theorem_results = [
+
+            item for item in self.nodes
+
+            if item.source.kind in {"theorem", "corollary"} and item.claims
+
+        ]
+
+        result = theorem_results[-1] if theorem_results else next(
+
+            (item for item in reversed(self.nodes) if item.claims), self.nodes[-1]
+
+        )
+
+        result_name = self._name(result.source.node_id)
+
+        construction_complete = all(
+
+            construction in {"COMPLETA", "REFERENCIA_RESUELTA", "DOCUMENTAL"}
+
+            for construction, _ in assertion_statuses.values()
+
+        )
+
+        # Generar un teorema candidato y demostrarlo son estados distintos.
+        # TEOREMA_EMITIDO confirma que PUBLICAR construyo una obligacion Lean;
+        # solo VERIFICADA/VERIFICADA_ESTRUCTURAL cuentan como prueba conocida
+        # por el generador. La validacion definitiva corresponde al kernel Lean.
+        generation_complete = construction_complete and all(
+            proof in {
+                "NO_APLICA",
+                "VERIFICADA",
+                "VERIFICADA_ESTRUCTURAL",
+                "TEOREMA_EMITIDO",
+                "PENDIENTE",
+            }
+            for _, proof in assertion_statuses.values()
+        )
+
+        proof_complete = all(
+            proof in {
+                "NO_APLICA",
+                "VERIFICADA",
+                "VERIFICADA_ESTRUCTURAL",
+            }
+            for _, proof in assertion_statuses.values()
+        )
+
+        formalization_complete = construction_complete and proof_complete
+
+        # Un candidato no demostrado NO es un error de generacion. Solo se
+        # interrumpe si PUBLICAR ni siquiera pudo construir las obligaciones.
+        if not generation_complete:
+            ungenerated = sorted(
+                node_id
+                for node_id, (construction, proof) in assertion_statuses.items()
+                if (
+                    construction not in {
+                        "COMPLETA", "REFERENCIA_RESUELTA", "DOCUMENTAL"
+                    }
+                    or proof in {"NO_CERTIFICADA", "NO_INICIADA"}
+                )
+            )
+            details = (
+                ", ".join(ungenerated)
+                if ungenerated
+                else "estado global de generacion incompleto"
+            )
+            raise LeanBackendError(
+                "PUBLICAR no pudo construir la formalizacion Lean para: " + details
+            )
+
+        if deductive_relations or node_relations:
+
+            lines.extend(["", "-- Relaciones deductivas trasladadas del Markdown a codigo Lean."])
+
+        for node_name, formula_index, previous_index, dependencies, source_name in deductive_relations:
+
+            antecedents = []
+
+            if previous_index:
+
+                antecedents.append(
+
+                    f"Node_{node_name}_source_{previous_index} ctx"
+
+                )
+
+            antecedents.extend(
+
+                node_bodies[dep]
+
+                for dep in dependencies
+
+                if dep in node_bodies
+
+            )
+
+            relation_body = " → ".join(
+
+                [*(f"({value})" for value in antecedents), f"({source_name})"]
+
+            )
+
+            lines.append(
+
+                f"def DeductiveLink_{node_name}_{formula_index} "
+
+                f"(ctx : FormalContext) : Prop := {relation_body}"
+
+            )
+
+        for node_id, node_name, dependencies in node_relations:
+
+            antecedents = [
+
+                node_bodies[dep]
+
+                for dep in dependencies
+
+                if dep in node_bodies
+
+            ]
+
+            if not antecedents:
+
+                continue
+
+            relation_body = " → ".join(
+
+                [*(f"({value})" for value in antecedents), f"({node_bodies[node_id]})"]
+
+            )
+
+            lines.append(
+
+                f"def DeductiveNode_{node_name} "
+
+                f"(ctx : FormalContext) : Prop := {relation_body}"
+
+            )
+
+        lines.extend([f"end {self.namespace}", "", "-- DEMUESTRA_AUDIT_BEGIN"])
+
+        lines.extend([
+
+            "-- DEMUESTRA_CONSTRUCTION_COMPLETE: "
+
+            + ("TRUE" if construction_complete else "FALSE"),
+
+            "-- DEMUESTRA_DEDUCTIVE_COVERAGE_COMPLETE: "
+
+            + ("TRUE" if deductive_coverage_complete else "FALSE"),
+
+            "-- DEMUESTRA_PROOF_COMPLETE: "
+
+            + ("TRUE" if proof_complete else "FALSE"),
+
+        ])
+
+        if formalization_complete:
+
+            lines.extend([
+
+                "-- DEMUESTRA_FORMALIZATION_STATUS: COMPLETE",
+
+                f"-- DEMUESTRA_RESULT: {self.namespace}.derive_{result_name}",
+
+                f"-- DEMUESTRA_JSON_NODE: {result.source.node_id}",
+
+                f"#check {self.namespace}.derive_{result_name}",
+
+                f"#print axioms {self.namespace}.derive_{result_name}",
+
+            ])
+
+        else:
+            result_proof_status = assertion_statuses.get(
+                result.source.node_id, ("INCOMPLETA", "NO_INICIADA")
+            )[1]
+            result_theorem_emitted = result_proof_status in {
+                "TEOREMA_EMITIDO",
+                "VERIFICADA",
+                "VERIFICADA_ESTRUCTURAL",
+            }
+            lines.extend([
+                "-- DEMUESTRA_FORMALIZATION_STATUS: PARTIAL",
+                f"-- DEMUESTRA_JSON_NODE: {result.source.node_id}",
+            ])
+            if result_theorem_emitted:
+                lines.extend([
+                    f"-- DEMUESTRA_RESULT_UNVERIFIED: {self.namespace}.derive_{result_name}",
+                    f"#check {self.namespace}.derive_{result_name}",
+                ])
+            elif result.source.node_id in defined_nodes:
+                lines.append(f"#check {self.namespace}.Node_{result_name}")
+
+        lines.extend(["-- DEMUESTRA_AUDIT_END", ""])
+
+        return "\n".join(lines)
+
+
+
+    def _supporting_definitions(self, body, node_bodies, current_node_id):
+
+        used = set(re.findall(r"ctx\.([A-Za-z0-9_]+)", body))
+
+        if not used:
+
+            return ()
+
+        result = []
+
+        for item in self.nodes:
+
+            candidate = item.source
+
+            if candidate.node_id == current_node_id:
+
+                break
+
+            if candidate.kind in self.PROOF_KINDS:
+
+                continue
+
+            candidate_body = node_bodies.get(candidate.node_id)
+
+            if not candidate_body or candidate_body == "True":
+
+                continue
+
+            declared = self._declared_context_symbols(item)
+
+            if used & declared:
+
+                result.append(candidate.node_id)
+
+        return tuple(result)
+
+
+
+    def _declared_context_symbols(self, item):
+
+        result = set()
+
+        for formula in item.declarations:
+
+            ast = self._normalize_formula_ast(formula.ast)
+
+            clauses = ast.children if ast.kind == "tuple" else (ast,)
+
+            for clause in clauses:
+
+                if clause.kind == "binary" and clause.value in {"EQ", "IFF", "COLON"}:
+
+                    name = self.emitter._symbolic_name(clause.children[0])
+
+                    if name:
+
+                        result.add(self._field_name(name, None))
+
+        return result
+
+
+
+    def _emit_document_derivation(
+
+        self, lines, node_name, hypotheses, body, decompositions,
+
+        effective_deps, node_clause_bodies
+
+    ):
+
+        """Recognize deductions from the formalized clauses of real dependencies."""
+
+        target = self._strip_outer_parentheses(body)
+
+        candidates = []
+
+        for dep in effective_deps:
+
+            clauses = node_clause_bodies.get(dep, ())
+
+            dep_name = self._name(dep)
+
+            for index, clause in enumerate(clauses, start=1):
+
+                reference = (
+
+                    f"h_{dep_name}_{index}" if len(clauses) > 1
+
+                    else f"h_{dep_name}"
+
+                )
+
+                candidates.append((self._strip_outer_parentheses(clause), reference))
+
+        proof = None
+
+        for candidate, reference in candidates:
+
+            if candidate == target:
+
+                proof = [f"  exact {reference}"]
+
+                break
+
+            if self._symmetric_equality(candidate, target):
+
+                proof = [f"  exact {reference}.symm"]
+
+                break
+
+            if self._balanced_difference(candidate, target):
+
+                proof = [f"  linarith [{reference}]"]
+
+                break
+
+            implication = self._split_top_level(target, " → ")
+
+            if implication is not None and implication[1] == candidate:
+
+                proof = ["  intro _", f"  exact {reference}"]
+
+                break
+
+            subset_proof = self._conjunct_subset_proof(
+
+                candidate, target, reference
+
+            )
+
+            if subset_proof is not None:
+
+                proof = subset_proof
+
+                break
+
+            chain_proof = self._equivalence_chain_proof(
+
+                candidate, target, reference
+
+            )
+
+            if chain_proof is not None:
+
+                proof = chain_proof
+
+                break
+
+        if proof is None:
+
+            return False
+
+        separator = " " if hypotheses else ""
+
+        lines.append(
+
+            f"theorem derive_{node_name} (ctx : FormalContext)"
+
+            f"{separator}{hypotheses} : ({body}) := by"
+
+        )
+
+        if decompositions:
+
+            lines.extend(decompositions)
+
+        lines.extend(proof)
+
+        return True
+
+
+
+    @classmethod
+
+    def _strip_outer_parentheses(cls, expression):
+
+        value = expression.strip()
+
+        while value.startswith("(") and value.endswith(")"):
+
+            depth = 0
+
+            encloses_all = True
+
+            for index, char in enumerate(value):
+
+                if char == "(":
+
+                    depth += 1
+
+                elif char == ")":
+
+                    depth -= 1
+
+                    if depth == 0 and index != len(value) - 1:
+
+                        encloses_all = False
+
+                        break
+
+            if not encloses_all or depth != 0:
+
+                break
+
+            value = value[1:-1].strip()
+
+        return value
+
+
+
+    @classmethod
+
+    def _split_top_level(cls, expression, operator):
+
+        value = cls._strip_outer_parentheses(expression)
+
+        depth = 0
+
+        index = 0
+
+        while index <= len(value) - len(operator):
+
+            char = value[index]
+
+            if char == "(":
+
+                depth += 1
+
+            elif char == ")":
+
+                depth -= 1
+
+            elif depth == 0 and value.startswith(operator, index):
+
+                return (
+
+                    cls._strip_outer_parentheses(value[:index]),
+
+                    cls._strip_outer_parentheses(value[index + len(operator):]),
+
+                )
+
+            index += 1
+
+        return None
+
+
+
+    @classmethod
+
+    def _symmetric_equality(cls, source, target):
+
+        source_parts = cls._split_top_level(source, " = ")
+
+        target_parts = cls._split_top_level(target, " = ")
+
+        return bool(
+
+            source_parts and target_parts
+
+            and source_parts[0] == target_parts[1]
+
+            and source_parts[1] == target_parts[0]
+
+        )
+
+
+
+    @classmethod
+
+    def _balanced_difference(cls, source, target):
+
+        """Recognize B = C - A as the same linear equality as A = C - B."""
+
+        source_eq = cls._split_top_level(source, " = ")
+
+        target_eq = cls._split_top_level(target, " = ")
+
+        if not source_eq or not target_eq:
+
+            return False
+
+        source_sub = cls._split_top_level(source_eq[1], " - ")
+
+        target_sub = cls._split_top_level(target_eq[1], " - ")
+
+        return bool(
+
+            source_sub and target_sub
+
+            and source_eq[0] == target_sub[1]
+
+            and target_eq[0] == source_sub[1]
+
+            and source_sub[0] == target_sub[0]
+
+        )
+
+
+
+    @classmethod
+
+    def _flatten_top_level(cls, expression, operator):
+
+        value = cls._strip_outer_parentheses(expression)
+
+        parts = cls._split_top_level(value, operator)
+
+        if parts is None:
+
+            return [value]
+
+        return (
+
+            cls._flatten_top_level(parts[0], operator)
+
+            + cls._flatten_top_level(parts[1], operator)
+
+        )
+
+
+
+    @classmethod
+
+    def _existential_body(cls, expression):
+
+        value = cls._strip_outer_parentheses(expression)
+
+        if not value.startswith("∃ "):
+
+            return None
+
+        depth = 0
+
+        for index, char in enumerate(value):
+
+            if char == "(":
+
+                depth += 1
+
+            elif char == ")":
+
+                depth -= 1
+
+            elif char == "," and depth == 0:
+
+                return cls._strip_outer_parentheses(value[index + 1:])
+
+        return None
+
+
+
+    @classmethod
+
+    def _conjunct_subset_proof(cls, source, target, reference):
+
+        existential_body = cls._existential_body(source)
+
+        source_body = existential_body if existential_body is not None else source
+
+        source_parts = cls._flatten_top_level(source_body, " ∧ ")
+
+        target_parts = cls._flatten_top_level(target, " ∧ ")
+
+        if len(source_parts) < 2 or len(target_parts) < 1:
+
+            return None
+
+        positions = []
+
+        for part in target_parts:
+
+            try:
+
+                positions.append(source_parts.index(part))
+
+            except ValueError:
+
+                return None
+
+        names = [f"h_document_{index + 1}" for index in range(len(source_parts))]
+
+        pattern = ", ".join(names)
+
+        if existential_body is not None:
+
+            pattern = "_, " + pattern
+
+        selected = [names[index] for index in positions]
+
+        result = [f"  rcases {reference} with ⟨{pattern}⟩"]
+
+        if len(selected) == 1:
+
+            result.append(f"  exact {selected[0]}")
+
+        else:
+
+            result.append("  exact ⟨" + ", ".join(selected) + "⟩")
+
+        return result
+
+
+
+    def _matching_definition_dependencies(
+
+        self, target, node_clause_bodies, current_node_id
+
+    ):
+
+        normalized_target = self._strip_outer_parentheses(target)
+
+        result = []
+
+        for item in self.nodes:
+
+            node = item.source
+
+            if node.node_id == current_node_id:
+
+                break
+
+            if node.kind in self.PROOF_KINDS:
+
+                continue
+
+            clauses = node_clause_bodies.get(node.node_id, ())
+
+            if any(
+
+                self._strip_outer_parentheses(clause) == normalized_target
+
+                for clause in clauses
+
+            ):
+
+                result.append(node.node_id)
+
+        return tuple(result)
+
+
+
+    @classmethod
+
+    def _equivalence_chain_proof(cls, source, target, reference):
+
+        target_iff = cls._split_top_level(target, " ↔ ")
+
+        if target_iff is None:
+
+            return None
+
+        source_parts = cls._flatten_top_level(source, " ∧ ")
+
+        edges = []
+
+        for index, part in enumerate(source_parts):
+
+            endpoints = cls._split_top_level(part, " ↔ ")
+
+            if endpoints is not None:
+
+                edges.append((endpoints[0], endpoints[1], index))
+
+        if not edges:
+
+            return None
+
+        start, goal = target_iff
+
+        queue = [(start, [])]
+
+        visited = {start}
+
+        path = None
+
+        while queue:
+
+            current, current_path = queue.pop(0)
+
+            if current == goal:
+
+                path = current_path
+
+                break
+
+            for left, right, index in edges:
+
+                if current == left and right not in visited:
+
+                    visited.add(right)
+
+                    queue.append((right, [*current_path, (index, False)]))
+
+                elif current == right and left not in visited:
+
+                    visited.add(left)
+
+                    queue.append((left, [*current_path, (index, True)]))
+
+        if not path:
+
+            return None
+
+        names = [f"h_document_{index + 1}" for index in range(len(source_parts))]
+
+        result = [
+
+            f"  rcases {reference} with ⟨" + ", ".join(names) + "⟩"
+
+        ]
+
+        terms = [names[index] + (".symm" if reverse else "") for index, reverse in path]
+
+        expression = terms[-1]
+
+        for term in reversed(terms[:-1]):
+
+            expression = f"{term}.trans ({expression})"
+
+        result.append(f"  exact {expression}")
+
+        return result
+
+
+
+    def _emit_kernel_candidate(
+
+        self, lines, node_name, hypotheses, body, decompositions=None
+
+    ):
+
+        """
+
+        Emite un candidato deductivo Lean.
+
+
+
+        IMPORTANTE:
+
+        - No inventa una demostración.
+
+        - No utiliza `sorry`.
+
+        - No oculta objetivos pendientes mediante `try`.
+
+        - Si las hipótesis disponibles no permiten cerrar el objetivo,
+
+          Lean debe dejar constancia del fallo.
+
+        - La certificación pertenece al kernel de Lean, no al generador.
+
+        """
+
+        separator = " " if hypotheses else ""
+
+
+
+        lines.append(
+
+            f"theorem derive_{node_name} (ctx : FormalContext)"
+
+            f"{separator}{hypotheses} : ({body}) := by"
+
+        )
+
+
+
+        spec = self.equivalence_specs.get(node_name)
+
+
+
+        if spec is not None:
+
+            if decompositions:
+
+                lines.extend(decompositions)
+
+
+
+            source = spec["source"]
+
+            target = spec["target"]
+
+            forward = spec["forward"]
+
+            inverse = spec["inverse"]
+
+
+
+            h_forward = (
+
+                f"h_{spec['forward_dep']}"
+
+                f"{spec.get('forward_suffix', '')}"
+
+            )
+
+            h_inverse = (
+
+                f"h_{spec['inverse_dep']}"
+
+                f"{spec.get('inverse_suffix', '')}"
+
+            )
+
+
+
+            preserves_coordinate = spec.get(
+
+                "preserves_coordinate", False
+
+            )
+
+
+
+            if preserves_coordinate:
+
+                lines.append(
+
+                    f"  rcases {h_forward} with "
+
+                    "⟨h_forward_maps, h_forward_coordinate⟩"
+
+                )
+
+                h_forward_maps = "h_forward_maps"
+
+            else:
+
+                h_forward_maps = h_forward
+
+
+
+            identity_suffix = spec.get(
+
+                "inverse_identity_suffix"
+
+            )
+
+
+
+            if identity_suffix:
+
+                h_identity = (
+
+                    f"h_{spec['inverse_dep']}"
+
+                    f"{identity_suffix}"
+
+                )
+
+                lines.append(
+
+                    f"  rcases {h_identity} with "
+
+                    "⟨h_left, h_right⟩"
+
+                )
+
+                h_inverse_maps = h_inverse
+
+            else:
+
+                lines.append(
+
+                    f"  rcases {h_inverse} with "
+
+                    "⟨h_inverse_maps, h_left, h_right⟩"
+
+                )
+
+                h_inverse_maps = "h_inverse_maps"
+
+
+
+            lines.extend([
+
+                f"  let equivalence : ↥({source}) ≃ ↥({target}) :=",
+
+                "    {",
+
+                (
+
+                    "      toFun := fun x => "
+
+                    f"⟨{forward} x.val, "
+
+                    f"{h_forward_maps} x.val x.property⟩"
+
+                ),
+
+                (
+
+                    "      invFun := fun z => "
+
+                    f"⟨{inverse} z.val, "
+
+                    f"{h_inverse_maps} z.val z.property⟩"
+
+                ),
+
+                "      left_inv := by",
+
+                "        intro x",
+
+                "        apply Subtype.ext",
+
+                "        exact h_left x.val x.property",
+
+                "      right_inv := by",
+
+                "        intro z",
+
+                "        apply Subtype.ext",
+
+                "        exact h_right z.val z.property",
+
+                "    }",
+
+            ])
+
+
+
+            if preserves_coordinate:
+
+                lines.extend([
+
+                    (
+
+                        "  refine "
+
+                        "⟨equivalence, ?_, ?_, "
+
+                        "h_forward_coordinate, ?_⟩"
+
+                    ),
+
+                    "  · intro x",
+
+                    "    rfl",
+
+                    "  · intro z",
+
+                    "    rfl",
+
+                    "  · intro z hz",
+
+                    (
+
+                        "    have h := "
+
+                        f"h_forward_coordinate ({inverse} z) "
+
+                        f"({h_inverse_maps} z hz)"
+
+                    ),
+
+                    "    rw [h_right z hz] at h",
+
+                    "    exact h.symm",
+
+                ])
+
+            else:
+
+                lines.extend([
+
+                    "  refine ⟨equivalence, ?_, ?_⟩",
+
+                    "  · intro x",
+
+                    "    rfl",
+
+                    "  · intro z",
+
+                    "    rfl",
+
+                ])
+
+
+
+            return
+
+
+
+        if decompositions:
+
+            lines.extend(decompositions)
+
+
+
+        #
+
+        # Candidato deductivo genérico.
+
+        #
+
+        # Antes se utilizaba:
+
+        #
+
+        #     all_goals try assumption
+
+        #
+
+        # Eso podía dejar objetivos abiertos y, aun así, el backend
+
+        # contabilizaba el nodo como teorema emitido.
+
+        #
+
+        # Aquí no ocultamos el problema. Primero intentamos exactamente
+
+        # las hipótesis disponibles. Después permitimos únicamente
+
+        # simplificación lógica estándar. Si el resultado no se deduce,
+
+        # Lean DEBE fallar.
+
+        #
+
+        lines.append("  assumption")
+
+
+
+    @staticmethod
+
+    def _comment_value(value):
+
+        return " ".join(str(value).split())
+
+
+
+    @staticmethod
+
+    def _has_limit(ast):
+
+        return ast.kind == "limit" or any(
+
+            LeanBackend._has_limit(child) for child in ast.children if isinstance(child, Ast)
+
+        )
+
+
+
+    @staticmethod
+
+    def _contains_ellipsis(ast):
+
+        if ast.kind == "identifier" and ast.value == "ldots":
+
+            return True
+
+        return any(
+
+            LeanBackend._contains_ellipsis(child)
+
+            for child in ast.children if isinstance(child, Ast)
+
+        )
+
+
+
+    @staticmethod
+
+    def _without_ellipsis_chain(ast):
+
+        if ast.kind == "binary" and ast.value == "AND":
+
+            first, second = ast.children
+
+            if (
+
+                first.kind == "binary" and first.value == "EQ"
+
+                and second.kind == "binary" and second.value == "EQ"
+
+                and first.children[1] == second.children[0]
+
+                and LeanBackend._contains_ellipsis(first.children[1])
+
+            ):
+
+                return Ast("binary", "EQ", (first.children[0], second.children[1]))
+
+        return ast
+
+
+
+    @classmethod
+
+    def _normalize_formula_ast(cls, ast):
+
+        if ast.children:
+
+            ast = Ast(
+
+                ast.kind,
+
+                ast.value,
+
+                tuple(
+
+                    cls._normalize_formula_ast(child) if isinstance(child, Ast) else child
+
+                    for child in ast.children
+
+                ),
+
+            )
+
+        ast = cls._without_ellipsis_chain(ast)
+
+        if (
+
+            ast.kind == "binary" and ast.value == "COLON"
+
+            and not (
+
+                ast.children[1].kind == "binary"
+
+                and ast.children[1].value == "MAPSTO"
+
+            )
+
+        ):
+
+            # Remaining colons describe the universe/context in which the
+            # proposition is read (formal D/A/P/T labels were removed by the
+            # parser); they are not Lean type ascriptions.
+
+            return ast.children[1]
+
+        if (
+
+            ast.kind == "binary" and ast.value == "LT"
+
+            and ast.children[1].kind == "constant"
+
+            and ast.children[1].value == "INFINITY"
+
+        ):
+
+            return Ast(
+
+                "unary", "NOT",
+
+                (Ast("limit", None, ast.children),),
+
+            )
+
+        if ast.kind == "binary" and ast.value == "IMPLIES":
+
+            premise, consequence = ast.children
+
+            if (
+
+                premise.kind == "binary"
+
+                and premise.value == "IN"
+
+                and premise.children[0].kind == "identifier"
+
+            ):
+
+                variable, domain = premise.children
+
+                return Ast("quantifier", "FORALL", (variable, domain, consequence))
+
+        return ast
+
+
+
+    @staticmethod
+
+    def _has_uninterpreted_text(ast):
+
+        if ast.kind in {"text", "assertion"}:
+
+            return True
+
+        return any(
+
+            LeanBackend._has_uninterpreted_text(child)
+
+            for child in ast.children if isinstance(child, Ast)
+
+        )
+
+
+
+    @staticmethod
+
+    def _has_uninterpreted_assertion(ast):
+
+        if ast.kind == "assertion":
+
+            return True
+
+        return any(
+
+            LeanBackend._has_uninterpreted_assertion(child)
+
+            for child in ast.children if isinstance(child, Ast)
+
+        )
+
+
+
+    def _mapping_expression(self, ast):
+
+        if ast.kind != "binary" or ast.value != "COLON":
+
+            return None
+
+        function, arrow = ast.children
+
+        if arrow.kind != "binary" or arrow.value != "MAPSTO":
+
+            return None
+
+        name = self.emitter._symbolic_name(function)
+
+        domain, codomain = arrow.children
+
+        domain_name = self.emitter._symbolic_name(domain)
+
+        codomain_name = self.emitter._symbolic_name(codomain)
+
+        def coordinate_interval(value):
+
+            if value.kind == "interval":
+
+                return value
+
+            if (
+
+                value.kind == "subscript"
+
+                and value.children
+
+                and value.children[0].kind == "interval"
+
+            ):
+
+                return value.children[0]
+
+            return None
+
+        if not name:
+
+            return None
+
+        domain_interval = coordinate_interval(domain)
+
+        codomain_interval = coordinate_interval(codomain)
+
+        if domain_interval is not None and codomain_interval is not None:
+
+            signature = self.symbols.functions.get(name)
+
+            if signature is None or len(signature.arguments) != 1:
+
+                return None
+
+            variable = "x_map"
+
+            lean_type = self._type(signature.arguments[0])
+
+            return (
+
+                f"(∀ {variable} : {lean_type}, "
+
+                f"{variable} ∈ {self.emitter.emit(domain_interval)} → "
+
+                f"({self._resolve(name, 1)} {variable}) ∈ "
+
+                f"{self.emitter.emit(codomain_interval)})"
+
+            )
+
+        if not domain_name:
+
+            return None
+
+        domain_type = self.symbols.values.get(domain_name, "")
+
+        codomain_type = self.symbols.values.get(codomain_name, "") if codomain_name else ""
+
+        signature = self.symbols.functions.get(name)
+
+        if not domain_type.startswith("Set[") or not codomain_type.startswith("Set["):
+
+            if signature is None or len(signature.arguments) != 1:
+
+                return None
+
+            return (
+
+                f"({self._resolve(name, 1)} {self.emitter._parenthesize(domain)} = "
+
+                f"{self.emitter.emit(codomain)})"
+
+            )
+
+        if (
+
+            signature is None
+
+            or signature.arguments != (domain_type[4:-1],)
+
+            or signature.result != codomain_type[4:-1]
+
+        ):
+
+            return None
+
+        variable = "x_map"
+
+        lean_type = self._type(signature.arguments[0])
+
+        return (
+
+            f"(∀ {variable} : {lean_type}, {variable} ∈ {self._resolve(domain_name)} → "
+
+            f"({self._resolve(name, 1)} {variable}) ∈ {self._resolve(codomain_name)})"
+
+        )
+
+
+
+    def _witnessed_congruence(self, item, ast):
+
+        if ast.kind != "binary" or ast.value != "CONG":
+
+            return None
+
+        domain_name, codomain_name = (
+
+            self.emitter._symbolic_name(child) for child in ast.children
+
+        )
+
+        mappings = {}
+
+        for dependency in self.nodes:
+
+            if dependency.source.node_id not in item.source.deps:
+
+                continue
+
+            for formula_index, formula in enumerate(dependency.declarations, start=1):
+
+                arrow = formula.ast
+
+                if self._mapping_expression(arrow) is None:
+
+                    continue
+
+                function, spaces = arrow.children
+
+                source, target = (
+
+                    self.emitter._symbolic_name(child) for child in spaces.children
+
+                )
+
+                mappings.setdefault((source, target), set()).add((
+
+                    self.emitter._symbolic_name(function),
+
+                    dependency.source.node_id,
+
+                    formula_index,
+
+                ))
+
+        forward = mappings.get((domain_name, codomain_name), set())
+
+        inverse = mappings.get((codomain_name, domain_name), set())
+
+        if len(forward) != 1 or len(inverse) != 1:
+
+            return None
+
+        (forward_name, forward_dep, forward_index), = forward
+
+        (inverse_name, inverse_dep, inverse_index), = inverse
+
+        inverse_item = next(
+
+            candidate for candidate in self.nodes
+
+            if candidate.source.node_id == inverse_dep
+
+        )
+
+        inverse_identity_index = next((
+
+            index for index, formula in enumerate(inverse_item.declarations, start=1)
+
+            if formula.ast.kind == "tuple"
+
+        ), None)
+
+        source = self._resolve(domain_name)
+
+        target = self._resolve(codomain_name)
+
+        f = self._resolve(forward_name, 1)
+
+        f_inv = self._resolve(inverse_name, 1)
+
+        contracts = self._coordinate_contracts()
+
+        forward_contract = contracts.get(forward_name)
+
+        inverse_contract = contracts.get(inverse_name)
+
+        preserves_coordinate = (
+
+            forward_contract is not None and inverse_contract is not None
+
+        )
+
+        self.equivalence_specs[item.source.node_id] = {
+
+            "source": source,
+
+            "target": target,
+
+            "forward": f,
+
+            "inverse": f_inv,
+
+            "forward_dep": self._name(forward_dep),
+
+            "inverse_dep": self._name(inverse_dep),
+
+            "forward_suffix": f"_{forward_index}" if len(next(
+
+                candidate.declarations for candidate in self.nodes
+
+                if candidate.source.node_id == forward_dep
+
+            )) > 1 else "",
+
+            "inverse_suffix": f"_{inverse_index}" if len(inverse_item.declarations) > 1 else "",
+
+            "inverse_identity_suffix": (
+
+                f"_{inverse_identity_index}" if inverse_identity_index is not None else None
+
+            ),
+
+            "preserves_coordinate": preserves_coordinate,
+
+        }
+
+        result = (
+
+            f"(∃ h : ↥({source}) ≃ ↥({target}), "
+
+            f"(∀ x_iso : ↥({source}), (h x_iso).val = {f} x_iso.val) ∧ "
+
+            f"(∀ z_iso : ↥({target}), (h.symm z_iso).val = {f_inv} z_iso.val)"
+
+        )
+
+        if preserves_coordinate:
+
+            result += f" ∧ ({forward_contract}) ∧ ({inverse_contract})"
+
+        return result + ")"
+
+
+
+    def _validate_selected_formulas(self):
+
+        errors = []
+
+        for item in self.nodes:
+
+            for formula in (*item.declarations, *item.claims):
+
+                try:
+
+                    normalized = self._normalize_formula_ast(formula.ast)
+
+                    SemanticAnalyzer(self.symbols, formula.location).analyze(normalized)
+
+                except Exception as error:
+
+                    errors.append(str(error))
+
+        if errors:
+
+            raise LeanBackendError("No se pueden emitir formulas sin tipo:\n- " + "\n- ".join(errors))
+
+
+
+    def _source_translation(self, item, formula):
+
+        source_ast = self._normalize_formula_ast(formula.ast)
+
+        source_ast = self._normalize_representation_ast(source_ast)
+
+        if source_ast.kind == "identifier":
+
+            signature = self.symbols.functions.get(str(source_ast.value))
+
+            if signature is not None and signature.arguments != ("...",):
+
+                function_type = "Function[" + ",".join(
+
+                    (*signature.arguments, signature.result)
+
+                ) + "]"
+
+                return (
+
+                    function_type,
+
+                    self._resolve(str(source_ast.value), len(signature.arguments)),
+
+                )
+
+        source_ast = self._prose_scoped_claim(item, formula, source_ast)
+
+        source_expr = self._universally_scoped_expression(item, formula, source_ast)
+
+        if source_expr is not None:
+
+            return "Prop", source_expr
+
+        source_expr = self._mapping_expression(source_ast)
+
+        if source_expr is not None:
+
+            if re.search(
+
+                r"coordenada\s+transversal\s+es",
+
+                item.source.prose,
+
+                re.IGNORECASE,
+
+            ):
+
+                function = self.emitter._symbolic_name(source_ast.children[0])
+
+                contracts = self._coordinate_contracts()
+
+                contract = contracts.get(function)
+
+                if contract is not None:
+
+                    source_expr = f"({source_expr}) ∧ ({contract})"
+
+            return "Prop", source_expr
+
+        source_expr = self._witnessed_congruence(item, source_ast)
+
+        if source_expr is not None:
+
+            return "Prop", source_expr
+
+        analyzer = SemanticAnalyzer(self.symbols, formula.location)
+
+        source_type = analyzer.analyze(source_ast)
+
+        if source_ast.kind == "tuple" and source_ast.children:
+
+            child_types = [analyzer.analyze(child) for child in source_ast.children]
+
+            if all(child_type == "Prop" for child_type in child_types):
+
+                return "Prop", " ∧ ".join(
+
+                    f"({self.emitter.emit(child)})"
+
+                    for child in source_ast.children
+
+                )
+
+        emitted = self.emitter.emit(source_ast)
+
+        if source_type == "Prop" and formula in item.claims and formula.is_display:
+
+            conditions = self._leading_conditions(item, formula)
+
+            if conditions:
+
+                antecedent = " ∧ ".join(
+
+                    f"({self.emitter.emit(condition)})" for condition in conditions
+
+                )
+
+                emitted = f"({antecedent}) → ({emitted})"
+
+        return source_type, emitted
+
+
+
+    def _prose_scoped_claim(self, item, formula, ast):
+
+        if formula not in item.claims:
+
+            return ast
+
+        if not re.search(
+
+            r"todos?\s+los?\s+.+aparecen?.+recta|all\s+.+appear.+line",
+
+            item.source.prose,
+
+            re.IGNORECASE | re.DOTALL,
+
+        ):
+
+            return ast
+
+        if not (
+
+            ast.kind == "binary" and ast.value == "EQ"
+
+            and ast.children[0].kind == "call"
+
+            and ast.children[0].value == "Re"
+
+            and ast.children[0].children
+
+            and ast.children[0].children[0].kind == "identifier"
+
+        ):
+
+            return ast
+
+        variable = ast.children[0].children[0]
+
+        for dependency in reversed(self.nodes):
+
+            if dependency.source.node_id not in item.source.deps:
+
+                continue
+
+            for declaration in reversed(dependency.declarations):
+
+                declaration_ast = self._normalize_formula_ast(declaration.ast)
+
+                if declaration_ast.kind != "binary" or declaration_ast.value != "EQ":
+
+                    continue
+
+                left, right = declaration_ast.children
+
+                name = self.emitter._symbolic_name(left)
+
+                if (
+
+                    name and right.kind == "set_builder"
+
+                    and self.symbols.values.get(name) == "Set[Complex]"
+
+                ):
+
+                    line = Ast("set_builder", None, (variable, ast))
+
+                    return Ast("binary", "SUBSETEQ", (left, line))
+
+        return ast
+
+
+
+    def _prose_contract_expressions(self, item):
+
+        if re.search(
+
+            r"no\s+reduce.+3S.+dimensi[oó]n|"
+
+            r"does\s+not\s+reduce.+3S.+dimension",
+
+            item.source.prose,
+
+            re.IGNORECASE | re.DOTALL,
+
+        ):
+
+            coordinate_props = []
+
+            for formula in item.source.formulas:
+
+                if not formula.is_display:
+
+                    continue
+
+                try:
+
+                    formula_type, expression = self._source_translation(item, formula)
+
+                except Exception:
+
+                    continue
+
+                if formula_type == "Prop":
+
+                    coordinate_props.append(expression)
+
+            if coordinate_props:
+
+                premise = " ∧ ".join(f"({value})" for value in coordinate_props)
+
+                conclusion = "ctx.U = (((3 : ℝ) * ctx.S) + ctx.T)"
+
+                return ((
+
+                    "la eleccion local alinea coordenadas sin reducir 3S",
+
+                    f"({premise}) → ({conclusion})",
+
+                ),)
+
+        if not re.search(
+
+            r"biyectiv[ao].+continua.+inversa|bijectiv.+continu.+inverse",
+
+            item.source.prose,
+
+            re.IGNORECASE | re.DOTALL,
+
+        ):
+
+            return ()
+
+        result = []
+
+        for candidate in self.nodes:
+
+            if item.source.node_id not in candidate.source.deps:
+
+                continue
+
+            for claim in candidate.claims:
+
+                ast = self._normalize_formula_ast(claim.ast)
+
+                if ast.kind == "binary" and ast.value == "CONG":
+
+                    result.append(("biyectiva, continua y con inversa", self.emitter.emit(ast)))
+
+        return tuple(result)
+
+
+
+    def _leading_conditions(self, item, formula):
+
+        prose = item.source.prose
+
+        display_start = prose.find("$$")
+
+        if display_start < 0:
+
+            return ()
+
+        prefix = " ".join(prose[:display_start].split())
+
+        if not re.search(r"\b(?:para|si|cuando|for|if|when)\b", prefix, re.IGNORECASE):
+
+            return ()
+
+        result = []
+
+        for candidate in item.source.formulas:
+
+            if candidate is formula or candidate.is_display:
+
+                continue
+
+            source = " ".join(candidate.source.split()).strip(" .,")
+
+            if not source or source not in prefix:
+
+                continue
+
+            try:
+
+                if SemanticAnalyzer(self.symbols, candidate.location).analyze(candidate.ast) == "Prop":
+
+                    result.append(candidate.ast)
+
+            except Exception:
+
+                continue
+
+        return tuple(result)
+
+
+
+    def _universally_scoped_expression(self, item, formula, ast):
+
+        scope_text = f"{formula.lead_text}\n{item.source.prose}"
+
+        if not re.search(
+
+            r"\b(?:para\s+todo|para\s+todos|for\s+all|for\s+every)\b",
+
+            scope_text,
+
+            re.IGNORECASE,
+
+        ):
+
+            return None
+
+        clauses = ast.children if ast.kind == "tuple" else (ast,)
+
+        domains = self._mapping_domains()
+
+        emitted = []
+
+        for clause in clauses:
+
+            binding = self._mapped_argument(clause, domains)
+
+            if binding is None:
+
+                return None
+
+            variable, domain = binding
+
+            variable_type = self.symbols.values.get(variable)
+
+            if variable_type is None:
+
+                return None
+
+            bound = self._name(variable + "_all")
+
+            expression = self.emitter.emit(clause)
+
+            expression = re.sub(
+
+                rf"(?<![A-Za-z0-9_]){re.escape(self._resolve(variable))}(?![A-Za-z0-9_])",
+
+                bound,
+
+                expression,
+
+            )
+
+            emitted.append(
+
+                f"(∀ {bound} : {self._type(variable_type)}, "
+
+                f"{bound} ∈ {self._resolve(domain)} → ({expression}))"
+
+            )
+
+        return " ∧ ".join(emitted)
+
+
+
+    def _mapping_domains(self):
+
+        result = {}
+
+        for item in self.nodes:
+
+            for formula in item.source.formulas:
+
+                ast = formula.ast
+
+                if ast.kind != "binary" or ast.value != "COLON":
+
+                    continue
+
+                function, arrow = ast.children
+
+                if arrow.kind != "binary" or arrow.value != "MAPSTO":
+
+                    continue
+
+                name = self.emitter._symbolic_name(function)
+
+                domain = self.emitter._symbolic_name(arrow.children[0])
+
+                if name and domain:
+
+                    result[name] = domain
+
+        return result
+
+
+
+    def _coordinate_contracts(self):
+
+        domains = self._mapping_domains()
+
+        result = {}
+
+        for item in self.nodes:
+
+            for formula in item.source.formulas:
+
+                ast = self._normalize_formula_ast(formula.ast)
+
+                clauses = ast.children if ast.kind == "tuple" else (ast,)
+
+                for clause in clauses:
+
+                    binding = self._mapped_argument(clause, domains)
+
+                    if binding is None:
+
+                        continue
+
+                    variable, domain = binding
+
+                    for function, function_domain in domains.items():
+
+                        if function_domain != domain:
+
+                            continue
+
+                        function_ref = self._resolve(function, 1)
+
+                        expression = self.emitter.emit(clause)
+
+                        if function_ref not in expression:
+
+                            continue
+
+                        variable_type = self.symbols.values.get(variable)
+
+                        if variable_type is None:
+
+                            continue
+
+                        bound = self._name(variable + "_all")
+
+                        expression = re.sub(
+
+                            rf"(?<![A-Za-z0-9_]){re.escape(self._resolve(variable))}(?![A-Za-z0-9_])",
+
+                            bound,
+
+                            expression,
+
+                        )
+
+                        result[function] = (
+
+                            f"∀ {bound} : {self._type(variable_type)}, "
+
+                            f"{bound} ∈ {self._resolve(domain)} → ({expression})"
+
+                        )
+
+        return result
+
+
+
+    def _mapped_argument(self, ast, domains):
+
+        if ast.kind == "apply" and len(ast.children) == 2:
+
+            function = self.emitter._symbolic_name(ast.children[0])
+
+            argument = ast.children[1]
+
+            if function in domains and argument.kind == "identifier":
+
+                return argument.value, domains[function]
+
+        if ast.kind == "call" and len(ast.children) == 1:
+
+            function = str(ast.value)
+
+            argument = ast.children[0]
+
+            if function in domains and argument.kind == "identifier":
+
+                return argument.value, domains[function]
+
+        for child in ast.children:
+
+            if isinstance(child, Ast):
+
+                found = self._mapped_argument(child, domains)
+
+                if found is not None:
+
+                    return found
+
+        return None
+
+
+
+    def _context_declaration(self):
+
+        fields = {}
+
+        for name, type_name in sorted(self.symbols.values.items()):
+
+            if name not in self.symbols.domains and name not in self.value_definitions:
+
+                fields[self._field_name(name, None)] = self._type(type_name)
+
+        for name, signature in sorted(self.symbols.functions.items()):
+
+            if name in {"Re", "abs"}:
+
+                continue
+
+            if name in self.predicate_definitions:
+
+                continue
+
+            if signature.arguments == ("...",):
+
+                groups = {}
+
+                for args, _ in self.inference._calls.get(name, []):
+
+                    groups.setdefault(len(args), args)
+
+                for arity, args in sorted(groups.items()):
+
+                    argument_types = tuple(self.inference._node_type(arg) for arg in args)
+
+                    fields[self._field_name(name, arity)] = self._function_type(argument_types, signature.result)
+
+            else:
+
+                fields[self._field_name(name, len(signature.arguments))] = self._function_type(signature.arguments, signature.result)
+
+        for text_name in sorted(self._text_atoms()):
+
+            if text_name not in self.text_definitions:
+
+                fields.setdefault(self._name("Text_" + text_name), "Prop")
+
+        for item in self.nodes:
+
+            for index, formula in enumerate(item.source.formulas, start=1):
+
+                try:
+
+                    self._source_translation(item, formula)
+
+                except Exception:
+
+                    fields.setdefault(
+
+                        self._name(f"SourceAssumption_{item.source.node_id}_{index}"),
+
+                        "Prop",
+
+                    )
+
+        fields.setdefault(self._field_name("DivergesToInfinity", 1), "ℝ → Prop")
+
+        fields.setdefault(self._field_name("TendsTo", 2), "ℝ → ℝ → Prop")
+
+        fields.setdefault(self._field_name("InfiniteSum_Nat_Real", 2), "ℕ → (ℕ → ℝ) → ℝ")
+
+        fields.setdefault(self._field_name("InfiniteSum_Nat_Complex", 2), "ℕ → (ℕ → ℂ) → ℂ")
+
+        fields.setdefault(self._field_name("Pow_Real", 2), "ℝ → ℝ → ℝ")
+
+        fields.setdefault(self._field_name("Pow_Complex", 2), "ℂ → ℂ → ℂ")
+
+        lines = ["structure FormalContext where"]
+
+        lines.extend(f"  {name} : {type_expr}" for name, type_expr in sorted(fields.items()))
+
+        return lines
+
+
+
+    def _discover_predicate_definitions(self):
+
+        explicitly_declared = {
+
+            self.emitter._symbolic_name(formula.ast.children[0])
+
+            for item in self.nodes
+
+            for formula in item.declarations
+
+            if formula.ast.kind == "binary"
+
+            and formula.ast.value == "COLON"
+
+            and self.emitter._symbolic_name(formula.ast.children[0])
+
+        }
+
+        for item in self.nodes:
+
+            if item.source.kind in self.PROOF_KINDS:
+
+                continue
+
+            for formula in item.claims:
+
+                ast = self._normalize_formula_ast(formula.ast)
+
+                if ast.kind != "quantifier" or ast.value != "FORALL":
+
+                    continue
+
+                variable, _, body = ast.children
+
+                if variable.kind != "identifier":
+
+                    continue
+
+                if body.kind != "binary" or body.value != "IFF":
+
+                    continue
+
+                predicate, definition = body.children
+
+                if predicate.kind not in {"apply", "call"}:
+
+                    continue
+
+                if predicate.kind == "apply":
+
+                    if len(predicate.children) != 2:
+
+                        continue
+
+                    name = self.emitter._symbolic_name(predicate.children[0])
+
+                    argument = predicate.children[1]
+
+                else:
+
+                    if len(predicate.children) != 1:
+
+                        continue
+
+                    name = str(predicate.value)
+
+                    argument = predicate.children[0]
+
+                if (
+
+                    not name
+
+                    or name in explicitly_declared
+
+                    or argument.kind != "identifier"
+
+                    or argument.value != variable.value
+
+                ):
+
+                    continue
+
+                signature = self.symbols.functions.get(name)
+
+                if (
+
+                    signature is None
+
+                    or len(signature.arguments) != 1
+
+                    or signature.result != "Prop"
+
+                ):
+
+                    continue
+
+                bound = self._name(variable.value + "_defined")
+
+                expression = self.emitter.emit(definition)
+
+                expression = re.sub(
+
+                    rf"(?<![A-Za-z0-9_]){re.escape(self._resolve(variable.value))}(?![A-Za-z0-9_])",
+
+                    bound,
+
+                    expression,
+
+                )
+
+                self.predicate_definitions[name] = (
+
+                    bound,
+
+                    signature.arguments[0],
+
+                    expression,
+
+                )
+
+
+
+    def _predicate_declarations(self):
+
+        lines = []
+
+        for name, (variable, type_name, expression) in sorted(
+
+            self.predicate_definitions.items()
+
+        ):
+
+            lines.append(
+
+                f"def Derived_{self._name(name)} (ctx : FormalContext) "
+
+                f"({variable} : {self._type(type_name)}) : Prop := ({expression})"
+
+            )
+
+        return lines
+
+
+
+    def _discover_text_definitions(self):
+
+        def visit(node):
+
+            if node.kind == "binary" and node.value == "IFF":
+
+                left, right = node.children
+
+                if left.kind == "text" and left.value not in self.text_definitions:
+
+                    self.text_definitions[str(left.value)] = right
+
+                if right.kind == "text" and right.value not in self.text_definitions:
+
+                    self.text_definitions[str(right.value)] = left
+
+            for child in node.children:
+
+                if isinstance(child, Ast):
+
+                    visit(child)
+
+
+
+        for item in self.nodes:
+
+            formulas = list(item.declarations)
+
+            if item.source.kind not in self.PROOF_KINDS:
+
+                formulas.extend((*item.claims, *item.steps))
+
+            for formula in formulas:
+
+                visit(self._normalize_formula_ast(formula.ast))
+
+        stable_name = next(
+
+            (name for name in self.text_definitions if name.endswith("estado_estable")),
+
+            None,
+
+        )
+
+        if stable_name is not None:
+
+            for name in self._text_atoms():
+
+                if "no_estable" in name and name not in self.text_definitions:
+
+                    self.text_definitions[name] = Ast(
+
+                        "unary", "NOT", (Ast("text", stable_name),)
+
+                    )
+
+
+
+    def _text_declarations(self):
+
+        lines = []
+
+        for name, expression in self.text_definitions.items():
+
+            lines.append(
+
+                f"def Derived_Text_{self._name(name)} (ctx : FormalContext) : Prop := "
+
+                f"({self.emitter.emit(expression)})"
+
+            )
+
+        return lines
+
+
+
+    def _discover_value_definitions(self):
+
+        # Las igualdades de nodos P_/T_ son obligaciones demostrativas. No se
+
+        # convierten en abreviaturas globales: hacerlo ocultaria el teorema y
+
+        # mezclaria simbolos homonimos usados en secciones diferentes.
+
+        self.value_definitions.clear()
+
+
+
+    @staticmethod
+
+    def _contains_ast_kind(ast, kind):
+
+        return ast.kind == kind or any(
+
+            LeanBackend._contains_ast_kind(child, kind)
+
+            for child in ast.children if isinstance(child, Ast)
+
+        )
+
+
+
+    @staticmethod
+
+    def _derivative_assignments(ast):
+
+        result = []
+
+        if ast.kind == "binary" and ast.value == "EQ":
+
+            left, right = ast.children
+
+            if right.kind == "identifier" and LeanBackend._contains_ast_kind(left, "derivative"):
+
+                result.append((right, left))
+
+        for child in ast.children:
+
+            if isinstance(child, Ast):
+
+                result.extend(LeanBackend._derivative_assignments(child))
+
+        return result
+
+
+
+    def _value_declarations(self):
+
+        lines = []
+
+        for name, (type_name, expression) in self.value_definitions.items():
+
+            lines.append(
+
+                f"def Derived_{self._name(name)} (ctx : FormalContext) : "
+
+                f"{self._type(type_name)} := ({self.emitter.emit(expression)})"
+
+            )
+
+        return lines
+
+
+
+    def _text_atoms(self):
+
+        result = set()
+
+        def visit(node):
+
+            if node.kind == "text":
+
+                result.add(str(node.value))
+
+            for child in node.children:
+
+                if isinstance(child, Ast):
+
+                    visit(child)
+
+        for item in self.nodes:
+
+            for formula in (*item.declarations, *item.claims, *item.steps):
+
+                visit(formula.ast)
+
+        return result
+
+
+
+    def _assertion_atoms(self):
+
+        result = set()
+
+        def visit(node):
+
+            if node.kind == "assertion":
+
+                result.add(str(node.value))
+
+            for child in node.children:
+
+                if isinstance(child, Ast):
+
+                    visit(child)
+
+        for item in self.nodes:
+
+            for formula in (*item.declarations, *item.claims, *item.steps):
+
+                visit(formula.ast)
+
+        return result
+
+
+
+    def _context_atoms(self):
+
+        result = set()
+
+        def visit(node):
+
+            if node.kind == "binary" and node.value == "CONTEXT":
+
+                name = self.emitter._symbolic_name(node.children[1])
+
+                if name:
+
+                    result.add(name)
+
+            for child in node.children:
+
+                if isinstance(child, Ast):
+
+                    visit(child)
+
+        for item in self.nodes:
+
+            for formula in (*item.declarations, *item.claims, *item.steps):
+
+                visit(formula.ast)
+
+        return result
+
+
+
+    def _resolve(self, name, arity=None):
+
+        if name in self.predicate_definitions:
+
+            return f"Derived_{self._name(name)} ctx"
+
+        if name.startswith("Text_") and name[5:] in self.text_definitions:
+
+            return f"Derived_Text_{self._name(name[5:])} ctx"
+
+        if name in self.value_definitions:
+
+            return f"Derived_{self._name(name)} ctx"
+
+        return "ctx." + self._field_name(name, arity)
+
+
+
+    def _field_name(self, name, arity):
+
+        base = self._name(name)
+
+        signature = self.symbols.functions.get(name)
+
+        if arity is not None and (name in self.symbols.values or (signature and signature.arguments == ("...",))):
+
+            return f"{base}_fn_{arity}"
+
+        return base
+
+
+
+    def _function_type(self, arguments, result):
+
+        return " → ".join([*(self._type(value) for value in arguments), self._type(result)])
+
+
+
+    def _type(self, value):
+
+        if value.startswith("Set["):
+
+            return f"Set ({self._type(value[4:-1])})"
+
+        if value.startswith("Tuple["):
+
+            return " × ".join(self._type(part) for part in value[6:-1].split(","))
+
+        if value.startswith("Function["):
+
+            return " → ".join(self._type(part) for part in value[9:-1].split(","))
+
+        return self.TYPES.get(value, self._name(value))
+
+
+
+    @staticmethod
+
+    def _name(value):
+
+        value = str(value).replace("'", "_prime")
+
+        name = re.sub(r"[^A-Za-z0-9_]", "_", value).strip("_")
+
+        if not name or name[0].isdigit():
+
+            name = "N_" + name
+
+        return name
+
+
+

@@ -1,4 +1,6 @@
+import json
 import re
+from collections import Counter
 
 from .base import Publicacion
 from .formal import FormalGraph, FormalGraphError
@@ -74,13 +76,146 @@ class Lean(Publicacion):
             if omitted:
                 details.append("nodos sin representacion formal: " + ", ".join(omitted))
             raise LeanSemanticAuditError(
-                "PUBLICAR no genero el archivo Lean porque el Markdown no ofrece "
-                "una formula para todos los nodos demostrativos.\n- "
+                "PUBLICAR no pudo representar todos los nodos en Lean. "
+                "Esto no determina si falta contenido en el Markdown o fallo "
+                "la extraccion.\n- "
                 + "\n- ".join(details)
-                + "\nAccion: exprese el enunciado del nodo entre $...$ o $$...$$. "
-                "Las referencias repetidas con sufijo numerico se enlazan automaticamente."
+                + "\nAccion: comparar el nodo con su origen antes de proponer "
+                "un cambio al Markdown."
             )
         return aliases, transparent
+
+    @staticmethod
+    def _source_formula_audit(graph, candidate):
+        expected = {
+            (node["id"], index): " ".join(formula.split())
+            for node in graph.nodes
+            for index, formula in enumerate(
+                node.get("formal_source", {}).get("formulas", ()), start=1
+            )
+        }
+        represented = {}
+        marker = re.compile(
+            r"(?m)^-- DEMUESTRA_SOURCE_(?:CLAIM|FORMULA):\s*(\{.*\})\s*$"
+        )
+        for match in marker.finditer(candidate):
+            try:
+                payload = json.loads(match.group(1))
+            except json.JSONDecodeError as error:
+                raise LeanSemanticAuditError(
+                    f"Marcador de cobertura Lean ilegible: {error}"
+                ) from error
+            key = (payload.get("node"), payload.get("formula"))
+            source = payload.get("source")
+            if key in represented:
+                raise LeanSemanticAuditError(
+                    f"Formula duplicada en la salida Lean: {key[0]} formula-{key[1]}."
+                )
+            represented[key] = source
+
+        missing = sorted(set(expected) - set(represented))
+        extra = sorted(set(represented) - set(expected))
+        changed = sorted(
+            key for key in set(expected) & set(represented)
+            if expected[key] != represented[key]
+        )
+        if missing or extra or changed:
+            details = []
+            if missing:
+                details.append("faltan " + ", ".join(f"{n}:{i}" for n, i in missing))
+            if extra:
+                details.append("sobran " + ", ".join(f"{n}:{i}" for n, i in extra))
+            if changed:
+                details.append("cambiaron " + ", ".join(f"{n}:{i}" for n, i in changed))
+            raise LeanSemanticAuditError(
+                "La cobertura formula por formula MD -> Lean no es exacta: "
+                + "; ".join(details)
+            )
+
+    @staticmethod
+    def _markdown_declaration_audit(graph, text, declarations):
+        """Contrasta el parser con un inventario lineal independiente del MD."""
+        broad_declaration = re.compile(
+            r"(?m)^[ \t]*(?:"
+            r"\$(?P<dollar>[DAPT]_[^$\r\n]+)\$[ \t]*(?:[—\-:])"
+            r"|(?P<bare>[DAPT]_[^:\r\n]+)[ \t]*:)"
+        )
+
+        source = Counter()
+        for match in broad_declaration.finditer(text):
+            marker = match.group("dollar") or match.group("bare")
+            node_id = graph._marker_id(marker)
+            if node_id in {"D_X", "A_X", "P_X", "T_X"}:
+                continue
+            line = text.count("\n", 0, match.start()) + 1
+            source[(line, node_id)] += 1
+
+        parsed = Counter(
+            (text.count("\n", 0, item["start"]) + 1, item["base_id"])
+            for item in declarations
+        )
+        missing = list((source - parsed).elements())
+        extra = list((parsed - source).elements())
+        if missing or extra:
+            details = []
+            if missing:
+                details.append(
+                    "declaraciones del MD omitidas: "
+                    + ", ".join(f"linea {line} ({node})" for line, node in missing)
+                )
+            if extra:
+                details.append(
+                    "declaraciones sin cabecera formal: "
+                    + ", ".join(f"linea {line} ({node})" for line, node in extra)
+                )
+            raise LeanSemanticAuditError(
+                "La creacion Lean perdio cobertura de declaraciones MD -> grafo: "
+                + "; ".join(details)
+            )
+
+    @staticmethod
+    def _markdown_formula_audit(graph):
+        text = graph.md.texto
+        declarations = graph._find_declarations(text)
+        if not declarations:
+            raise LeanSemanticAuditError("No hay declaraciones formales que auditar.")
+        Lean._markdown_declaration_audit(graph, text, declarations)
+        formal_start = min(item["start"] for item in declarations)
+
+        source_formulas = []
+        displays = list(graph.DISPLAY_MATH_RE.finditer(text))
+        masked = list(text)
+        for match in displays:
+            if match.start() >= formal_start:
+                source_formulas.append(" ".join(match.group("formula").split()))
+            masked[match.start():match.end()] = " " * (match.end() - match.start())
+        without_display = "".join(masked)
+        for match in graph.INLINE_MATH_RE.finditer(without_display):
+            formula = match.group("formula").strip()
+            if match.start() < formal_start:
+                continue
+            if re.fullmatch(graph.MARKER_PATTERN, formula):
+                continue
+            source_formulas.append(" ".join(formula.split()))
+
+        assigned_formulas = [
+            " ".join(formula.split())
+            for node in graph.nodes
+            for formula in node.get("formal_source", {}).get("formulas", ())
+        ]
+        source_counts = Counter(source_formulas)
+        assigned_counts = Counter(assigned_formulas)
+        missing = list((source_counts - assigned_counts).elements())
+        extra = list((assigned_counts - source_counts).elements())
+        if missing or extra:
+            details = []
+            if missing:
+                details.append(f"{len(missing)} formulas del MD sin asignar")
+            if extra:
+                details.append(f"{len(extra)} formulas asignadas sin origen exacto")
+            raise LeanSemanticAuditError(
+                "La creacion Lean perdio cobertura MD -> grafo: " + "; ".join(details)
+            )
 
     def _generar(self):
         before = self.md.fichero.read_bytes()
@@ -90,13 +225,19 @@ class Lean(Publicacion):
                 "el Markdown debe permanecer como unica fuente documental limpia."
             )
         graph, classified = self._frontend()
-        self._coverage_audit(graph, classified)
+        self._markdown_formula_audit(graph)
+        aliases, _ = self._coverage_audit(graph, classified)
         if self.md.fichero.read_bytes() != before:
             raise LeanCompilationError(
                 "El Markdown cambio durante la compilacion; operacion cancelada."
             )
         try:
-            candidate = LeanBackend(classified, self.md.fichero.stem).compile()
+            candidate = LeanBackend(
+                classified,
+                self.md.fichero.stem,
+                aliases=aliases,
+                source_argument=self.md.fichero,
+            ).compile()
         except LeanBackendError as error:
             raise LeanCompilationError(str(error)) from error
         declared = set(re.findall(r"(?m)^-- FORMAL_NODE:\s*([A-Za-z0-9_]+)\s*$", candidate))
@@ -106,6 +247,7 @@ class Lean(Publicacion):
                 "La salida Lean no representa exactamente los nodos del Markdown: "
                 f"faltan {sorted(expected - declared)}, sobran {sorted(declared - expected)}."
             )
+        self._source_formula_audit(graph, candidate)
         if re.search(r"\b(?:sorry|admit|axiom|opaque)\b", candidate):
             raise LeanSemanticAuditError("La salida Lean contiene una construccion prohibida.")
         return candidate

@@ -198,8 +198,9 @@ class ZenodoClient:
 
     @staticmethod
     def _sleep_with_status(seconds: int, label: str) -> None:
-        step = 10 if seconds <= 120 else 30
-        ProgressBar.wait(label, seconds, step=step)
+        # Refrescar cada segundo evita que las esperas cortas salten de 0 a
+        # 100 % y que las largas parezcan bloqueadas durante medio minuto.
+        ProgressBar.wait(label, seconds, step=1)
 
     @staticmethod
     def _summarize_response(response) -> str:

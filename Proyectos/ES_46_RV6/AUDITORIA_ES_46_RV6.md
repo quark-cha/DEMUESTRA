@@ -2,7 +2,7 @@
 
 ## Veredicto
 
-**CERRADO**
+**REQUIERE_REVISION**
 
 Objetivo: `T_RIEMANN`
 
@@ -15,11 +15,37 @@ forma parte del veredicto.
 - PASS `objetivo_existe`
 - PASS `dependencias_resueltas`
 - PASS `sin_ciclos`
-- PASS `lean_aprobado`
+- FAIL `lean_aprobado`
+- FAIL `verificacion_lean_completa`
+- PASS `traduccion_validada_completa`
+- PASS `construccion_validada_completa`
+- FAIL `prueba_validada_completa`
+- FAIL `objetivo_verificado_por_kernel`
 - PASS `prolog_aprobado`
+- PASS `prolog_md_directo_aprobado`
+- PASS `obligaciones_semanticas_cerradas`
 - PASS `nodo_lean_coincide`
 - PASS `dependencias_lean_internalizadas`
 - PASS `sin_pendientes_ya_demostrados`
+- PASS `sin_marcadores_no_certificables`
+
+## Clasificacion visual y semantica
+
+- **ERROR_EVALUADOR** — `Lean`: Lean comprobo la sintaxis y los tipos de la traduccion generada. La compilacion no demuestra por si sola el teorema.
+- **CERTIFICADO_PARCIAL** — `Lean parcial`: 17 nodos aceptados individualmente por el kernel.
+- **CERTIFICADO_ESTRUCTURAL** — `Prolog estructural`: Prolog cerro independientemente el arbol declarado. La auditoria estatica del archivo Lean certifico su estructura y sus conteos, sin ejecutar el kernel de Lean en esta ruta.
+- **CERTIFICADO** — `Prolog directo del MD`: Lee exclusivamente el Markdown y comprueba las reglas Deps, las referencias explicitas de la prueba y las premisas declaradas. Certifica la derivacion interna de T_RIEMANN en ese sistema; no convierte automaticamente cada premisa declarada en verdad matematica externa.
+
+## Prolog directo del Markdown
+
+- Informe: `PROLOG_MD_DIRECTO_ES_46_RV6.md`
+- JSON ADEC: `PROLOG_MD_DIRECTO_ES_46_RV6.json`
+- Veredicto: **TEOREMA DERIVADO DESDE PREMISAS DECLARADAS**
+- Refutacion formal: **no**
+
+### Obligaciones abiertas
+
+- Ninguna
 
 ## Raices utilizadas
 
@@ -51,4 +77,25 @@ antecedentes demostrados antes de poder publicarse como pendiente.
 
 ## Axiomas informados por Lean
 
-propext, Classical.choice, Quot.sound
+No determinados: Lean no completo una verificacion global valida.
+
+## Recomendacion prioritaria
+
+**Accion:** Repetir la auditoria completa y emitir el certificado final.
+
+**Impacto esperado:** Confirma que todos los evaluadores independientes permanecen en verde.
+
+**Siguiente objetivo matematico:** No quedan obligaciones semanticas registradas.
+
+### Conservar
+
+- 17 nodos certificados parcialmente por Lean
+- resultado estructural Prolog
+- informes y hashes ya emitidos
+- independencia entre evaluadores
+
+### No hacer
+
+- No modificar el MD para ocultar errores del traductor.
+- No convertir una hipotesis abierta en teorema por declaracion.
+- No invalidar certificados parciales por fallos de otros evaluadores.

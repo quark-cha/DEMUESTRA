@@ -264,19 +264,19 @@ class WebPublisher:
                 trace.result.files_equal = equal
                 trace.result.files_pending = to_upload
                 trace.kv("iguales", len(equal))
-                trace.kv("pendientes de subir", len(to_upload))
-                trace.kv("pendientes de borrar", len(to_delete))
+                trace.kv("seleccionados para subir/actualizar", len(to_upload))
+                trace.kv("seleccionados para eliminar", len(to_delete))
 
                 if equal:
                     trace.kv("archivos iguales omitidos del detalle", len(equal))
                 for name in to_upload:
                     remote_hash = remote_hashes.get(name)
                     if remote_hash is None:
-                        trace.file("PENDIENTE", name, "no existe en remoto")
+                        trace.file("NUEVO", name, "no existe en remoto")
                     else:
-                        trace.file("PENDIENTE", name, "hash local distinto del remoto")
+                        trace.file("ACTUALIZAR", name, "hash local distinto del remoto")
                 for name in to_delete:
-                    trace.file("BORRAR", name, "no existe en local")
+                    trace.file("ELIMINAR", name, "no existe en local")
 
             with trace.phase("subida de archivos"):
                 if not to_upload:
@@ -285,8 +285,8 @@ class WebPublisher:
                 progress = ProgressBar("WEB subida", len(to_upload))
                 progress.start()
                 for name in to_upload:
-                    progress.advance(name)
                     local_path = self.local_dir / name
+                    progress.update(progress.current, f"subiendo {name}")
                     try:
                         self.ftp.upload(local_path, f"{self.remote_dir}/{name}")
                     except Exception as exc:
@@ -294,8 +294,10 @@ class WebPublisher:
                         trace.failure("upload", error=exc, item=name)
                         raise
                     trace.result.files_uploaded.append(name)
-                    trace.file("SUBIDO", name)
+                    progress.advance(name)
                 progress.finish()
+                if to_upload:
+                    trace.kv("subidos/actualizados", len(to_upload))
 
             with trace.phase("borrado remoto"):
                 if not to_delete:
@@ -304,7 +306,7 @@ class WebPublisher:
                 progress = ProgressBar("WEB borrado", len(to_delete))
                 progress.start()
                 for name in to_delete:
-                    progress.advance(name)
+                    progress.update(progress.current, f"eliminando {name}")
                     try:
                         self.ftp.delete(f"{self.remote_dir}/{name}")
                     except Exception as exc:
@@ -312,8 +314,10 @@ class WebPublisher:
                         trace.failure("delete", error=exc, item=name)
                         raise
                     trace.result.files_deleted.append(name)
-                    trace.file("BORRADO", name)
+                    progress.advance(name)
                 progress.finish()
+                if to_delete:
+                    trace.kv("eliminados", len(to_delete))
 
             with trace.phase("actualizacion de hashes remotos"):
                 self.ftp.upload(self.local_hash_file, self.remote_hash_file)

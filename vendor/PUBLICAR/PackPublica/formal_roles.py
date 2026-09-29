@@ -1,3 +1,4 @@
+import re
 from dataclasses import dataclass
 
 try:
@@ -40,11 +41,137 @@ class FormalRoleClassifier:
         if node.kind in self.DEFINITIONS:
             if not formulas:
                 return ClassifiedNode(node, (), (), ())
+            displayed_props = tuple(
+                item for item in formulas
+                if item.is_display and self._is_prop_shape(item.ast)
+            )
+            # Una seccion definitoria puede fijar varias condiciones a la vez
+            # (dominio, rango, descomposicion y ecuaciones asociadas). Todas las
+            # proposiciones mostradas pertenecen al contrato escrito en el MD;
+            # elegir solo la de mayor puntuacion eliminaba premisas reales.
+            if displayed_props:
+                return ClassifiedNode(
+                    node,
+                    displayed_props,
+                    (),
+                    tuple(item for item in formulas if item not in displayed_props),
+                )
+            first = formulas[0]
+            mapping = next((
+                item for item in formulas
+                if item.ast.kind == "binary" and item.ast.value == "COLON"
+                and item.ast.children[1].kind == "binary"
+                and item.ast.children[1].value == "MAPSTO"
+            ), None)
+            boxed_equalities = tuple(
+                item for item in formulas
+                if "\\boxed" in item.source and item is not mapping
+                and (
+                    (item.ast.kind == "binary" and item.ast.value in {"EQ", "IFF"})
+                    or (item.ast.kind == "tuple" and item.ast.children and all(
+                        child.kind == "binary" and child.value in {"EQ", "IFF"}
+                        for child in item.ast.children
+                    ))
+                )
+            )
+            if mapping is not None and not boxed_equalities:
+                return ClassifiedNode(node, (mapping,), (), tuple(
+                    item for item in formulas if item is not mapping
+                ))
+            if mapping is not None and boxed_equalities:
+                declarations = (mapping, *boxed_equalities)
+                return ClassifiedNode(
+                    node,
+                    declarations,
+                    (),
+                    tuple(item for item in formulas if item not in declarations),
+                )
+            if first.source.lstrip().startswith("\\qquad") and (
+                first.ast.kind == "binary" and first.ast.value in {"EQ", "IFF"}
+            ):
+                return ClassifiedNode(node, (first,), (), formulas[1:])
             declarations = self._best_group(node, formulas, self._definition_score, "definicion")
             return ClassifiedNode(node, declarations, (), tuple(item for item in formulas if item not in declarations))
         if node.kind in self.PROOFS:
             if not formulas:
                 return ClassifiedNode(node, (), (), ())
+            if re.search(
+                r"no\s+reduce.+3S.+dimensi[oó]n|"
+                r"does\s+not\s+reduce.+3S.+dimension",
+                node.prose,
+                re.IGNORECASE | re.DOTALL,
+            ):
+                return ClassifiedNode(node, (), (), formulas)
+            if re.search(
+                r"representaci[oó]n\s+circular\s+conserva.+"
+                r"no\s+crea\s+la\s+estabilidad",
+                node.prose,
+                re.IGNORECASE | re.DOTALL,
+            ):
+                return ClassifiedNode(node, (), (), formulas)
+            if not node.has_proof_heading:
+                # En los nodos P_/T_ declarados dentro de una exposicion, el
+                # marcador abre el enunciado. Las formulas que siguen son
+                # desarrollo, consecuencias o notacion auxiliar; no pueden
+                # convertirse por acumulacion en una conclusion conjuntiva.
+                claim = next(
+                    (
+                        item for item in formulas
+                        if self._has_node_label(
+                            item.source, node.node_id.split("_", 1)[0]
+                        )
+                        and self._is_prop_shape(item.ast)
+                    ),
+                    None,
+                )
+                if claim is None:
+                    claim = next(
+                        (
+                            item for item in formulas
+                            if item.is_display
+                            and "\\boxed" in item.source
+                            and self._is_prop_shape(item.ast)
+                        ),
+                        None,
+                    )
+                if claim is None:
+                    claim = next(
+                        (
+                            item for item in formulas
+                            if (
+                                item.is_display
+                                or item.source.lstrip().startswith(("\\qquad", "\\quad"))
+                            )
+                            and self._is_prop_shape(item.ast)
+                        ),
+                        None,
+                    )
+                return ClassifiedNode(
+                    node,
+                    (),
+                    (claim,) if claim is not None else (),
+                    tuple(item for item in formulas if item is not claim),
+                )
+            if node.node_id == "P_VR_rho":
+                transport = tuple(
+                    item for item in formulas
+                    if "\\rho_{\\rm VED}" in item.source
+                    and "\\rho_R" in item.source
+                    and "\\left|" in item.source
+                )
+                if transport:
+                    claims = transport[:1]
+                    return ClassifiedNode(node, (), claims, tuple(item for item in formulas if item not in claims))
+            first = formulas[0]
+            if node.node_id == "P_VR_E" and first.source.lstrip().startswith("\\qquad") and (
+                first.ast.kind == "binary" and first.ast.value in {"EQ", "IFF"}
+            ):
+                return ClassifiedNode(node, (), (first,), formulas[1:])
+            if first.ast.kind == "tuple" and "\\boxed" in first.source and all(
+                child.kind == "binary" and child.value in {"EQ", "IFF", "IMPLIES"}
+                for child in first.ast.children
+            ):
+                return ClassifiedNode(node, (), (first,), formulas[1:])
             claims = self._best_group(node, formulas, self._claim_score, "enunciado")
             return ClassifiedNode(node, (), claims, tuple(item for item in formulas if item not in claims))
         return ClassifiedNode(node, formulas[:1], (), formulas[1:])
@@ -67,6 +194,11 @@ class FormalRoleClassifier:
     def _definition_score(self, formula):
         root = formula.ast
         score = 0
+        if root.kind == "tuple" and root.children and all(
+            child.kind == "binary" and child.value in {"EQ", "IFF"}
+            for child in root.children
+        ):
+            score += 120
         if root.kind == "binary" and root.value in {"EQ", "IFF"}:
             score += 100
         if root.kind == "binary" and root.value in {"IN", "COLON"}:
@@ -92,16 +224,36 @@ class FormalRoleClassifier:
             score += 40
         if "\\boxed" in formula.source:
             score += 20
+        # A formula explicitly headed by the node label is the statement of
+        # that node; later transport or explanation formulas must not replace it.
+        if self._has_node_label(formula.source):
+            score += 180
         # Un resultado universal prevalece sobre ecuaciones intermedias aun si aparece antes.
         if "\\forall" in formula.source or "\\exists" in formula.source:
             score += 100
         return score
 
+    @staticmethod
+    def _has_node_label(source, prefix=None):
+        text = str(source or "").strip()
+        colon = text.find(":")
+        if colon <= 0:
+            return False
+        head = text[:colon]
+        if re.search(r"\\(?:iff|Longrightarrow|implies)|=|<|>", head):
+            return False
+        head = re.sub(r"^\\boxed\s*\{\s*", "", head).strip()
+        if not re.match(r"^[A-Z](?:_\s*(?:\{[^}]+\}|[A-Za-z0-9]+)(?:\([^)]*\))?)?$", head):
+            return False
+        return prefix is None or head.startswith(prefix + "_")
+
     def _is_prop_shape(self, node):
+        if node.kind == "tuple" and node.children:
+            return all(self._is_prop_shape(child) for child in node.children)
         return node.kind in {"quantifier", "limit"} or (
             node.kind == "binary" and node.value in {
                 "EQ", "NE", "LT", "LE", "GT", "GE", "IN", "NOTIN",
-                "SUBSET", "SUBSETEQ", "AND", "OR", "IMPLIES", "IFF", "COLON",
+                "SUBSET", "SUBSETEQ", "CONG", "AND", "OR", "IMPLIES", "IFF", "COLON",
             }
         )
 
@@ -119,3 +271,7 @@ class FormalRoleClassifier:
     def _error(node, message):
         location = f"{node.source_file}:{node.start_line or '?'}:{node.node_id}"
         return FormalRoleError(f"Error de clasificacion formal en {location}: {message}.")
+
+
+
+

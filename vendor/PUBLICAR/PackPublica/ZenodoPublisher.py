@@ -6,7 +6,6 @@ import html
 import fnmatch
 import os
 import requests
-import time
 import shutil
 import re
 import zipfile
@@ -244,7 +243,7 @@ class ZenodoPublisher:
                 trace.result.files_equal = equal
                 trace.result.files_pending = pending
                 trace.kv("iguales", len(equal))
-                trace.kv("pendientes de subir/actualizar", len(pending))
+                trace.kv("seleccionados para subir/actualizar", len(pending))
                 trace.kv("sobran en Zenodo publicado", len(remote_only))
 
         except Exception as exc:
@@ -538,10 +537,10 @@ class ZenodoPublisher:
 
                     if remote_value is None:
                         to_upload.append(filename)
-                        trace.file("PENDIENTE", filename, "no existe en Zenodo publicado")
+                        trace.file("NUEVO", filename, "no existe en Zenodo publicado")
                     elif remote_value != local_md5:
                         to_upload.append(filename)
-                        trace.file("PENDIENTE", filename, "hash local distinto del publicado")
+                        trace.file("ACTUALIZAR", filename, "hash local distinto del publicado")
                     else:
                         equal.append(filename)
                         trace.file("IGUAL", filename)
@@ -554,7 +553,7 @@ class ZenodoPublisher:
                 # También interesa saber qué sobra remotamente.
                 remote_only = sorted(set(remote_hashes) - set(local_hashes))
                 trace.kv("iguales", len(equal))
-                trace.kv("pendientes de subir/actualizar", len(to_upload))
+                trace.kv("seleccionados para subir/actualizar", len(to_upload))
                 trace.kv("sobran en Zenodo publicado", len(remote_only))
 
                 for name in remote_only:
@@ -656,7 +655,10 @@ class ZenodoPublisher:
 
                     if response is not None and response.status_code == 504:
                         print("⚠️ Zenodo tardó demasiado en responder (504). Verificando estado...")
-                        time.sleep(5)
+                        self.client._sleep_with_status(
+                            5,
+                            "Zenodo espera antes de verificar publicacion",
+                        )
 
                         dep_info = self.client.get_deposition(new_deposition_id)
                         state = dep_info.get("state")
@@ -845,18 +847,18 @@ class ZenodoPublisher:
         delete_progress.start()
         for f in draft_files:
             name = f.get("filename") or f.get("key") or f.get("name")
-            delete_progress.advance(name or "archivo sin nombre")
+            etiqueta = name or "archivo sin nombre"
+            delete_progress.update(delete_progress.current, f"revisando {etiqueta}")
 
             if not name:
+                delete_progress.advance(etiqueta)
                 continue
 
             if name not in local_hashes:
-                print(
-                    f"  🗑️ Eliminando {name} "
-                    "(no pertenece al conjunto local)"
-                )
+                delete_progress.update(delete_progress.current, f"eliminando {name}")
                 self.client.delete_file(new_deposition_id, f["id"])
                 deleted.append(name)
+                delete_progress.advance(name)
                 continue
 
             checksum = str(f.get("checksum", ""))
@@ -867,12 +869,10 @@ class ZenodoPublisher:
                 draft_md5 = checksum
 
             if draft_md5 and draft_md5 != local_hashes[name]:
-                print(
-                    f"  🗑️ Eliminando {name} "
-                    "(contenido diferente)"
-                )
+                delete_progress.update(delete_progress.current, f"eliminando {name}")
                 self.client.delete_file(new_deposition_id, f["id"])
                 deleted.append(name)
+            delete_progress.advance(name)
 
         # Consultar de nuevo el contenido real del borrador.
         draft_files = self.client.list_files(new_deposition_id)
@@ -897,7 +897,6 @@ class ZenodoPublisher:
         upload_progress = ProgressBar("ZENODO subida", len(missing_in_draft))
         upload_progress.start()
         for name in missing_in_draft:
-            upload_progress.advance(name)
             local_path = pdf_dir / name
 
             if not local_path.exists():
@@ -907,10 +906,10 @@ class ZenodoPublisher:
                     f"{local_path}"
                 )
 
-            print(f"  ⬆️ Subiendo {name}...")
+            upload_progress.update(upload_progress.current, f"subiendo {name}")
             self.client.upload_file(new_deposition_id, local_path)
-            print(f"  ✔ {name} subido.")
             uploaded.append(name)
+            upload_progress.advance(name)
         upload_progress.finish()
 
         return {"deleted": deleted, "uploaded": uploaded}
@@ -1248,22 +1247,20 @@ class ZenodoPublisher:
         stale_progress = ProgressBar("ZENODO local retirada", len(stale_files))
         stale_progress.start()
         for stale in stale_files:
-            stale_progress.advance(stale.name)
-            stale_progress.message(
-                f"  🗑️ {stale.name}: ya no existe en pdfs/ -> retirar de zenodo local"
-            )
+            stale_progress.update(stale_progress.current, f"retirando {stale.name}")
             stale.unlink()
+            stale_progress.advance(stale.name)
         stale_progress.finish()
 
         copy_progress = ProgressBar("ZENODO local copia", len(candidates))
         copy_progress.start()
         for source in candidates:
-            copy_progress.advance(source.name)
+            copy_progress.update(copy_progress.current, f"revisando {source.name}")
             target = zenodo_dir / source.name
             src_sha = self._compute_sha256(source)
 
             if not target.exists():
-                copy_progress.message(f"  ➕ {source.name}: NUEVO -> COPIAR")
+                copy_progress.update(copy_progress.current, f"copiando {source.name}")
                 shutil.copy2(source, target)
 
                 if self._compute_sha256(target) != src_sha:
@@ -1274,15 +1271,17 @@ class ZenodoPublisher:
 
                 copied.append(source.name)
                 new_count += 1
+                copy_progress.advance(source.name)
                 continue
 
             dst_sha = self._compute_sha256(target)
 
             if src_sha == dst_sha:
                 equal_count += 1
+                copy_progress.advance(source.name)
                 continue
 
-            copy_progress.message(f"  🔄 {source.name}: MODIFICADO -> ACTUALIZAR")
+            copy_progress.update(copy_progress.current, f"actualizando {source.name}")
             shutil.copy2(source, target)
 
             if self._compute_sha256(target) != src_sha:
@@ -1293,6 +1292,7 @@ class ZenodoPublisher:
 
             copied.append(source.name)
             updated_count += 1
+            copy_progress.advance(source.name)
         copy_progress.finish()
 
         print(

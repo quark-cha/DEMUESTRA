@@ -1,11 +1,5 @@
-import json
 import re
 from collections import deque
-
-try:
-    from .json import Json
-except ImportError:
-    from PackPublica.json import Json
 
 
 class FormalGraphError(ValueError):
@@ -13,38 +7,272 @@ class FormalGraphError(ValueError):
 
 
 class FormalGraph:
-    """Representacion interna comun, derivada solo del Markdown actual."""
+    """Grafo formal extraido directamente del Markdown actual.
+
+    Esta ruta no instancia ni lee el generador JSON. Lean y Prolog reciben
+    una estructura creada de nuevo desde el texto fuente.
+    """
+
+    PREFIX_KIND = {
+        "D": "definition",
+        "A": "foundation",
+        "P": "proposition",
+        "T": "theorem",
+    }
+    PROOF_BEARING_KINDS = {
+        "lemma", "proposition", "theorem", "corollary",
+        "self_validation", "meta_validation",
+    }
+    MARKER_PATTERN = (
+        r"[DAPT]_(?:\{(?:[^{}]|\{[^{}]*\})+\}|\\[A-Za-z]+|[A-Za-z0-9][A-Za-z0-9']*)"
+        r"(?:\([^)]*\))?"
+    )
+    DOLLAR_DECL_RE = re.compile(
+        r"(?m)^[ \t]*\$(?P<marker>" + MARKER_PATTERN + r")\$\s*(?:[—\-:])"
+    )
+    BARE_DECL_RE = re.compile(
+        r"(?m)^[ \t]*(?P<marker>" + MARKER_PATTERN + r")\s*:"
+    )
+    MARKER_RE = re.compile(r"\$?(?P<marker>" + MARKER_PATTERN + r")\$?")
+    DEP_RE = re.compile(r"^\s*(?:deps?|dependencias?)\s*:\s*(?P<deps>.+?)\s*$", re.IGNORECASE)
 
     DISPLAY_MATH_RE = re.compile(r"\$\$(?P<formula>.*?)\$\$", re.DOTALL)
     INLINE_MATH_RE = re.compile(r"(?<!\$)\$(?!\$)(?P<formula>.*?)(?<!\$)\$(?!\$)", re.DOTALL)
+    HEADING_RE = re.compile(r"^(?P<marks>#{1,6})\s+.+$", re.MULTILINE)
 
     def __init__(self, md_obj):
         self.md = md_obj
-        self.data = json.loads(Json(md_obj).contenido)
-        self.nodes = [node for node in self.data.get("nodes", []) if node.get("id")]
+        self.nodes = [node for node in self._nodes_from_markdown() if node.get("id")]
+        self.data = {"nodes": self.nodes}
         self.by_id = {node["id"]: node for node in self.nodes}
         if len(self.by_id) != len(self.nodes):
             raise FormalGraphError("El Markdown genera identificadores de nodo duplicados.")
         self._enrich()
         self.order = self._topological_order()
 
+    @staticmethod
+    def _clean_inline(value):
+        return re.sub(r"\s+", " ", str(value or "")).strip(" -—:\t\r\n")
+
+    @staticmethod
+    def _slug(value):
+        value = re.sub(r"\\([A-Za-z]+)", r"\1", str(value or "").strip())
+        return re.sub(r"[^A-Za-z0-9]+", "_", value).strip("_") or "node"
+
+    @staticmethod
+    def _marker_id(marker):
+        marker = str(marker or "").strip().strip("$")
+        prefix, raw = marker.split("_", 1)
+        raw = raw.strip()
+        if raw.startswith("{") and raw.endswith("}"):
+            raw = raw[1:-1].strip()
+        raw = raw.replace("{", "").replace("}", "")
+        raw = re.sub(r"\\(?:rm|mathrm)\s*", "", raw).strip()
+        raw = raw.replace("'", "_prime")
+        raw = re.sub(r"\\([A-Za-z]+)", r"\1", raw)
+        raw = re.sub(r"[^A-Za-z0-9]+", "_", raw).strip("_")
+        return f"{prefix}_{raw or 'X'}"
+
+    @staticmethod
+    def _heading_at(headings, position):
+        current = None
+        for heading in headings:
+            if heading.start() > position:
+                break
+            current = heading.group(0).lstrip("#").strip()
+        return current
+
+    def _find_declarations(self, text):
+        headings = list(self.HEADING_RE.finditer(text))
+        declarations = []
+        seen_at = set()
+        for regex in (self.DOLLAR_DECL_RE, self.BARE_DECL_RE):
+            for match in regex.finditer(text):
+                node_id = self._marker_id(match.group("marker"))
+                if node_id in {"D_X", "A_X", "P_X", "T_X"}:
+                    continue
+                key = (node_id, match.start())
+                if key in seen_at:
+                    continue
+                seen_at.add(key)
+                declarations.append({
+                    "id": node_id,
+                    "prefix": node_id.split("_", 1)[0],
+                    "start": match.start(),
+                    "end": match.end(),
+                    "heading": self._heading_at(headings, match.start()),
+                })
+        declarations.sort(key=lambda item: item["start"])
+        occurrences = {}
+        for item in declarations:
+            base_id = item["id"]
+            occurrence = occurrences.get(base_id, 0) + 1
+            occurrences[base_id] = occurrence
+            item["base_id"] = base_id
+            if occurrence > 1:
+                item["id"] = f"{base_id}_{occurrence}"
+        return declarations
+
+    def _explicit_deps(self, body):
+        deps = []
+        cleaned = []
+        for line in body.splitlines():
+            match = self.DEP_RE.match(line)
+            if match:
+                deps.extend(
+                    dep.strip()
+                    for dep in re.split(r"[,;]", match.group("deps"))
+                    if dep.strip()
+                )
+            else:
+                cleaned.append(line)
+        return deps, "\n".join(cleaned).strip()
+
+    def _referenced_ids(self, body, valid_previous_ids):
+        refs = []
+        for match in self.MARKER_RE.finditer(body):
+            ref = self._marker_id(match.group("marker"))
+            if ref in valid_previous_ids and ref not in refs:
+                refs.append(ref)
+        return refs
+
+    def _fallback_deps(self, nodes, kind):
+        if kind not in self.PROOF_BEARING_KINDS:
+            return []
+        preferred = [
+            node["id"] for node in nodes
+            if node.get("kind") in {
+                "foundation", "definition", "axiom", "postulate",
+                "proposition", "lemma", "theorem",
+            }
+        ]
+        return preferred[-3:]
+
+    def _description_name(self, node_id, heading, body):
+        first_line = next((line.strip() for line in body.splitlines() if line.strip()), "")
+        first_line = re.sub(
+            r"^\$?[DAPT]_(?:\{\\rm\s+[^}]+\}|\{[^}]+\}|[A-Za-z0-9][A-Za-z0-9']*)\$?\s*(?:[—\-:])\s*",
+            "",
+            first_line,
+        )
+        name = self._clean_inline(first_line) or self._clean_inline(heading) or node_id
+        if len(name) > 140:
+            name = name[:137].rstrip() + "..."
+        return name, body or name
+
+    def _append_heading_theorem(self, text, nodes):
+        if any(node.get("kind") == "theorem" for node in nodes):
+            return
+        headings = list(self.HEADING_RE.finditer(text))
+        candidates = [
+            (index, heading) for index, heading in enumerate(headings)
+            if heading.start() > 500 and "teorema" in heading.group(0).lower()
+        ]
+        if not candidates:
+            return
+        index, heading = candidates[-1]
+        title = heading.group(0).lstrip("#").strip()
+        body_start = heading.end()
+        body_end = headings[index + 1].start() if index + 1 < len(headings) else len(text)
+        node_id = "T_" + self._slug(title)
+        used = {node["id"] for node in nodes}
+        base_id = node_id
+        suffix = 2
+        while node_id in used:
+            node_id = f"{base_id}_{suffix}"
+            suffix += 1
+        body = text[body_start:body_end].strip()
+        nodes.append({
+            "id": node_id,
+            "kind": "theorem",
+            "name": title,
+            "description": body or title,
+            "deps": self._fallback_deps(nodes, "theorem"),
+            "source": {
+                "file": self.md.fichero.name,
+                "start_line": text.count("\n", 0, heading.start()) + 1,
+            },
+        })
+
+    def _nodes_from_markdown(self):
+        text = self.md.texto
+        declarations = self._find_declarations(text)
+        if not declarations:
+            raise FormalGraphError(
+                f"{self.md.fichero.name} no contiene marcadores formales D_/A_/P_/T_."
+            )
+        headings = list(self.HEADING_RE.finditer(text))
+        for index, item in enumerate(declarations):
+            item["body_start"] = item["start"]
+            if index == 0:
+                continue
+            previous = declarations[index - 1]
+            intervening = [
+                heading for heading in headings
+                if previous["end"] <= heading.start() < item["start"]
+            ]
+            if intervening:
+                item["body_start"] = intervening[-1].start()
+            if item["body_start"] == item["start"]:
+                display_open = text.rfind("$$", 0, item["start"])
+                # A declaration label can live inside a display block. Own the
+                # opening delimiter as well, so neither adjacent node starts or
+                # ends in the middle of a mathematical formula.
+                if display_open >= 0 and text.count("$$", 0, item["start"]) % 2 == 1:
+                    item["body_start"] = display_open
+
+        nodes = []
+        for index, item in enumerate(declarations):
+            next_start = (
+                declarations[index + 1]["body_start"]
+                if index + 1 < len(declarations) else len(text)
+            )
+            # The node owns one exact, non-overlapping Markdown span. Keeping
+            # the declaration in the span is essential when the marker is the
+            # label of a displayed proposition (for example ``P_ST: ...``).
+            raw_body = text[item["body_start"]:next_start].strip()
+            explicit_deps, body = self._explicit_deps(raw_body)
+            kind = self.PREFIX_KIND.get(item["prefix"], "concept")
+            name, description = self._description_name(item["id"], item.get("heading"), body)
+            valid_previous_ids = {node["id"] for node in nodes}
+            deps = []
+            base_id = item.get("base_id", item["id"])
+            if item["id"] != base_id and base_id in valid_previous_ids:
+                deps.append(base_id)
+            for dep in explicit_deps:
+                normalized = self._marker_id(dep) if re.match(r"^[DAPT]_", dep) else dep
+                if normalized in valid_previous_ids and normalized not in deps:
+                    deps.append(normalized)
+            for dep in self._referenced_ids(body, valid_previous_ids):
+                if dep not in deps:
+                    deps.append(dep)
+            if not deps:
+                deps = self._fallback_deps(nodes, kind)
+            nodes.append({
+                "id": item["id"],
+                "kind": kind,
+                "name": name,
+                "description": description,
+                "deps": deps,
+                "source": {
+                    "file": self.md.fichero.name,
+                    "start_line": text.count("\n", 0, item["start"]) + 1,
+                },
+            })
+        self._append_heading_theorem(text, nodes)
+        return nodes
+
     @classmethod
     def _formulas(cls, text):
         text = str(text or "")
-        parts = text.split("$$")
-        if len(parts) > 1:
-            # Json conserva a veces un nodo desde el interior de una formula y
-            # su primer $$ es, por tanto, de cierre. Elegimos la paridad que
-            # contiene mas sintaxis matematica en vez de asumir que siempre abre.
-            even_score = sum(cls._math_score(part) for part in parts[0::2])
-            odd_score = sum(cls._math_score(part) for part in parts[1::2])
-            parity = 0 if even_score > odd_score else 1
-            formulas = [part.strip() for part in parts[parity::2] if part.strip()]
-            prose_parts = parts[1 - parity::2]
-            without_display = "\n".join(prose_parts)
-        else:
-            formulas = []
-            without_display = text
+        displays = list(cls.DISPLAY_MATH_RE.finditer(text))
+        formulas = [match.group("formula").strip() for match in displays]
+        # Mask complete display spans before looking for inline mathematics;
+        # this preserves source positions and cannot leave a stray '$'.
+        masked = list(text)
+        for match in displays:
+            masked[match.start():match.end()] = " " * (match.end() - match.start())
+        without_display = "".join(masked)
         formulas.extend(
             match.group("formula").strip()
             for match in cls.INLINE_MATH_RE.finditer(without_display)
@@ -52,7 +280,9 @@ class FormalGraph:
         boundary_fragments = {r"\boxed{", "{", "}"}
         return [
             formula for formula in formulas
-            if formula and formula.strip() not in boundary_fragments
+            if formula
+            and formula.strip() not in boundary_fragments
+            and not re.fullmatch(cls.MARKER_PATTERN, formula.strip())
         ]
 
     @staticmethod
@@ -64,6 +294,54 @@ class FormalGraph:
         prose = len(re.findall(r"\b[A-Za-zÀ-ÿ]{4,}\b", fragment))
         paragraphs = fragment.count("\n\n")
         return (latex * 4) - prose - (paragraphs * 4)
+
+    @staticmethod
+    def _discourse_role(lead, in_statement):
+        normalized = re.sub(r"\s+", " ", str(lead or "")).strip().lower()
+        if in_statement:
+            if re.search(r"\b(se demostrar[aá]|demostraremos|to prove|we prove)\b", normalized):
+                return "GOAL"
+            return "STATEMENT"
+        if re.search(r"\b(supongamos|assume|suppose)\b", normalized):
+            return "LOCAL_ASSUMPTION"
+        if re.search(r"\b(equivalentemente|equivalently)\b", normalized):
+            return "EQUIVALENT_CONCLUSION"
+        if re.search(
+            r"\b(luego|por tanto|en consecuencia|como .* arbitrari|therefore|hence)\b",
+            normalized,
+        ):
+            return "CONCLUSION"
+        if re.search(
+            r"\b(por pertenecer|por |entonces|se sabe|queda|pero|sin embargo|"
+            r"implica|obliga|because|then|thus)\b",
+            normalized,
+        ):
+            return "DERIVED_STEP"
+        return "PROOF_STEP"
+
+    @classmethod
+    def _formula_contexts(cls, text, formulas, statement_count):
+        contexts = []
+        cursor = 0
+        for index, formula in enumerate(formulas):
+            position = text.find(formula, cursor)
+            if position < 0:
+                position = text.find(formula)
+            if position < 0:
+                lead = ""
+                end = cursor
+                display = False
+            else:
+                lead = text[cursor:position]
+                end = position + len(formula)
+                display = text[:position].rstrip().endswith("$$")
+            contexts.append({
+                "lead": lead.strip(),
+                "role": cls._discourse_role(lead, index < statement_count),
+                "display": display,
+            })
+            cursor = max(cursor, end)
+        return contexts
 
     def _source_span(self, node_id):
         lines = self.md.texto.splitlines()
@@ -77,10 +355,23 @@ class FormalGraph:
 
     def _enrich(self):
         for node in self.nodes:
+            formal_body = node.get("description", "")
+            proof_heading = re.search(
+                r"(?mi)^#{2,6}\s+(?:demostraci[oó]n|proof)\b",
+                formal_body,
+            )
+            statement_body = formal_body[:proof_heading.start()] if proof_heading else formal_body
+            formulas = self._formulas(formal_body)
+            statement_formula_count = len(self._formulas(statement_body))
             node["formal_source"] = {
-                "formulas": self._formulas(node.get("description", "")),
-                "prose": node.get("description", ""),
-                "source": self._source_span(node["id"]),
+                "formulas": formulas,
+                "formula_contexts": self._formula_contexts(
+                    formal_body, formulas, statement_formula_count
+                ),
+                "statement_formula_count": statement_formula_count,
+                "has_proof_heading": proof_heading is not None,
+                "prose": formal_body,
+                "source": node.get("source") or self._source_span(node["id"]),
             }
 
     def _topological_order(self):

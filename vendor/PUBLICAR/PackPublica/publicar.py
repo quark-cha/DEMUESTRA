@@ -40,16 +40,13 @@ class Publicar:
         progress = ProgressBar("PUBLICAR exploracion", len(archivos))
         progress.start()
         for md in archivos:
-            progress.advance(md.name)
+            progress.update(progress.current, f"preparando {md.name}")
             doc = self.clasificar(md)
             self.documentos.append(doc)
             md_obj = Md(doc)
             md_obj.forzado = self.FORZADO  # asignar el valor de FORZADO al objeto Md
             self.md_objects.append(md_obj)
-            progress.message(
-                f"📄 Preparado: {doc.nombre} "
-                f"({'Libro' if isinstance(doc, Libro) else 'Articulo'})"
-            )
+            progress.advance(f"preparado {md.name}")
         progress.finish()
         return self.md_objects
 

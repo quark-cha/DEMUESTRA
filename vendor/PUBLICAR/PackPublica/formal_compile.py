@@ -15,6 +15,9 @@ class ParsedFormula:
     source: str
     ast: Ast
     location: str
+    discourse_role: str = "UNCLASSIFIED"
+    lead_text: str = ""
+    is_display: bool = False
 
 
 @dataclass(frozen=True)
@@ -26,6 +29,8 @@ class ParsedNode:
     prose: str
     source_file: str
     start_line: int | None
+    statement_formula_count: int | None = None
+    has_proof_heading: bool = False
 
 
 class FormalGraphCompiler:
@@ -51,13 +56,22 @@ class FormalGraphCompiler:
             filename = source.get("file") or "<markdown>"
             line = source.get("start_line")
             formulas = []
+            contexts = formal.get("formula_contexts", [])
             for index, formula in enumerate(formal.get("formulas", []), start=1):
                 location = f"{filename}:{line or '?'}:{node_id}:formula-{index}"
                 try:
                     ast = parse_formula(formula, location)
                 except FormalSyntaxError as error:
                     raise FormalCompilationError(str(error)) from error
-                formulas.append(ParsedFormula(formula, ast, location))
+                context = contexts[index - 1] if index <= len(contexts) else {}
+                formulas.append(ParsedFormula(
+                    formula,
+                    ast,
+                    location,
+                    context.get("role", "UNCLASSIFIED"),
+                    context.get("lead", ""),
+                    bool(context.get("display", False)),
+                ))
             parsed.append(ParsedNode(
                 node_id=node_id,
                 kind=node.get("kind", "concept"),
@@ -66,6 +80,8 @@ class FormalGraphCompiler:
                 prose=formal.get("prose", ""),
                 source_file=filename,
                 start_line=line,
+                statement_formula_count=formal.get("statement_formula_count"),
+                has_proof_heading=bool(formal.get("has_proof_heading", False)),
             ))
             seen.add(node_id)
         return tuple(parsed)

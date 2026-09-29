@@ -1,8 +1,8 @@
 try:
-    from .formal_ast import Ast
+    from .formal_ast import Ast, derivative_symbol, expand_derivative
     from .formal_semantic import FunctionType, SymbolTable
 except ImportError:
-    from PackPublica_formal_ast import Ast
+    from PackPublica_formal_ast import Ast, derivative_symbol, expand_derivative
     from PackPublica_formal_semantic import FunctionType, SymbolTable
 
 
@@ -60,10 +60,17 @@ class SymbolInference:
             columns = zip(*(entry_args for entry_args, _ in entries))
             argument_types = tuple(self._widest(self._node_type(arg) for arg in column) for column in columns)
             results = {item_result for _, item_result in entries if item_result}
-            result_type = "Prop" if "Prop" in results else "Real"
+            if "Prop" in results:
+                result_type = "Prop"
+            elif results:
+                result_type = self._widest(results)
+            else:
+                result_type = "Real"
             self.table.functions.setdefault(name, FunctionType(argument_types, result_type))
         for name, element in self._set_nodes.items():
             self.table.values[name] = f"Set[{self._node_type(element)}]"
+        for ast in formulas:
+            self._harmonize_set_equalities(ast)
         return self.table
 
     @staticmethod
@@ -74,6 +81,44 @@ class SymbolInference:
         return order[max(order.index(item) for item in numeric)] if len(numeric) == len(values) else values[-1]
 
     def _constraints(self, node, expected=None):
+        if node.kind == "assertion":
+            if self._node_type(node.children[0]) != "Prop":
+                name = "Assertion_" + str(node.value)
+                self._calls.setdefault(name, []).append((node.children, "Prop"))
+            for child in node.children:
+                self._constraints(child)
+            return
+        if (
+            node.kind == "binary" and node.value == "COLON"
+            and node.children[1].kind == "binary"
+            and node.children[1].value == "MAPSTO"
+        ):
+            function, arrow = node.children
+            name = self._name(function)
+            domain, codomain = arrow.children
+            if name:
+                self._calls.setdefault(name, []).append(
+                    ((domain,), self._node_type(codomain))
+                )
+            self._constraints(domain)
+            self._constraints(codomain)
+            return
+        if node.kind == "derivative":
+            expanded = expand_derivative(node)
+            if expanded is not None:
+                self._constraints(expanded, expected)
+                return
+            subject, variable = node.children
+            if variable.kind == "identifier":
+                self.table.functions.setdefault(
+                    "Derivative_" + str(variable.value),
+                    FunctionType(("Real",), "Real"),
+                )
+            if subject.kind == "identifier":
+                self.table.values.setdefault(
+                    "DerivativeSubject_" + str(subject.value), "Real"
+                )
+            return
         if node.kind == "quantifier" and len(node.children) == 3:
             variable, domain, body = node.children
             domain_name = self._name(domain)
@@ -94,16 +139,49 @@ class SymbolInference:
                 self._set_nodes[left_name] = element
                 if element_name:
                     self._set_elements[left_name] = element_name
+            if left_name:
+                right_type = self._node_type(right)
+                if right_type.startswith("Set["):
+                    self.table.values[left_name] = right_type
+            # Equality constrains both sides to the same type. Passing that
+            # expectation into nested calls lets inverse identities infer
+            # codomains such as f : Real -> Complex without using names.
+            self._constraints(left, self._node_type(right))
+            self._constraints(right, self._node_type(left))
+            return
         if node.kind == "binary" and node.value in {"IN", "NOTIN"}:
             left, right = node.children
             domain = self._domain_type(right)
             left_name = self._name(left)
             right_name = self._name(right)
+            # Membership constrains the element even when it is a function
+            # application.  Without this, n(f^-1(z)) kept the default Real
+            # result while N+ was emitted as Set Nat.
+            if domain:
+                self._constraints(left, domain)
             if left_name and domain:
                 self.table.values[left_name] = domain
             elif left_name and right_name:
                 self._sets[right_name] = "Real"
                 self._set_elements[right_name] = left_name
+        if node.kind == "binary" and node.value == "CONG":
+            for child in node.children:
+                name = self._name(child)
+                if name and name not in self.table.values:
+                    self.table.values[name] = "Set[Real]"
+        if node.kind == "binary" and node.value == "UNION":
+            left, right = node.children
+            left_name = self._name(left)
+            right_name = self._name(right)
+            left_type = self._node_type(left)
+            right_type = self._node_type(right)
+            set_type = left_type if left_type.startswith("Set[") else right_type
+            if not set_type.startswith("Set["):
+                set_type = "Set[Real]"
+            if left_name:
+                self.table.values[left_name] = set_type
+            if right_name:
+                self.table.values[right_name] = set_type
         if node.kind in {"call", "apply"}:
             name, args = self._call(node)
             if name:
@@ -116,6 +194,12 @@ class SymbolInference:
                 arg = self._name(args[0])
                 if arg:
                     self._complex.add(arg)
+        if node.kind == "summation":
+            variable, _lower, _upper, body = node.children
+            if variable.kind == "identifier":
+                self.table.values[variable.value] = "Nat"
+            self._constraints(body, expected)
+            return
         child_expected = "Prop" if node.kind == "binary" and node.value in {"AND", "OR", "IMPLIES", "IFF"} else None
         for child in node.children:
             if isinstance(child, Ast):
@@ -124,12 +208,45 @@ class SymbolInference:
     def _node_type(self, node):
         if node.kind == "number":
             return "Nat"
+        if node.kind == "derivative":
+            expanded = expand_derivative(node)
+            if expanded is not None:
+                return self._node_type(expanded)
+            return "Real"
+        if node.kind == "unary" and node.value == "NEG":
+            child_type = self._node_type(node.children[0])
+            return "Int" if child_type == "Nat" else child_type
+        if node.kind == "unary" and node.value == "PM":
+            child_type = self._node_type(node.children[0])
+            return "Int" if child_type == "Nat" else child_type
         if node.kind == "text":
             return "Prop"
+        if node.kind == "assertion":
+            return "Prop"
+        if node.kind in {"call", "apply"}:
+            name, _ = self._call(node)
+            signature = self.table.functions.get(name)
+            if signature:
+                return signature.result
         if node.kind == "tuple":
             return "Tuple[" + ",".join(self._node_type(child) for child in node.children) + "]"
         if node.kind == "binary" and node.value in {"PLUS", "MINUS", "PM", "MUL", "DIV"}:
             return self._widest(self._node_type(child) for child in node.children)
+        if node.kind == "binary" and node.value in {
+            "EQ", "NE", "LT", "LE", "GT", "GE", "IN", "NOTIN",
+            "SUBSET", "SUBSETEQ", "CONG", "AND", "OR", "IMPLIES", "IFF",
+        }:
+            return "Prop"
+        if node.kind == "binary" and node.value == "UNION":
+            left = self._node_type(node.children[0])
+            right = self._node_type(node.children[1])
+            if left.startswith("Set["):
+                return left
+            if right.startswith("Set["):
+                return right
+            return "Set[Real]"
+        if node.kind == "summation":
+            return self._node_type(node.children[3])
         name = self._name(node)
         if name in self.table.values:
             return self.table.values[name]
@@ -143,8 +260,13 @@ class SymbolInference:
     def _all_names(self, nodes):
         result = set()
         def visit(node):
+            if node.kind == "derivative":
+                expanded = expand_derivative(node)
+                if expanded is not None:
+                    visit(expanded)
+                return
             name = self._name(node)
-            if name and node.kind in {"identifier", "subscript", "decorated", "power", "limit"}:
+            if name and node.kind in {"identifier", "subscript", "decorated", "power"}:
                 result.add(name)
             for child in node.children:
                 if isinstance(child, Ast):
@@ -174,7 +296,46 @@ class SymbolInference:
             for child in node.children if isinstance(child, Ast)
         )
 
+    def _harmonize_set_equalities(self, node):
+        if node.kind == "binary" and node.value == "EQ":
+            left, right = node.children
+            if right.kind == "binary" and right.value == "UNION":
+                names = [self._name(left), *(self._name(child) for child in right.children)]
+                names = [name for name in names if name]
+                set_types = [
+                    self.table.values.get(name)
+                    for name in names
+                    if str(self.table.values.get(name, "")).startswith("Set[")
+                ]
+                if set_types:
+                    precise = next(
+                        (type_name for type_name in set_types if type_name != "Set[Real]"),
+                        set_types[0],
+                    )
+                    for name in names:
+                        self.table.values[name] = precise
+        if node.kind == "binary" and node.value == "UNION":
+            names = [self._name(child) for child in node.children]
+            names = [name for name in names if name]
+            set_types = [
+                self.table.values.get(name)
+                for name in names
+                if str(self.table.values.get(name, "")).startswith("Set[")
+            ]
+            if set_types:
+                precise = next(
+                    (type_name for type_name in set_types if type_name != "Set[Real]"),
+                    set_types[0],
+                )
+                for name in names:
+                    self.table.values[name] = precise
+        for child in node.children:
+            if isinstance(child, Ast):
+                self._harmonize_set_equalities(child)
+
     def _name(self, node):
+        if node.kind == "derivative":
+            return derivative_symbol(node)
         if node.kind in {"identifier", "number", "sign", "constant"}:
             return str(node.value)
         if node.kind == "decorated":
@@ -186,7 +347,11 @@ class SymbolInference:
         if node.kind == "tuple":
             values = [self._name(child) for child in node.children]
             return "_".join(values) if all(values) else None
-        if node.kind == "power" and node.children[1].kind in {"identifier", "text"}:
+        if (
+            node.kind == "power"
+            and node.children[0].kind in {"subscript", "decorated"}
+            and node.children[1].kind in {"identifier", "text"}
+        ):
             left, right = (self._name(child) for child in node.children)
             return f"{left}_{right}" if left and right else None
         if node.kind == "power" and node.children[1].kind == "unary" and node.children[1].value == "NEG":

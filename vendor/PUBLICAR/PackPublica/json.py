@@ -1,7 +1,5 @@
 import json as json_lib
 import re
-import tempfile
-from pathlib import Path
 
 from .base import Publicacion
 
@@ -127,13 +125,9 @@ class Json(Publicacion):
         used_ids = set()
         for item in declarations:
             base_id = item["id"]
-            node_id = base_id
-            suffix = 2
-            while node_id in used_ids:
-                node_id = f"{base_id}_{suffix}"
-                suffix += 1
-            item["id"] = node_id
-            used_ids.add(node_id)
+            item["duplicate"] = base_id in used_ids
+            item["id"] = base_id
+            used_ids.add(base_id)
             unique.append(item)
         return unique
 
@@ -199,19 +193,7 @@ class Json(Publicacion):
                 break
         return parts
 
-    def _lean_file_for_source(self):
-        source = Path(getattr(self.md, "fichero", ""))
-        candidates = [
-            source.with_suffix(".lean"),
-            Path("lean") / f"{source.stem}.lean",
-            Path("Proyectos") / source.stem / f"{source.stem}.lean",
-        ]
-        for candidate in candidates:
-            if candidate.is_file():
-                return str(candidate).replace("\\", "/")
-        return None
-
-    def _proof_from_body(self, body, lean_file=None):
+    def _proof_from_body(self, body):
         steps = self._proof_steps(body)
         if not steps:
             return None
@@ -237,7 +219,6 @@ class Json(Publicacion):
         if not candidates:
             return nodes
 
-        lean_file = self._lean_file_for_source()
         used_ids = {node["id"] for node in nodes}
         for index, heading in candidates[-1:]:
             title = heading.group("title").strip()
@@ -253,7 +234,7 @@ class Json(Publicacion):
             used_ids.add(node_id)
 
             deps = self._fallback_deps(nodes, "theorem")
-            proof = self._proof_from_body(body or title, lean_file=lean_file)
+            proof = self._proof_from_body(body or title)
             node = {
                 "id": node_id,
                 "kind": "theorem",
@@ -296,9 +277,12 @@ class Json(Publicacion):
             return []
 
         nodes = []
-        lean_file = self._lean_file_for_source()
         for index, item in enumerate(declarations):
             next_start = declarations[index + 1]["start"] if index + 1 < len(declarations) else len(text)
+            # Repeated logical markers are restatements or references. They
+            # delimit the surrounding text but do not create new theorems.
+            if item.get("duplicate"):
+                continue
             raw_body = text[item["end"]:next_start].strip()
             explicit_deps, body = self._explicit_deps(raw_body)
             kind = self.PREFIX_KIND.get(item["prefix"], "concept")
@@ -324,13 +308,17 @@ class Json(Publicacion):
                 "name": name,
                 "description": description,
                 "deps": deps,
+                "source": {
+                    "file": self.md.fichero.name,
+                    "start_line": text.count("\n", 0, item["start"]) + 1,
+                },
             }
 
             relationship = self._measurement_relationship(deps)
             if relationship:
                 node["measurement_relationship"] = relationship
 
-            proof = self._proof_from_body(description, lean_file=lean_file)
+            proof = self._proof_from_body(description)
             if proof and node["kind"] in self.PROOF_BEARING_KINDS:
                 node["proof"] = proof
 
@@ -379,37 +367,16 @@ class Json(Publicacion):
         return nodes
 
     def _generar(self):
-        temp_md = None
-        try:
-            with tempfile.NamedTemporaryFile(
-                mode="w",
-                suffix=".md",
-                prefix="json_temp_",
-                delete=False,
-                encoding="utf-8",
-            ) as handle:
-                handle.write(self.md.texto)
-                temp_md = Path(handle.name)
-
-            text = temp_md.read_text(encoding="utf-8", errors="replace")
-            nodes = self._nodes_from_logical_markers(text) or self._nodes_from_headings(text)
-
-            data = {
-                "schema": "ADEC_nodes_input_v1",
-                "title": self._title(text),
-                "version": "1.0",
-                "validation_mode": "article_analysis",
-                "artifact_stage": "extracted_from_markdown",
-                "formal_verification": {
-                    "status": "pending",
-                    "verified": False,
-                    "note": "Pendiente de la ejecucion posterior del constructor Lean.",
-                },
-                "source": self.md.fichero.name,
-                "authors": self._authors(text),
-                "nodes": nodes,
-            }
-            return json_lib.dumps(data, ensure_ascii=False, indent=2)
-        finally:
-            if temp_md and temp_md.exists():
-                temp_md.unlink()
+        text = self.md.texto
+        nodes = self._nodes_from_logical_markers(text) or self._nodes_from_headings(text)
+        data = {
+            "schema": "ADEC_nodes_input_v1",
+            "title": self._title(text),
+            "version": "1.0",
+            "validation_mode": "article_analysis",
+            "artifact_stage": "extracted_from_markdown",
+            "source": self.md.fichero.name,
+            "authors": self._authors(text),
+            "nodes": nodes,
+        }
+        return json_lib.dumps(data, ensure_ascii=False, indent=2)

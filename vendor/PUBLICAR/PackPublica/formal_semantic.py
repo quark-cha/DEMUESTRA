@@ -1,9 +1,10 @@
+import re
 from dataclasses import dataclass, field
 
 try:
-    from .formal_ast import Ast
+    from .formal_ast import Ast, derivative_symbol, expand_derivative
 except ImportError:  # Permite ejecutar las pruebas del modulo aislado.
-    from PackPublica_formal_ast import Ast
+    from PackPublica_formal_ast import Ast, derivative_symbol, expand_derivative
 
 
 class FormalSemanticError(ValueError):
@@ -73,10 +74,54 @@ class SemanticAnalyzer:
             self._fail(f"simbolo no declarado: {node.value}")
         if node.kind == "constant":
             return "Real"
+        if node.kind == "derivative":
+            expanded = expand_derivative(node)
+            if expanded is not None:
+                return self._infer(expanded, symbols)
+            return "Real"
+        if node.kind == "summation":
+            variable, lower, upper, body = node.children
+            if variable.kind != "identifier":
+                self._fail("la variable de sumatoria debe ser un identificador")
+            child = symbols.child()
+            # A bound summation index shadows an equally named global symbol.
+            child.values[variable.value] = "Nat"
+            for name in list(child.values):
+                if name.startswith(f"{variable.value}_") or name.endswith(f"_{variable.value}"):
+                    child.values.pop(name, None)
+            lower_type = self._infer(lower, child)
+            self._infer(upper, child)
+            if lower_type not in self.NUMERIC:
+                self._fail(f"el limite inferior de sumatoria debe ser numerico, obtuvo {lower_type}")
+            body_type = self._infer(body, child)
+            if body_type not in self.NUMERIC:
+                self._fail(f"la sumatoria requiere cuerpo numerico, obtuvo {body_type}")
+            return body_type
+        if node.kind == "enumeration":
+            symbol = node.children[0]
+            values = node.children[1:]
+            symbol_type = self._infer(symbol, symbols)
+            for value in values:
+                if value.kind == "identifier" and value.value == "ldots":
+                    continue
+                value_type = self._infer(value, symbols)
+                if not self._compatible(value_type, symbol_type):
+                    self._fail(f"enumeracion incompatible: {symbol_type} y {value_type}")
+            return "Prop"
         if node.kind == "text":
             return "Prop"
         if node.kind == "assertion":
-            self._infer(node.children[0], symbols)
+            subject_type = self._infer(node.children[0], symbols)
+            if subject_type == "Prop":
+                return "Prop"
+            name = "Assertion_" + str(node.value)
+            signature = symbols.functions.get(name)
+            if signature is None:
+                self._fail(f"predicado textual no declarado: {name}")
+            if signature.arguments != (subject_type,) or signature.result != "Prop":
+                self._fail(
+                    f"predicado textual incompatible con sujeto {subject_type}: {name}"
+                )
             return "Prop"
         if node.kind == "sign":
             return "Sign"
@@ -93,7 +138,10 @@ class SemanticAnalyzer:
                 self._fail(f"simbolo no declarado: {name}")
             return symbols.values[name]
         if node.kind == "power":
-            if node.children[1].kind in {"identifier", "text"}:
+            if (
+                node.children[0].kind in {"subscript", "decorated"}
+                and node.children[1].kind in {"identifier", "text"}
+            ):
                 symbolic = self._symbol_name(node)
                 if symbolic in symbols.values:
                     return symbols.values[symbolic]
@@ -101,8 +149,10 @@ class SemanticAnalyzer:
             exponent = self._infer(node.children[1], symbols)
             if base.startswith("Set[") and exponent == "Sign":
                 return base
-            if base not in self.NUMERIC or exponent not in {"Nat", "Int"}:
+            if base not in self.NUMERIC or exponent not in self.NUMERIC:
                 self._fail(f"potencia incompatible: base {base}, exponente {exponent}")
+            if exponent not in {"Nat", "Int"}:
+                return self._promote(base, exponent)
             return base
         if node.kind in {"call", "apply"}:
             if node.kind == "apply":
@@ -148,6 +198,19 @@ class SemanticAnalyzer:
             self._infer(node.children[0], symbols)
             self._infer(node.children[1], symbols)
             return "Prop"
+        if node.kind == "converges":
+            variable, target, expression, result = node.children
+            self._infer(target, symbols)
+            expression_type = self._infer(expression, symbols)
+            result_type = self._infer(result, symbols)
+            if not self._compatible(expression_type, result_type):
+                self._fail(
+                    "el limite compara tipos incompatibles: "
+                    f"{expression_type} y {result_type}"
+                )
+            if variable.kind != "identifier":
+                self._fail("la variable de limite debe ser un identificador")
+            return "Prop"
             if signature is None:
                 self._fail(f"funcion no declarada: {node.value}")
             if len(node.children) != len(signature.arguments):
@@ -171,7 +234,11 @@ class SemanticAnalyzer:
             if node.value == "NEG":
                 if operand not in self.NUMERIC:
                     self._fail(f"el signo negativo requiere un numero, se obtuvo {operand}")
-                return operand
+                return "Int" if operand == "Nat" else operand
+            if node.value == "PM":
+                if operand not in self.NUMERIC:
+                    self._fail(f"± requiere un numero, se obtuvo {operand}")
+                return "Int" if operand == "Nat" else operand
         if node.kind == "binary":
             return self._infer_binary(node, symbols)
         if node.kind == "quantifier":
@@ -229,7 +296,11 @@ class SemanticAnalyzer:
             return str(node.value)
         if node.kind == "decorated":
             return f"{node.value}_{self._symbol_name(node.children[0])}"
-        if node.kind == "power" and node.children[1].kind in {"identifier", "text"}:
+        if (
+            node.kind == "power"
+            and node.children[0].kind in {"subscript", "decorated"}
+            and node.children[1].kind in {"identifier", "text"}
+        ):
             return f"{self._symbol_name(node.children[0])}_{self._symbol_name(node.children[1])}"
         if node.kind == "power" and node.children[1].kind == "unary" and node.children[1].value == "NEG":
             return f"{self._symbol_name(node.children[0])}_inv"
@@ -247,7 +318,6 @@ class SemanticAnalyzer:
             return "Declaration"
         if operator == "CONTEXT":
             left = self._infer(node.children[0], symbols)
-            self._infer(node.children[1], symbols)
             if left != "Prop":
                 self._fail(f"CONTEXT requiere Prop a la izquierda; obtuvo {left}")
             return "Prop"
@@ -256,6 +326,10 @@ class SemanticAnalyzer:
         if operator in {"AND", "OR", "IMPLIES", "IFF"}:
             if left != "Prop" or right != "Prop":
                 self._fail(f"{operator} requiere Prop y Prop; obtuvo {left} y {right}")
+            return "Prop"
+        if operator == "CORRESPONDS":
+            return "Prop"
+        if operator == "MAPSTO":
             return "Prop"
         if operator in {"EQ", "NE"}:
             if not self._compatible(left, right):
@@ -277,6 +351,10 @@ class SemanticAnalyzer:
                 self._fail(f"{operator} requiere dos conjuntos; obtuvo {left} y {right}")
             if left != right:
                 self._fail(f"conjuntos incompatibles: {left} y {right}")
+            return "Prop"
+        if operator == "CONG":
+            if not left.startswith("Set[") or not right.startswith("Set["):
+                self._fail(f"CONG requiere dos espacios como conjuntos; obtuvo {left} y {right}")
             return "Prop"
         if operator == "UNION":
             if not left.startswith("Set[") or left != right:
@@ -311,7 +389,7 @@ class LeanExpressionEmitter:
         "IFF": "↔", "IMPLIES": "→", "OR": "∨", "AND": "∧",
         "EQ": "=", "NE": "≠", "LT": "<", "LE": "≤", "GT": ">", "GE": "≥",
         "IN": "∈", "NOTIN": "∉", "PLUS": "+", "MINUS": "-", "MUL": "*", "DIV": "/",
-        "SUBSET": "⊂", "SUBSETEQ": "⊆", "UNION": "∪",
+        "SUBSET": "⊆", "SUBSETEQ": "⊆", "UNION": "∪",
         "COLON": ":",
         "CONTEXT": "∧",
     }
@@ -321,6 +399,17 @@ class LeanExpressionEmitter:
         self.resolver = resolver or (lambda name: name)
         self.symbols = symbols
         self.bound = set()
+        self.bound_types = {}
+
+    @staticmethod
+    def correspondence_name(left_type, right_type):
+        clean = lambda value: re.sub(r"[^A-Za-z0-9]+", "_", value).strip("_")
+        return f"Corresponds_{clean(left_type)}_to_{clean(right_type)}"
+
+    @staticmethod
+    def transformation_name(left_type, right_type):
+        clean = lambda value: re.sub(r"[^A-Za-z0-9]+", "_", value).strip("_")
+        return f"Transforms_{clean(left_type)}_to_{clean(right_type)}"
 
     def emit(self, node):
         if node.kind == "number":
@@ -331,10 +420,75 @@ class LeanExpressionEmitter:
             return self.TYPES.get(node.value, self._resolve(node.value))
         if node.kind == "constant":
             return {"PI": "Real.pi", "INFINITY": "Filter.atTop"}.get(node.value, node.value)
+        if node.kind == "derivative":
+            expanded = expand_derivative(node)
+            if expanded is not None:
+                return self.emit(expanded)
+            subject, variable = node.children
+            variable_name = self._symbolic_name(variable)
+            if not variable_name:
+                raise FormalSemanticError("la variable de derivacion debe tener nombre")
+            if subject.kind == "identifier":
+                subject_name = str(subject.value)
+                subject_type = self.symbols.values.get(subject_name, "Real") if self.symbols else "Real"
+                if subject_type == "Real":
+                    value = self._resolve(subject_name)
+                else:
+                    value = self._resolve("DerivativeSubject_" + subject_name)
+            else:
+                value = self.emit(subject)
+            operator = self._resolve("Derivative_" + variable_name, 1)
+            for _ in range(int(node.value or "1")):
+                value = f"{operator} ({value})"
+            return value
+        if node.kind == "summation":
+            variable, lower, upper, body = node.children
+            variable_name = variable.value
+            self.bound.add(variable_name)
+            self.bound_types[variable_name] = "Nat"
+            try:
+                body_type = "Complex"
+                if self.symbols:
+                    child = self.symbols.child()
+                    child.values[variable_name] = "Nat"
+                    for name in list(child.values):
+                        if name.startswith(f"{variable_name}_") or name.endswith(f"_{variable_name}"):
+                            child.values.pop(name, None)
+                    body_type = SemanticAnalyzer(self.symbols).analyze(body, symbols=child)
+                lean_type = "ℂ" if body_type == "Complex" else "ℝ"
+                field = "InfiniteSum_Nat_Complex" if body_type == "Complex" else "InfiniteSum_Nat_Real"
+                lower_text = self.emit(lower)
+                body_text = self.emit(body)
+                return (
+                    f"{self._resolve(field, 2)} ({lower_text}) "
+                    f"(fun {self._lean_name(variable_name)} : ℕ => ({body_text} : {lean_type}))"
+                )
+            finally:
+                self.bound.discard(variable_name)
+                self.bound_types.pop(variable_name, None)
+        if node.kind == "enumeration":
+            symbol = node.children[0]
+            values = node.children[1:]
+            if (
+                len(values) >= 4
+                and [getattr(value, "value", None) for value in values[:3]] == ["1", "2", "3"]
+                and values[-1].kind == "identifier"
+                and values[-1].value == "ldots"
+            ):
+                return f"{self.emit(symbol)} ∈ {{x : ℕ | 1 ≤ x}}"
+            alternatives = []
+            for value in values:
+                if value.kind == "identifier" and value.value == "ldots":
+                    continue
+                alternatives.append(f"{self.emit(symbol)} = {self.emit(value)}")
+            return "(" + " ∨ ".join(alternatives or ["True"]) + ")"
         if node.kind == "text":
             return self._resolve(self._lean_name("Text_" + node.value))
         if node.kind == "assertion":
-            return self._resolve(self._lean_name("Text_" + node.value))
+            if self._emit_type(node.children[0]) == "Prop":
+                return self.emit(node.children[0])
+            name = "Assertion_" + str(node.value)
+            return f"{self._resolve(name, 1)} ({self.emit(node.children[0])})"
         if node.kind == "sign":
             return {"PLUS": "plus", "MINUS": "minus", "PM": "plusMinus"}.get(node.value, node.value)
         if node.kind == "decorated":
@@ -345,10 +499,33 @@ class LeanExpressionEmitter:
             return self._resolve(name) if name else self._lean_name(f"{self.emit(node.children[0])}_{self.emit(node.children[1])}")
         if node.kind == "power":
             name = self._symbolic_name(node)
-            if name and self.symbols and name in self.symbols.values:
+            if name and self.symbols and name in self.symbols.values and not self._uses_bound(node):
                 return self._resolve(name)
-            if node.children[1].kind == "sign" and node.children[0].kind == "identifier" and node.children[0].value in {"N", "Nat"}:
-                return "{n : ℕ | 0 < n}"
+            if node.children[1].kind == "sign" and node.children[1].value == "PLUS":
+                domain = self._symbolic_name(node.children[0])
+                positive_types = {
+                    "N": "ℕ", "Nat": "ℕ", "Z": "ℤ", "Int": "ℤ",
+                    "R": "ℝ", "Real": "ℝ",
+                }
+                if domain in positive_types:
+                    lean_type = positive_types[domain]
+                    return f"{{x : {lean_type} | 0 < x}}"
+            if self.symbols:
+                analyzer = SemanticAnalyzer(self.symbols)
+                exponent_type = analyzer.analyze(node.children[1])
+                result_type = analyzer.analyze(node)
+                if exponent_type not in {"Nat", "Int"}:
+                    if result_type == "Complex":
+                        return (
+                            f"{self._resolve('Pow_Complex', 2)} "
+                            f"({self._as_complex(node.children[0])}) "
+                            f"({self._as_complex(node.children[1])})"
+                        )
+                    return (
+                        f"{self._resolve('Pow_Real', 2)} "
+                        f"({self._as_real(node.children[0])}) "
+                        f"({self._as_real(node.children[1])})"
+                    )
             return f"{self._parenthesize(node.children[0])} ^ {self._parenthesize(node.children[1])}"
         if node.kind == "apply":
             symbolic = self._symbolic_name(node.children[0])
@@ -372,6 +549,8 @@ class LeanExpressionEmitter:
                 variable_type = self.TYPES.get(declared, declared)
             if variable:
                 self.bound.add(variable)
+                reverse_types = {lean: semantic for semantic, lean in self.TYPES.items()}
+                self.bound_types[variable] = reverse_types.get(variable_type, "Real")
             try:
                 condition_text = self.emit(condition)
                 if element.kind == "identifier" and element.value == variable:
@@ -382,8 +561,36 @@ class LeanExpressionEmitter:
             finally:
                 if variable:
                     self.bound.discard(variable)
+                    self.bound_types.pop(variable, None)
         if node.kind == "limit":
-            return f"{self._resolve('DivergesToInfinity', 1)} ({self.emit(node.children[0])})"
+            source, target = node.children
+            if target.kind == "constant" and target.value == "INFINITY":
+                return f"{self._resolve('DivergesToInfinity', 1)} ({self.emit(source)})"
+            return (
+                f"{self._resolve('TendsTo', 2)} "
+                f"({self.emit(source)}) ({self.emit(target)})"
+            )
+        if node.kind == "converges":
+            variable, target, expression, result = node.children
+            if target.kind != "constant" or target.value != "INFINITY":
+                raise FormalSemanticError("solo se emiten limites de sucesiones hacia infinito")
+            variable_name = variable.value
+            lean_variable = self._lean_name(variable_name)
+            variable_type = "Real"
+            if self.symbols:
+                variable_type = self.symbols.values.get(variable_name, "Real")
+            lean_type = self.TYPES.get(variable_type, variable_type)
+            self.bound.add(variable_name)
+            self.bound_types[variable_name] = variable_type
+            try:
+                body = self.emit(expression)
+            finally:
+                self.bound.discard(variable_name)
+                self.bound_types.pop(variable_name, None)
+            return (
+                f"Filter.Tendsto (fun {lean_variable} : {lean_type} => {body}) "
+                f"Filter.atTop (nhds ({self.emit(result)}))"
+            )
         if node.kind == "call":
             builtins = {"Re": "Complex.re", "abs": "abs"}
             name = builtins.get(node.value, node.value)
@@ -392,11 +599,40 @@ class LeanExpressionEmitter:
             args = " ".join(self._parenthesize(child) for child in node.children)
             return f"{name} {args}".rstrip()
         if node.kind == "unary":
+            if node.value == "PM":
+                raise FormalSemanticError("± debe emitirse como alternativas dentro de una igualdad o comprension")
             operator = "¬" if node.value == "NOT" else "-"
             return f"{operator}{self._parenthesize(node.children[0])}"
         if node.kind == "binary":
+            if node.value == "CONG":
+                left = self.emit(node.children[0])
+                right = self.emit(node.children[1])
+                return f"Nonempty (↥({left}) ≃ₜ ↥({right}))"
             if node.value == "CONTEXT":
+                # "P en U" conserva P y registra U en la traza de origen.
                 return self.emit(node.children[0])
+            if node.value == "CORRESPONDS":
+                analyzer = SemanticAnalyzer(self.symbols)
+                left_type = analyzer.analyze(node.children[0])
+                right_type = analyzer.analyze(node.children[1])
+                relation = self._resolve(
+                    self.correspondence_name(left_type, right_type), 2
+                )
+                return (
+                    f"{relation} {self._parenthesize(node.children[0])} "
+                    f"{self._parenthesize(node.children[1])}"
+                )
+            if node.value == "MAPSTO":
+                analyzer = SemanticAnalyzer(self.symbols)
+                left_type = analyzer.analyze(node.children[0])
+                right_type = analyzer.analyze(node.children[1])
+                relation = self._resolve(
+                    self.transformation_name(left_type, right_type), 2
+                )
+                return (
+                    f"{relation} {self._parenthesize(node.children[0])} "
+                    f"{self._parenthesize(node.children[1])}"
+                )
             if node.value in {"IN", "NOTIN"}:
                 domain_name = self._symbolic_name(node.children[1])
                 if self.symbols and domain_name in self.symbols.domains:
@@ -413,6 +649,9 @@ class LeanExpressionEmitter:
                     ) + ")"
             left = self._numeric_parenthesize(node.children[0], node)
             right = self._numeric_parenthesize(node.children[1], node)
+            if node.value in {"IN", "NOTIN"}:
+                left = self._membership_element(node.children[0], node.children[1])
+                right = self.emit(node.children[1])
             if node.value == "PM":
                 raise FormalSemanticError("± solo es valido dentro de una igualdad o comprension de conjunto")
             operator = self.BINARY[node.value]
@@ -424,10 +663,13 @@ class LeanExpressionEmitter:
             domain = node.children[1]
             type_name = self._quantified_type(domain)
             self.bound.add(variable_name)
+            reverse_types = {lean: semantic for semantic, lean in self.TYPES.items()}
+            self.bound_types[variable_name] = reverse_types.get(type_name, "Real")
             try:
                 body = self.emit(node.children[2])
             finally:
                 self.bound.discard(variable_name)
+                self.bound_types.pop(variable_name, None)
             domain_name = self._symbolic_name(domain)
             if (
                 self.symbols and domain_name in self.symbols.values
@@ -448,31 +690,41 @@ class LeanExpressionEmitter:
     def _parenthesize(self, node):
         value = self.emit(node)
         return f"({value})" if node.kind in {
-            "binary", "quantifier", "interval", "set_builder", "limit"
+            "binary", "quantifier", "interval", "set_builder", "limit",
+            "call", "apply",
         } else value
 
     def _numeric_parenthesize(self, child, parent):
         value = self._parenthesize(child)
         if not self.symbols or parent.value not in {"PLUS", "MINUS", "MUL", "DIV"}:
             return value
-        analyzer = SemanticAnalyzer(self.symbols)
-        child_type = analyzer.analyze(child)
-        target = analyzer.analyze(parent)
-        lean_target = {"Real": "ℝ", "Complex": "ℂ"}.get(target)
+        child_type = self._emit_type(child)
+        target = self._emit_type(parent)
+        lean_target = {"Int": "ℤ", "Real": "ℝ", "Complex": "ℂ"}.get(target)
         if lean_target and child_type in {"Nat", "Int", "Real"} and child_type != target:
             return f"({value} : {lean_target})"
         return value
 
     def _arithmetic_branches(self, node):
+        if node.kind == "unary" and node.value == "PM":
+            values = self._arithmetic_branches(node.children[0])
+            return [branch for value in values for branch in (value, f"-({value})")]
+        if node.kind == "power" and node.children[1].kind == "unary" and node.children[1].value == "PM":
+            positive = Ast("power", None, (node.children[0], node.children[1].children[0]))
+            negative = Ast(
+                "power",
+                None,
+                (node.children[0], Ast("unary", "NEG", (node.children[1].children[0],))),
+            )
+            return [self.emit(positive), self.emit(negative)]
         if node.kind == "binary" and node.value in {"PLUS", "MINUS", "MUL", "DIV", "PM"}:
             lefts = self._arithmetic_branches(node.children[0])
             rights = self._arithmetic_branches(node.children[1])
             operators = ["+", "-"] if node.value == "PM" else [self.BINARY[node.value]]
             if self.symbols:
-                analyzer = SemanticAnalyzer(self.symbols)
-                target = analyzer.analyze(node)
-                lean_target = {"Real": "ℝ", "Complex": "ℂ"}.get(target)
-                child_types = [analyzer.analyze(child) for child in node.children]
+                target = self._emit_type(node)
+                lean_target = {"Int": "ℤ", "Real": "ℝ", "Complex": "ℂ"}.get(target)
+                child_types = [self._emit_type(child) for child in node.children]
                 if lean_target:
                     if child_types[0] != target and child_types[0] in {"Nat", "Int", "Real"}:
                         lefts = [f"({value} : {lean_target})" for value in lefts]
@@ -480,6 +732,62 @@ class LeanExpressionEmitter:
                         rights = [f"({value} : {lean_target})" for value in rights]
             return [f"({left} {operator} {right})" for left in lefts for right in rights for operator in operators]
         return [self.emit(node)]
+
+    def _as_real(self, node):
+        value = self.emit(node)
+        if not self.symbols:
+            return value
+        node_type = self._emit_type(node)
+        if node_type in {"Nat", "Int"}:
+            return f"({value} : ℝ)"
+        return value
+
+    def _as_complex(self, node):
+        value = self.emit(node)
+        if not self.symbols:
+            return value
+        node_type = self._emit_type(node)
+        if node_type in {"Nat", "Int", "Real"}:
+            return f"({value} : ℂ)"
+        return value
+
+    def _emit_type(self, node):
+        if node.kind == "identifier" and node.value in self.bound:
+            return self.bound_types.get(node.value, "Real")
+        if not self.symbols:
+            return "Real"
+        child = self.symbols.child()
+        for variable in self.bound:
+            variable_type = self.bound_types.get(variable, "Real")
+            child.values[variable] = variable_type
+            for name in list(child.values):
+                if name.startswith(f"{variable}_") or name.endswith(f"_{variable}"):
+                    child.values.pop(name, None)
+            child.values[variable] = variable_type
+        return SemanticAnalyzer(self.symbols).analyze(node, symbols=child)
+
+    def _membership_element(self, element, domain):
+        value = self.emit(element)
+        if not self.symbols:
+            return value
+        analyzer = SemanticAnalyzer(self.symbols)
+        try:
+            element_type = analyzer.analyze(element)
+            domain_type = analyzer.analyze(domain)
+        except FormalSemanticError:
+            return value
+        if not domain_type.startswith("Set["):
+            return value
+        target = domain_type[4:-1]
+        if element_type == target:
+            return value
+        if element_type in {"Nat", "Int", "Real"} and target == "Real":
+            return f"({value} : ℝ)"
+        if element_type in {"Nat", "Int", "Real"} and target == "Complex":
+            return f"({value} : ℂ)"
+        if element_type == "Nat" and target == "Int":
+            return f"({value} : ℤ)"
+        return value
 
     def _builder_variable(self, condition):
         if condition.kind == "binary" and condition.value in {"IN", "NOTIN"}:
@@ -509,13 +817,25 @@ class LeanExpressionEmitter:
         if node.kind == "limit":
             left, right = (self._symbolic_name(child) for child in node.children)
             return self._lean_name(f"{left}_to_{right}") if left and right else None
-        if node.kind == "power" and node.children[1].kind in {"identifier", "text"}:
+        if (
+            node.kind == "power"
+            and node.children[0].kind in {"subscript", "decorated"}
+            and node.children[1].kind in {"identifier", "text"}
+        ):
             left, right = (self._symbolic_name(child) for child in node.children)
             return self._lean_name(f"{left}_{right}") if left and right else None
         if node.kind == "power" and node.children[1].kind == "unary" and node.children[1].value == "NEG":
             left = self._symbolic_name(node.children[0])
             return self._lean_name(f"{left}_inv") if left else None
         return None
+
+    def _uses_bound(self, node):
+        if node.kind == "identifier" and node.value in self.bound:
+            return True
+        return any(
+            self._uses_bound(child)
+            for child in node.children if isinstance(child, Ast)
+        )
 
     def _resolve(self, name, arity=None):
         try:

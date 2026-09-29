@@ -13,6 +13,85 @@ class Ast:
     children: tuple = ()
 
 
+def derivative_symbol(node):
+    """Return the stable symbol used for an atomic differential expression."""
+    if node.kind != "derivative":
+        raise ValueError("derivative_symbol requiere un nodo derivative")
+
+    def fragment(value):
+        if value.kind in {"identifier", "number", "constant", "sign"}:
+            return str(value.value)
+        if value.kind == "power":
+            return f"{fragment(value.children[0])}_pow_{fragment(value.children[1])}"
+        if value.kind == "subscript":
+            return f"{fragment(value.children[0])}_{fragment(value.children[1])}"
+        if value.kind == "decorated":
+            return f"{value.value}_{fragment(value.children[0])}"
+        if value.kind == "unary":
+            return f"{str(value.value).lower()}_{fragment(value.children[0])}"
+        if value.kind == "binary":
+            operation = {
+                "PLUS": "plus", "MINUS": "minus", "MUL": "mul", "DIV": "div",
+            }.get(value.value, str(value.value).lower())
+            return f"{fragment(value.children[0])}_{operation}_{fragment(value.children[1])}"
+        return value.kind
+
+    subject, variable = node.children
+    raw = f"derivative_{node.value}_{fragment(subject)}_by_{fragment(variable)}"
+    return re.sub(r"[^A-Za-z0-9_]", "_", raw).strip("_")
+
+
+def expand_derivative(node):
+    """Expand elementary symbolic derivatives; leave unknown ones atomic."""
+    if node.kind != "derivative" or node.value != "1":
+        return None
+    subject, variable = node.children
+    if variable.kind != "identifier":
+        return None
+
+    def derive(expression):
+        if expression.kind in {"number", "constant"}:
+            return Ast("number", "0")
+        if expression.kind == "identifier":
+            if expression.value == f"d{variable.value}":
+                return Ast("number", "1")
+            if str(expression.value).startswith("d") and len(str(expression.value)) > 1:
+                subject = Ast("identifier", str(expression.value)[1:])
+                return Ast("derivative", "1", (subject, variable))
+            return Ast("derivative", "1", (expression, variable))
+        if expression.kind == "unary" and expression.value == "NEG":
+            return Ast("unary", "NEG", (derive(expression.children[0]),))
+        if expression.kind == "binary" and expression.value in {"PLUS", "MINUS"}:
+            return Ast("binary", expression.value, tuple(derive(child) for child in expression.children))
+        if expression.kind == "binary" and expression.value == "MUL":
+            left, right = expression.children
+            return Ast("binary", "PLUS", (
+                Ast("binary", "MUL", (derive(left), right)),
+                Ast("binary", "MUL", (left, derive(right))),
+            ))
+        if (
+            expression.kind == "power"
+            and expression.children[1].kind == "number"
+            and str(expression.children[1].value).isdigit()
+        ):
+            base, exponent = expression.children
+            order = int(exponent.value)
+            if order == 0:
+                return Ast("number", "0")
+            lower_power = base if order == 2 else Ast(
+                "power", None, (base, Ast("number", str(order - 1)))
+            )
+            return Ast("binary", "MUL", (
+                Ast("binary", "MUL", (Ast("number", str(order)), lower_power)),
+                derive(base),
+            ))
+        return Ast("derivative", "1", (expression, variable))
+
+    if subject.kind not in {"binary", "power", "unary"}:
+        return None
+    return derive(subject)
+
+
 class LatexLexer:
     """Lexer determinista para el lenguaje matematico de PUBLICAR."""
 
@@ -32,7 +111,9 @@ class LatexLexer:
         "implies": "IMPLIES",
         "iff": "IFF",
         "Leftrightarrow": "IFF",
+        "leftrightarrow": "CORRESPONDS",
         "Longleftrightarrow": "IFF",
+        "longleftrightarrow": "CORRESPONDS",
         "le": "LE",
         "leq": "LE",
         "ge": "GE",
@@ -50,6 +131,10 @@ class LatexLexer:
         "frac": "FRAC",
         "tfrac": "FRAC",
         "to": "TO",
+        "longrightarrow": "MAPSTO",
+        "mapsto": "MAPSTO",
+        "lim": "LIMIT",
+        "sum": "SUM",
         "sqrt": "SQRT",
         "infty": "INFINITY",
         "pi": "PI",
@@ -57,6 +142,7 @@ class LatexLexer:
         "tilde": "MODIFIER",
         "subset": "SUBSET",
         "subseteq": "SUBSETEQ",
+        "cong": "CONG",
         "sqcup": "UNION",
         "cup": "UNION",
         "ldots": "ELLIPSIS",
@@ -153,10 +239,13 @@ class FormalParser:
 
     PRECEDENCE = {
         "COLON": 5,
-        "IFF": 10, "IMPLIES": 20, "OR": 30, "AND": 40,
-        "UNION": 45, "CONTEXT": 45,
+        "MAPSTO": 6,
+        "IFF": 10, "CORRESPONDS": 10, "IMPLIES": 20, "OR": 30, "AND": 40,
+        "CONTEXT": 45,
         "EQ": 50, "NE": 50, "LT": 50, "LE": 50, "GT": 50, "GE": 50,
         "IN": 50, "NOTIN": 50, "SUBSET": 50, "SUBSETEQ": 50,
+        "CONG": 50,
+        "UNION": 55,
         "PLUS": 60, "MINUS": 60, "PM": 60,
         "MUL": 70, "DIV": 70,
     }
@@ -173,17 +262,42 @@ class FormalParser:
         if colon is not None:
             self.index = colon + 1
         result = self._expr(0)
+        comma_values = []
         while self._accept("COMMA"):
             if self._current()[0] in {"EOF", "RBRACE", "RBRACK", "RPAREN", "SET_RBRACE"}:
                 break
-            result = Ast("binary", "AND", (result, self._expr(0)))
+            comma_values.append(self._expr(0))
+        if comma_values:
+            # ``n = 1, 2, 3, ...`` is an enumeration, but
+            # ``dy = 0, dz = 0`` is a conjunction of complete propositions.
+            # The old code discarded the EQ node in the latter case and kept
+            # only its operands, corrupting the formula before type checking.
+            if (
+                result.kind == "binary"
+                and result.value == "EQ"
+                and not any(self._propish(value) for value in comma_values)
+            ):
+                result = Ast("enumeration", None, (*result.children, *comma_values))
+            elif result.kind == "tuple" and all(self._propish(value) for value in comma_values):
+                condition = comma_values[0]
+                for value in comma_values[1:]:
+                    condition = Ast("binary", "AND", (condition, value))
+                result = Ast("set_builder", None, (result, condition))
+            else:
+                for value in comma_values:
+                    result = Ast("binary", "AND", (result, value))
         while self._accept("RBRACE"):
             pass
         self._expect("EOF")
         return result
 
     def _declaration_label_colon(self):
-        if not re.match(r"^\s*(?:\\boxed\s*\{\s*)?[DAPT](?:_\s*\{[^}]+\}|_[A-Za-z0-9]+)\s*:", self.source):
+        if not re.match(
+            r"^\s*(?:\\boxed\s*\{\s*)?[DAPT]"
+            r"(?:_\s*\{[^}]+\}|_[A-Za-z0-9]+)"
+            r"(?:\([^)]*\))?\s*:",
+            self.source,
+        ):
             return None
         depth = 0
         for index, token in enumerate(self.tokens):
@@ -260,6 +374,37 @@ class FormalParser:
                     ))
                 else:
                     left = Ast("binary", operator[0], (left, right))
+            elif operator[0] == "IFF" and left.kind == "binary" and left.value == "IFF":
+                left = Ast("binary", "AND", (
+                    left,
+                    Ast("binary", "IFF", (left.children[1], right)),
+                ))
+            elif operator[0] == "IFF" and left.kind == "binary" and left.value == "AND":
+                previous = self._last_comparison(left, {"IFF"})
+                if previous is not None:
+                    left = Ast("binary", "AND", (
+                        left,
+                        Ast("binary", "IFF", (previous.children[1], right)),
+                    ))
+                else:
+                    left = Ast("binary", "IFF", (left, right))
+            elif operator[0] == "MAPSTO" and left.kind == "binary" and left.value == "MAPSTO":
+                left = Ast("binary", "AND", (
+                    left,
+                    Ast("binary", "MAPSTO", (left.children[1], right)),
+                ))
+            elif operator[0] == "MAPSTO" and left.kind == "binary" and left.value == "AND":
+                previous = self._last_comparison(left, {"MAPSTO"})
+                if previous is not None:
+                    left = Ast("binary", "AND", (
+                        left,
+                        Ast("binary", "MAPSTO", (previous.children[1], right)),
+                    ))
+                else:
+                    left = Ast("binary", "MAPSTO", (left, right))
+            elif operator[0] == "EQ" and left.kind == "sequence_limit":
+                variable, target, expression = left.children
+                left = Ast("converges", None, (variable, target, expression, right))
             else:
                 left = Ast("binary", operator[0], (left, right))
         return left
@@ -286,6 +431,11 @@ class FormalParser:
             operator = self._current()[0]
             if operator == "LPAREN":
                 if node.kind not in {"identifier", "subscript", "decorated", "power", "call", "apply"}:
+                    break
+                if (
+                    node.kind == "identifier"
+                    and re.fullmatch(r"d[A-Za-z]'?", str(node.value))
+                ):
                     break
                 self.index += 1
                 args = []
@@ -318,6 +468,36 @@ class FormalParser:
 
     def _prefix(self):
         token = self._current()
+        if token[0] == "LIMIT":
+            self.index += 1
+            self._expect("SUB")
+            specification = self._group()
+            if specification.kind != "limit":
+                raise FormalSyntaxError(
+                    f"Error sintactico en {self.location or 'formula'}: "
+                    "el subindice de lim debe tener la forma variable\\to destino."
+                )
+            expression = self._expr(self.PRECEDENCE["EQ"] + 1)
+            return Ast(
+                "sequence_limit",
+                None,
+                (*specification.children, expression),
+            )
+        if token[0] == "SUM":
+            self.index += 1
+            variable = Ast("identifier", "n")
+            lower = Ast("number", "0")
+            upper = Ast("constant", "INFINITY")
+            if self._accept("SUB"):
+                specification = self._group() if self._current()[0] in {"LBRACE", "LPAREN"} else self._prefix()
+                if specification.kind == "binary" and specification.value == "EQ":
+                    variable, lower = specification.children
+                else:
+                    variable = specification
+            if self._accept("CARET"):
+                upper = self._group() if self._current()[0] in {"LBRACE", "LPAREN"} else self._prefix()
+            body = self._expr(self.PRECEDENCE["MUL"] + 1)
+            return Ast("summation", None, (variable, lower, upper, body))
         if token[0] in {"FORALL", "EXISTS"}:
             self.index += 1
             variable = self._expect("IDENT")[1]
@@ -345,6 +525,9 @@ class FormalParser:
             self.index += 1
             numerator = self._fraction_operand()
             denominator = self._fraction_operand()
+            derivative = self._derivative_fraction(numerator, denominator)
+            if derivative is not None:
+                return derivative
             return Ast("binary", "DIV", (numerator, denominator))
         if token[0] == "SQRT":
             self.index += 1
@@ -421,7 +604,10 @@ class FormalParser:
             if token[0] == "MATHBB":
                 name = self._group_identifier()
             node = Ast("identifier", name)
-            if self._accept("LPAREN"):
+            if (
+                not re.fullmatch(r"d[A-Za-z]'?", str(name))
+                and self._accept("LPAREN")
+            ):
                 args = []
                 if self._current()[0] != "RPAREN":
                     args.append(self._expr(0))
@@ -475,6 +661,53 @@ class FormalParser:
                 self.tokens.insert(self.index, ("NUMBER", tail, token[2] + 1))
             return Ast("number", head)
         return self._prefix()
+
+    def _derivative_fraction(self, numerator, denominator):
+        denominator_data = self._differential_denominator(denominator)
+        if denominator_data is None:
+            return None
+        variable, denominator_order = denominator_data
+
+        subject = None
+        numerator_order = 1
+        if numerator.kind == "identifier" and numerator.value == "d":
+            if self._current()[0] not in {"LPAREN", "LBRACE", "LBRACK"}:
+                return None
+            subject = self._group()
+        elif numerator.kind == "identifier" and str(numerator.value).startswith("d"):
+            value = str(numerator.value)
+            if len(value) <= 1:
+                return None
+            subject = Ast("identifier", value[1:])
+        elif (
+            numerator.kind == "binary"
+            and numerator.value == "MUL"
+            and numerator.children[0].kind == "power"
+            and numerator.children[0].children[0] == Ast("identifier", "d")
+            and numerator.children[0].children[1].kind == "number"
+        ):
+            numerator_order = int(numerator.children[0].children[1].value)
+            subject = numerator.children[1]
+        else:
+            return None
+
+        if numerator_order != denominator_order:
+            return None
+        return Ast("derivative", str(numerator_order), (subject, variable))
+
+    @staticmethod
+    def _differential_denominator(node):
+        order = 1
+        base = node
+        if node.kind == "power" and node.children[1].kind == "number":
+            base = node.children[0]
+            order = int(node.children[1].value)
+        if base.kind != "identifier":
+            return None
+        value = str(base.value)
+        if not value.startswith("d") or len(value) <= 1:
+            return None
+        return Ast("identifier", value[1:]), order
 
     def _group_or_parenthesized(self):
         if self._current()[0] in {"LPAREN", "LBRACE", "LBRACK"}:

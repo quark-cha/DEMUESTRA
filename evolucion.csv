@@ -1,0 +1,5 @@
+operacion,duracion_segundos,codigo_salida,finalizado_en
+lake env lean Proyectos\ES_46_RV6\ES_46_RV6.lean,53.750,0,2026-09-28T23:54:57+02:00
+lake env lean Proyectos\ES_46_RV6\audit_prefix_708.lean,496.500,0,2026-09-25T15:53:58+02:00
+lake env lean Proyectos\ES_46_RV6\ES_46_RV6_candidate.lean,26.906,0,2026-09-25T15:54:58+02:00
+lake --version,1.141,0,2026-09-28T23:54:03+02:00

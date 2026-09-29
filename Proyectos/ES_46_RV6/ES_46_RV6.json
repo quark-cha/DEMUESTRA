@@ -3,7 +3,7 @@
   "title": "DOCUMENTO 46 — REVISIÓN 6",
   "version": "1.0",
   "validation_mode": "article_analysis",
-  "artifact_stage": "validation_complete",
+  "artifact_stage": "extracted_from_markdown",
   "source": "ES_46_RV6.md",
   "authors": [
     {
@@ -19,9 +19,10 @@
       "name": "El universo físico considerado se representa como",
       "description": "El universo físico considerado se representa como\n\n$$\n\\boxed{\nU=3S+T.\n}\n$$\n\nNo se elimina ninguna dimensión espacial.\n\n## 1.2. Elección local de la dirección de propagación\n\nSea una onda que en un punto determinado se propaga según una dirección espacial. Es lícito orientar localmente los ejes de coordenadas de manera que el eje $x$ coincida con la dirección instantánea de propagación.\n\nEntonces, para ese desplazamiento infinitesimal,\n\n$$\ndy=0,\n\\qquad\ndz=0,\n$$\n\ny\n\n$$\nds=dx.\n$$",
       "deps": [],
-      "source_status": "stated",
-      "prolog_status": "reachable",
-      "lean_status": "not_individually_verified"
+      "source": {
+        "file": "ES_46_RV6.md",
+        "start_line": 29
+      }
     },
     {
       "id": "P_COORD",
@@ -31,6 +32,10 @@
       "deps": [
         "D_U"
       ],
+      "source": {
+        "file": "ES_46_RV6.md",
+        "start_line": 57
+      },
       "proof": {
         "method": "derivation",
         "status": "declared",
@@ -42,10 +47,7 @@
           "## 2.1.",
           "Convención esencial sobre el apóstrofo"
         ]
-      },
-      "source_status": "demonstrated",
-      "prolog_status": "reachable",
-      "lean_status": "not_individually_verified"
+      }
     },
     {
       "id": "D_t_prime",
@@ -53,9 +55,10 @@
       "name": "El apóstrofo de $t'$ **no significa derivada**.",
       "description": "El apóstrofo de $t'$ **no significa derivada**.\n\n$t'$ representa la coordenada temporal propia del sistema observado respecto del observador en la transformación de Lorentz. En consecuencia, $dt'$ es el diferencial del tiempo propio del sistema observado.\n\nCuando sea necesaria una derivada se escribirá explícitamente, por ejemplo,\n\n$$\n\\frac{dt'}{dt}.\n$$\n\n## 2.2. Antecedente de Lorentz",
       "deps": [],
-      "source_status": "stated",
-      "prolog_status": "reachable",
-      "lean_status": "not_individually_verified"
+      "source": {
+        "file": "ES_46_RV6.md",
+        "start_line": 65
+      }
     },
     {
       "id": "A_L",
@@ -63,9 +66,10 @@
       "name": "Para velocidad relativa $v$,",
       "description": "Para velocidad relativa $v$,\n\n$$\ndt'\n=\ndt\n\\sqrt{\n1-\\frac{v^2}{c^2}\n}.\n$$\n\nDefinimos la velocidad longitudinal observada como\n\n$$\n\\boxed{\nv=\\frac{ds}{dt}.\n}\n$$\n\nEn unidades naturales,\n\n$$\nc=1.\n$$\n\nPor tanto,\n\n$$\ndt'^2\n=\ndt^2-ds^2,\n$$\n\ny obtenemos\n\n$$\n\\boxed{",
       "deps": [],
-      "source_status": "stated",
-      "prolog_status": "reachable",
-      "lean_status": "not_individually_verified"
+      "source": {
+        "file": "ES_46_RV6.md",
+        "start_line": 77
+      }
     },
     {
       "id": "P_ST",
@@ -77,6 +81,10 @@
         "D_t_prime",
         "A_L"
       ],
+      "source": {
+        "file": "ES_46_RV6.md",
+        "start_line": 114
+      },
       "measurement_relationship": "additive",
       "proof": {
         "method": "derivation",
@@ -91,10 +99,7 @@
           "La primera derivada espacial respecto de $t$ es",
           "$$ \\boxed{"
         ]
-      },
-      "source_status": "demonstrated",
-      "prolog_status": "reachable",
-      "lean_status": "not_individually_verified"
+      }
     },
     {
       "id": "P_v",
@@ -106,6 +111,10 @@
         "A_L",
         "P_ST"
       ],
+      "source": {
+        "file": "ES_46_RV6.md",
+        "start_line": 138
+      },
       "measurement_relationship": "additive",
       "proof": {
         "method": "derivation",
@@ -117,10 +126,7 @@
           "La segunda derivada es",
           "$$ \\boxed{"
         ]
-      },
-      "source_status": "demonstrated",
-      "prolog_status": "reachable",
-      "lean_status": "not_individually_verified"
+      }
     },
     {
       "id": "P_a",
@@ -132,6 +138,10 @@
         "P_ST",
         "P_v"
       ],
+      "source": {
+        "file": "ES_46_RV6.md",
+        "start_line": 154
+      },
       "measurement_relationship": "additive",
       "proof": {
         "method": "derivation",
@@ -146,10 +156,7 @@
           "## 4.1.",
           "Longitud de onda base"
         ]
-      },
-      "source_status": "demonstrated",
-      "prolog_status": "reachable",
-      "lean_status": "not_individually_verified"
+      }
     },
     {
       "id": "D_lambda",
@@ -157,9 +164,10 @@
       "name": "Sea $\\lambda$ la longitud de onda base asociada a la materia considerada.",
       "description": "Sea $\\lambda$ la longitud de onda base asociada a la materia considerada.\n\nA partir de las relaciones de Planck y Einstein,\n\n$$\nE=\\frac{hc}{\\lambda},\n$$\n\n$$\nE=Mc^2,\n$$\n\nse obtiene\n\n$$\nMc^2=\\frac{hc}{\\lambda},\n$$\n\ny por tanto\n\n$$\n\\boxed{\n\\lambda=\\frac{h}{Mc}.\n}\n$$\n\n## 4.2. Longitud de contorno",
       "deps": [],
-      "source_status": "stated",
-      "prolog_status": "reachable",
-      "lean_status": "not_individually_verified"
+      "source": {
+        "file": "ES_46_RV6.md",
+        "start_line": 174
+      }
     },
     {
       "id": "D_L",
@@ -167,9 +175,10 @@
       "name": "Sea $L$ la longitud total del contorno espacial recorrido por una onda confinada; es el perímetro de cierre de la onda.",
       "description": "Sea $L$ la longitud total del contorno espacial recorrido por una onda confinada; es el perímetro de cierre de la onda.\n\nDefinimos\n\n$$\n\\boxed{\nL=n\\lambda.\n}\n$$\n\nPara un cierre finito,\n\n$$\nn\\in\\mathbb R^+.\n$$\n\n## 4.3. Construcción de $U_{\\rm VED}$\n\n$D_{R_{\\rm VED}}$ — Se representa topológicamente el contorno de longitud $L$ mediante una circunferencia bidimensional de igual longitud:\n\n$$\n2\\pi R_{\\rm VED}=L.\n$$\n\nPor tanto,\n\n$$\n\\boxed{\nR_{\\rm VED}\n=\n\\frac{L}{2\\pi}\n=\n\\frac{n\\lambda}{2\\pi}.\n}\n$$\n\nLa afirmación no es que el confinamiento físico real en $3S+T$ tenga necesariamente forma circular. La circunferencia es una proyección topológica precisa que conserva la longitud $L$ y permite analizar las propiedades de cierre.\n\nAsí,\n\n$$\n\\boxed{\nU_{\\rm VED}(\\text{onda})\n=\nU_{\\rm VED}(\\text{cerrada},\\text{abierta})\n=\nU_{\\rm VED}(R_{\\rm VED})\n=\nU_{\\rm VED}(L,R_{\\rm VED}).\n}\n$$",
       "deps": [],
-      "source_status": "stated",
-      "prolog_status": "reachable",
-      "lean_status": "not_individually_verified"
+      "source": {
+        "file": "ES_46_RV6.md",
+        "start_line": 202
+      }
     },
     {
       "id": "P_VED_Inv",
@@ -181,6 +190,10 @@
         "D_lambda",
         "D_L"
       ],
+      "source": {
+        "file": "ES_46_RV6.md",
+        "start_line": 254
+      },
       "measurement_relationship": "additive",
       "proof": {
         "method": "derivation",
@@ -195,10 +208,7 @@
           "Para todo $n$ finito positivo,",
           "$$ L=n\\lambda<\\infty, $$"
         ]
-      },
-      "source_status": "demonstrated",
-      "prolog_status": "reachable",
-      "lean_status": "not_individually_verified"
+      }
     },
     {
       "id": "D_k",
@@ -206,9 +216,10 @@
       "name": "Sea $k\\in\\mathbb N^+$ el entero positivo más próximo que sirve como centro de una familia de cierre.",
       "description": "Sea $k\\in\\mathbb N^+$ el entero positivo más próximo que sirve como centro de una familia de cierre.",
       "deps": [],
-      "source_status": "stated",
-      "prolog_status": "reachable",
-      "lean_status": "not_individually_verified"
+      "source": {
+        "file": "ES_46_RV6.md",
+        "start_line": 314
+      }
     },
     {
       "id": "D_rho",
@@ -216,9 +227,10 @@
       "name": "Sea",
       "description": "Sea\n\n$$\n\\boxed{\n\\rho\n=\n\\operatorname{dist}(n,\\mathbb N^+).\n}\n$$\n\nPor definición de distancia al entero más próximo,\n\n$$\n\\boxed{\n0\\le\\rho\\le\\frac12.\n}\n$$\n\nTodo cierre finito se representa como\n\n$$\n\\boxed{\nn=k\\pm\\rho,\n\\qquad\nk\\in\\mathbb N^+,\n\\qquad\n0\\le\\rho\\le\\frac12.\n}\n$$\n\nEn el punto exactamente equidistante entre dos enteros, $\\rho=1/2$; las dos etiquetas vecinas representan la misma frontera.\n\nEntonces\n\n$$\n\\boxed{\nL(k,\\rho)\n=\n(k\\pm\\rho)\\lambda,\n}\n$$\n\ny\n\n$$\n\\boxed{\nR_{\\rm VED}(k,\\rho)\n=\n\\frac{(k\\pm\\rho)\\lambda}{2\\pi}.\n}\n$$\n\n## 6.2. Estabilidad\n\nSi\n\n$$\n\\rho=0,\n$$\n\nentonces\n\n$$\nn=k,\n$$\n\ny\n\n$$\nL=k\\lambda.\n$$\n\nEl contorno contiene un número entero de ciclos y el retorno se produce exactamente en fase.\n\nPor tanto,\n\n$$\n\\boxed{",
       "deps": [],
-      "source_status": "stated",
-      "prolog_status": "reachable",
-      "lean_status": "not_individually_verified"
+      "source": {
+        "file": "ES_46_RV6.md",
+        "start_line": 316
+      }
     },
     {
       "id": "P_VED_E",
@@ -230,6 +242,10 @@
         "D_k",
         "D_rho"
       ],
+      "source": {
+        "file": "ES_46_RV6.md",
+        "start_line": 394
+      },
       "measurement_relationship": "additive",
       "proof": {
         "method": "derivation",
@@ -242,10 +258,7 @@
           "Existe desfase respecto del cierre exacto",
           "$$ \\boxed{"
         ]
-      },
-      "source_status": "demonstrated",
-      "prolog_status": "reachable",
-      "lean_status": "not_individually_verified"
+      }
     },
     {
       "id": "P_VED_I",
@@ -257,6 +270,10 @@
         "D_rho",
         "P_VED_E"
       ],
+      "source": {
+        "file": "ES_46_RV6.md",
+        "start_line": 418
+      },
       "measurement_relationship": "additive",
       "proof": {
         "method": "derivation",
@@ -271,10 +288,7 @@
           "La parametrización anterior es exhaustiva.",
           "Para todo $n\\in\\mathbb R^+$ finito existe algún"
         ]
-      },
-      "source_status": "demonstrated",
-      "prolog_status": "not_reached",
-      "lean_status": "not_individually_verified"
+      }
     },
     {
       "id": "P_VED_K_E",
@@ -286,6 +300,10 @@
         "P_VED_E",
         "P_VED_I"
       ],
+      "source": {
+        "file": "ES_46_RV6.md",
+        "start_line": 462
+      },
       "measurement_relationship": "additive",
       "proof": {
         "method": "derivation",
@@ -297,10 +315,7 @@
           "$$ k=1,2,3,\\ldots $$",
           "enumeran todos los casos de estabilidad sin dejar ninguno fuera."
         ]
-      },
-      "source_status": "demonstrated",
-      "prolog_status": "not_reached",
-      "lean_status": "not_individually_verified"
+      }
     },
     {
       "id": "P_VED_K_I",
@@ -312,6 +327,10 @@
         "P_VED_I",
         "P_VED_K_E"
       ],
+      "source": {
+        "file": "ES_46_RV6.md",
+        "start_line": 480
+      },
       "measurement_relationship": "additive",
       "proof": {
         "method": "derivation",
@@ -319,10 +338,7 @@
         "steps": [
           "Para $\\rho=1/2$, los mismos $k$ enumeran todas las fronteras de máxima desviación."
         ]
-      },
-      "source_status": "demonstrated",
-      "prolog_status": "not_reached",
-      "lean_status": "not_individually_verified"
+      }
     },
     {
       "id": "P_VED_R_C",
@@ -334,6 +350,10 @@
         "P_VED_K_E",
         "P_VED_K_I"
       ],
+      "source": {
+        "file": "ES_46_RV6.md",
+        "start_line": 482
+      },
       "measurement_relationship": "additive",
       "proof": {
         "method": "derivation",
@@ -345,10 +365,7 @@
           "Por tanto,",
           "$$ \\boxed{"
         ]
-      },
-      "source_status": "demonstrated",
-      "prolog_status": "not_reached",
-      "lean_status": "not_individually_verified"
+      }
     },
     {
       "id": "P_VED_Completo",
@@ -360,6 +377,10 @@
         "P_VED_K_I",
         "P_VED_R_C"
       ],
+      "source": {
+        "file": "ES_46_RV6.md",
+        "start_line": 494
+      },
       "measurement_relationship": "additive",
       "proof": {
         "method": "derivation",
@@ -374,10 +395,7 @@
           "$A_7$ — En dicho documento se establece la constante geométrica",
           "$$ \\boxed{ \\tilde N = R_{\\rm VED}R_{\\rm Sch}. } $$"
         ]
-      },
-      "source_status": "demonstrated",
-      "prolog_status": "not_reached",
-      "lean_status": "not_individually_verified"
+      }
     },
     {
       "id": "P_VS",
@@ -389,6 +407,10 @@
         "P_VED_R_C",
         "P_VED_Completo"
       ],
+      "source": {
+        "file": "ES_46_RV6.md",
+        "start_line": 557
+      },
       "measurement_relationship": "additive",
       "proof": {
         "method": "derivation",
@@ -403,34 +425,7 @@
           "Así, dentro del marco, el estado $n=2$ fija la gravitación universal observada y el límite de onda libre no aporta respuesta gravitatoria.",
           "El objetivo de esta sección no es utilizar $U_{\\rm Sch}$ para obtener Riemann, sino establecer un precedente demostrado: es posible transportar información entre topologías conservando el estado representado."
         ]
-      },
-      "source_status": "demonstrated",
-      "prolog_status": "not_reached",
-      "lean_status": "not_individually_verified"
-    },
-    {
-      "id": "P_ST_2",
-      "kind": "proposition",
-      "name": "\\qquad",
-      "description": "\\qquad\nds^2=dt^2-dt'^2.\n$$\n\nLa ecuación dinámica se construye conservando la relación diferencial y su variación respecto de $t$:\n\n$$\n\\boxed{",
-      "deps": [
-        "P_VED_R_C",
-        "P_VED_Completo",
-        "P_VS"
-      ],
-      "measurement_relationship": "additive",
-      "proof": {
-        "method": "derivation",
-        "status": "declared",
-        "steps": [
-          "\\qquad ds^2=dt^2-dt'^2. $$",
-          "La ecuación dinámica se construye conservando la relación diferencial y su variación respecto de $t$",
-          "$$ \\boxed{"
-        ]
-      },
-      "source_status": "demonstrated",
-      "prolog_status": "not_reached",
-      "lean_status": "not_individually_verified"
+      }
     },
     {
       "id": "P_F",
@@ -438,10 +433,14 @@
       "name": "\\qquad",
       "description": "\\qquad\nF\n=\n(dt^2-dt'^2)\n+\n\\frac{d}{dt}(dt^2-dt'^2).\n}\n$$\n\nNo se elimina $dt'$ antes de desarrollar la expresión.\n\nDesarrollando respecto de $t$ en la notación adoptada en este marco,\n\n$$\n\\boxed{",
       "deps": [
+        "P_VED_R_C",
         "P_VED_Completo",
-        "P_VS",
-        "P_ST_2"
+        "P_VS"
       ],
+      "source": {
+        "file": "ES_46_RV6.md",
+        "start_line": 601
+      },
       "measurement_relationship": "additive",
       "proof": {
         "method": "derivation",
@@ -452,10 +451,7 @@
           "Desarrollando respecto de $t$ en la notación adoptada en este marco,",
           "$$ \\boxed{"
         ]
-      },
-      "source_status": "demonstrated",
-      "prolog_status": "not_reached",
-      "lean_status": "not_individually_verified"
+      }
     },
     {
       "id": "P_F1",
@@ -463,10 +459,14 @@
       "name": "\\qquad",
       "description": "\\qquad\nF\n=\ndt^2-dt'^2\n+\n2dt\n-\n2dt'\\frac{dt'}{dt}.\n}\n$$\n\nLa única prima presente en $dt'$ continúa significando tiempo propio del observado; la derivada aparece sólo en el cociente explícito $dt'/dt$.\n\n---\n\n# 10. Condición propia de la onda y reducción final de $F$\n\nLa onda viaja localmente a $c$ tanto si es libre como si está confinada:\n\n$$\n\\boxed{",
       "deps": [
+        "P_VED_Completo",
         "P_VS",
-        "P_ST_2",
         "P_F"
       ],
+      "source": {
+        "file": "ES_46_RV6.md",
+        "start_line": 617
+      },
       "measurement_relationship": "additive",
       "proof": {
         "method": "derivation",
@@ -479,10 +479,7 @@
           "La onda viaja localmente a $c$ tanto si es libre como si está confinada",
           "$$ \\boxed{"
         ]
-      },
-      "source_status": "demonstrated",
-      "prolog_status": "not_reached",
-      "lean_status": "not_individually_verified"
+      }
     },
     {
       "id": "P_W",
@@ -490,10 +487,14 @@
       "name": "\\qquad",
       "description": "\\qquad\nv_{\\rm onda}=c.\n}\n$$\n\nEn unidades naturales,\n\n$$\nc=1.\n$$\n\nComo\n\n$$\nv=\\frac{ds}{dt},\n$$\n\npara la onda\n\n$$\n\\frac{ds}{dt}=1.\n$$\n\nEsto implica igualdad numérica de las diferenciales de propagación en esas unidades,\n\n$$\nds=dt,\n$$\n\nsin afirmar que espacio y tiempo sean la misma entidad.\n\nPor Lorentz,\n\n$$\ndt'\n=\ndt\n\\sqrt{\n1-\\frac{v^2}{c^2}\n}.\n$$\n\nEn el límite de la onda,\n\n$$\nv\\to c,\n$$\n\nse obtiene\n\n$$\n\\boxed{\ndt'\\to0.\n}\n$$\n\nEn el desarrollo adoptado, en ese mismo límite,\n\n$$\ndt'^2\\to0,\n$$\n\ny\n\n$$\n\\frac{dt'}{dt}\\to0.\n$$\n\nSólo ahora aplicamos estas condiciones a",
       "deps": [
-        "P_ST_2",
+        "P_VS",
         "P_F",
         "P_F1"
       ],
+      "source": {
+        "file": "ES_46_RV6.md",
+        "start_line": 639
+      },
       "measurement_relationship": "additive",
       "proof": {
         "method": "derivation",
@@ -508,32 +509,7 @@
           "$$ \\frac{ds}{dt}=1. $$",
           "Esto implica igualdad numérica de las diferenciales de propagación en esas unidades,"
         ]
-      },
-      "source_status": "demonstrated",
-      "prolog_status": "not_reached",
-      "lean_status": "not_individually_verified"
-    },
-    {
-      "id": "P_F1_2",
-      "kind": "proposition",
-      "name": "$$",
-      "description": "$$\n\\boxed{",
-      "deps": [
-        "P_F",
-        "P_F1",
-        "P_W"
-      ],
-      "measurement_relationship": "additive",
-      "proof": {
-        "method": "derivation",
-        "status": "declared",
-        "steps": [
-          "$$ \\boxed{"
-        ]
-      },
-      "source_status": "demonstrated",
-      "prolog_status": "not_reached",
-      "lean_status": "not_individually_verified"
+      }
     },
     {
       "id": "P_F2",
@@ -541,10 +517,14 @@
       "name": "\\qquad",
       "description": "\\qquad\nF=dt^2+2dt.\n}\n$$\n\nFactorizando,\n\n$$\ndt^2+2dt\n=\n2dt\n\\left(\n1+\\frac12dt\n\\right),\n$$\n\npor lo que\n\n$$\n\\boxed{",
       "deps": [
+        "P_F",
         "P_F1",
-        "P_W",
-        "P_F1_2"
+        "P_W"
       ],
+      "source": {
+        "file": "ES_46_RV6.md",
+        "start_line": 712
+      },
       "measurement_relationship": "additive",
       "proof": {
         "method": "derivation",
@@ -556,10 +536,7 @@
           "por lo que",
           "$$ \\boxed{"
         ]
-      },
-      "source_status": "demonstrated",
-      "prolog_status": "not_reached",
-      "lean_status": "not_individually_verified"
+      }
     },
     {
       "id": "P_F3",
@@ -567,10 +544,14 @@
       "name": "\\qquad",
       "description": "\\qquad\nF\n=\n2dt\n\\left(\n1+\\frac12dt\n\\right).\n}\n$$\n\nEl factor\n\n$$\n\\boxed{\n\\frac12\n}\n$$\n\naparece algebraicamente en la factorización de $F$.\n\nNo procede de Riemann.  \nNo se introduce como normalización elegida.  \nNo se obtiene suponiendo previamente la recta crítica.\n\n---\n\n# 11. Construcción de $U_{\\rm Lap}$\n\nUna vez expuestas las ecuaciones diferenciales respecto de $t$, puede construirse su representación de Laplace.",
       "deps": [
+        "P_F1",
         "P_W",
-        "P_F1_2",
         "P_F2"
       ],
+      "source": {
+        "file": "ES_46_RV6.md",
+        "start_line": 733
+      },
       "measurement_relationship": "additive",
       "proof": {
         "method": "derivation",
@@ -585,10 +566,7 @@
           "No se obtiene suponiendo previamente la recta crítica.",
           "# 11."
         ]
-      },
-      "source_status": "demonstrated",
-      "prolog_status": "not_reached",
-      "lean_status": "not_individually_verified"
+      }
     },
     {
       "id": "D_Lap",
@@ -598,9 +576,10 @@
       "deps": [
         "P_F3"
       ],
-      "source_status": "stated",
-      "prolog_status": "not_reached",
-      "lean_status": "not_individually_verified"
+      "source": {
+        "file": "ES_46_RV6.md",
+        "start_line": 764
+      }
     },
     {
       "id": "P_Lap_Z",
@@ -612,6 +591,10 @@
         "P_F3",
         "D_Lap"
       ],
+      "source": {
+        "file": "ES_46_RV6.md",
+        "start_line": 851
+      },
       "measurement_relationship": "additive",
       "proof": {
         "method": "derivation",
@@ -626,123 +609,7 @@
           "Qué queda asentado antes de Riemann",
           "Hasta este punto quedan demostradas dentro del desarrollo las siguientes proposiciones"
         ]
-      },
-      "source_status": "demonstrated",
-      "prolog_status": "not_reached",
-      "lean_status": "not_individually_verified"
-    },
-    {
-      "id": "P_VED_E_2",
-      "kind": "proposition",
-      "name": "\\quad",
-      "description": "\\quad\n\\rho=0\n\\iff\n\\text{estado estable}.\n$$\n\n$$",
-      "deps": [
-        "P_F3",
-        "D_Lap",
-        "P_Lap_Z"
-      ],
-      "measurement_relationship": "additive",
-      "proof": {
-        "method": "derivation",
-        "status": "declared",
-        "steps": [
-          "\\quad \\rho=0 \\iff \\text{estado estable}. $$"
-        ]
-      },
-      "source_status": "demonstrated",
-      "prolog_status": "not_reached",
-      "lean_status": "not_individually_verified"
-    },
-    {
-      "id": "P_VED_Completo_2",
-      "kind": "proposition",
-      "name": "\\quad",
-      "description": "\\quad\n(k,\\rho)\n\\text{ contempla exhaustivamente todos los cierres finitos.}\n$$\n\n$$",
-      "deps": [
-        "D_Lap",
-        "P_Lap_Z",
-        "P_VED_E_2"
-      ],
-      "measurement_relationship": "additive",
-      "proof": {
-        "method": "derivation",
-        "status": "declared",
-        "steps": [
-          "\\quad (k,\\rho) \\text{ contempla exhaustivamente todos los cierres finitos.} $$"
-        ]
-      },
-      "source_status": "demonstrated",
-      "prolog_status": "not_reached",
-      "lean_status": "not_individually_verified"
-    },
-    {
-      "id": "P_VED_K_E_2",
-      "kind": "proposition",
-      "name": "\\quad",
-      "description": "\\quad\nk\\in\\mathbb N^+\n\\text{ enumera todos los estados estables.}\n$$\n\n$$",
-      "deps": [
-        "P_Lap_Z",
-        "P_VED_E_2",
-        "P_VED_Completo_2"
-      ],
-      "measurement_relationship": "additive",
-      "proof": {
-        "method": "derivation",
-        "status": "declared",
-        "steps": [
-          "\\quad k\\in\\mathbb N^+ \\text{ enumera todos los estados estables.} $$"
-        ]
-      },
-      "source_status": "demonstrated",
-      "prolog_status": "not_reached",
-      "lean_status": "not_individually_verified"
-    },
-    {
-      "id": "P_F3_2",
-      "kind": "proposition",
-      "name": "\\quad",
-      "description": "\\quad\nF\n=\n2dt\n\\left(\n1+\\frac12dt\n\\right).\n$$\n\n$$",
-      "deps": [
-        "P_VED_E_2",
-        "P_VED_Completo_2",
-        "P_VED_K_E_2"
-      ],
-      "measurement_relationship": "additive",
-      "proof": {
-        "method": "derivation",
-        "status": "declared",
-        "steps": [
-          "\\quad F = 2dt \\left( 1+\\frac12dt \\right). $$"
-        ]
-      },
-      "source_status": "demonstrated",
-      "prolog_status": "not_reached",
-      "lean_status": "not_individually_verified"
-    },
-    {
-      "id": "P_Lap_Z_2",
-      "kind": "proposition",
-      "name": "\\quad",
-      "description": "\\quad\nZ_{\\rm VED\\to Lap}\n\\subset\n\\{s:\\Re(s)=1/2\\}.\n$$\n\nNinguna de estas proposiciones se reabre en las secciones posteriores.\n\n---\n\n# 13. Definición del espacio $U_{\\rm Rim}$",
-      "deps": [
-        "P_VED_Completo_2",
-        "P_VED_K_E_2",
-        "P_F3_2"
-      ],
-      "measurement_relationship": "additive",
-      "proof": {
-        "method": "derivation",
-        "status": "declared",
-        "steps": [
-          "\\quad Z_{\\rm VED\\to Lap} \\subset \\{s:\\Re(s)=1/2\\}. $$",
-          "Ninguna de estas proposiciones se reabre en las secciones posteriores.",
-          "# 13.",
-          "Definición del espacio $U_{\\rm Rim}$"
-        ]
-      },
-      "source_status": "demonstrated",
-      "prolog_status": "not_reached",
-      "lean_status": "not_individually_verified"
+      }
     },
     {
       "id": "D_Rim",
@@ -750,9 +617,10 @@
       "name": "Sea",
       "description": "Sea\n\n$$\nz=a\\pm ib\n$$\n\nla coordenada compleja en la que se estudia la función zeta de Riemann.\n\nLa función zeta se define inicialmente por\n\n$$\n\\zeta(s)\n=\n\\sum_{n=1}^{\\infty}\\frac1{n^s}\n$$\n\npara $\\Re(s)>1$ y se prolonga meromórficamente al plano complejo, con un polo simple en\n\n$$\n\\boxed{s=1.}\n$$\n\nSus ceros se dividen en dos sectores.\n\n## 13.1. Sector trivial\n\nLos ceros triviales son\n\n$$\n\\boxed{\nZ_{\\rm Rim}^{\\rm triv}\n=\n\\{-2,-4,-6,\\ldots\\}\n=\n\\{-2m:m\\in\\mathbb N^+\\}.\n}\n$$\n\nEste sector está completamente enumerado y no constituye el objeto de la Hipótesis de Riemann.\n\n## 13.2. Sector no trivial\n\nDefinimos\n\n$$\n\\boxed{\nZ_{\\rm Rim}^{\\rm nt}\n=\n\\{\nz\\in\\mathbb C:\n\\zeta(z)=0,\n\\;\n0<\\Re(z)<1\n\\}.\n}\n$$\n\nPor tanto, para un cero no trivial arbitrario,\n\n$$\n\\boxed{\nz=a\\pm ib,\n\\qquad\n0<a<1.\n}\n$$\n\nLa ecuación funcional de Riemann introduce la simetría transversal\n\n$$\na\n\\longleftrightarrow\n1-a.\n$$\n\nEl eje fijo de esta reflexión es\n\n$$\n\\boxed{\na=\\frac12.\n}\n$$\n\n---\n\n# 14. Partición topológica de $U_{\\rm Rim}$\n\nPara el sector no trivial definimos la distancia transversal al eje de simetría:\n\n$$\n\\boxed{",
       "deps": [],
-      "source_status": "stated",
-      "prolog_status": "not_reached",
-      "lean_status": "not_individually_verified"
+      "source": {
+        "file": "ES_46_RV6.md",
+        "start_line": 912
+      }
     },
     {
       "id": "D_rho_R",
@@ -760,9 +628,10 @@
       "name": "\\qquad",
       "description": "\\qquad\n\\rho_R\n=\n\\left|\na-\\frac12\n\\right|.\n}\n$$\n\nComo\n\n$$\n0<a<1,\n$$\n\nse cumple\n\n$$\n\\boxed{\n0\\le\\rho_R<\\frac12,\n}\n$$\n\nalcanzándose $\\rho_R=1/2$ únicamente como frontera del strip.\n\nIntroduciendo una rama $\\varepsilon=\\pm1$,\n\n$$\n\\boxed{\na\n=\n\\frac12+\\varepsilon\\rho_R.\n}\n$$\n\nPor tanto todo punto del strip crítico puede escribirse como\n\n$$\n\\boxed{\nz_{\\varepsilon,\\pm}\n=\n\\frac12\n+\n\\varepsilon\\rho_R\n\\pm ib.\n}\n$$\n\nLa transformación transversal tiene inversa explícita:\n\n$$\n\\boxed{\n\\rho_R\n=\n\\left|\n\\Re(z)-\\frac12\n\\right|.\n}\n$$\n\n---\n\n## 14.1. Isomorfismo global previo entre los universos topológicos\n\nLa correspondencia no se limita a los valores estables ni se construye para\nseleccionar ceros. Actúa sobre el conjunto completo de valores transversales\nadmisibles de ambos universos.",
       "deps": [],
-      "source_status": "stated",
-      "prolog_status": "reachable",
-      "lean_status": "not_individually_verified"
+      "source": {
+        "file": "ES_46_RV6.md",
+        "start_line": 1003
+      }
     },
     {
       "id": "D_f",
@@ -770,9 +639,10 @@
       "name": "Sean",
       "description": "Sean\n\n$$\nU_{\\rm VED}^{\\rho}\n=\n\\left\\{x:\\rho_{\\rm VED}(x)\\in[0,\\tfrac12]\\right\\}\n$$\n\ny\n\n$$\nU_{\\rm Rim}^{\\rho}\n=\n\\left\\{z:\\rho_R(z)\\in[0,\\tfrac12]\\right\\}.\n$$\n\nDefinimos la transformación global\n\n$$\n\\boxed{\nf:U_{\\rm VED}^{\\rho}\\longrightarrow U_{\\rm Rim}^{\\rho}\n}\n$$\n\ncomo la transformación del valor topológico completo cuya coordenada\ntransversal es $\\rho$. Esta definición no impone una fórmula anticipada para\n$a=\\Re(z)$ ni presupone $a=1/2$.",
       "deps": [],
-      "source_status": "stated",
-      "prolog_status": "reachable",
-      "lean_status": "not_individually_verified"
+      "source": {
+        "file": "ES_46_RV6.md",
+        "start_line": 1072
+      }
     },
     {
       "id": "D_fInv",
@@ -780,9 +650,10 @@
       "name": "Definimos la transformación inversa",
       "description": "Definimos la transformación inversa\n\n$$\n\\boxed{\nf^{-1}:U_{\\rm Rim}^{\\rho}\\longrightarrow U_{\\rm VED}^{\\rho}.\n}\n$$\n\nPara todo valor de ambos universos se exige\n\n$$\n\\boxed{\nf^{-1}(f(x))=x,\n\\qquad\nf(f^{-1}(z))=z.\n}\n$$",
       "deps": [],
-      "source_status": "stated",
-      "prolog_status": "reachable",
-      "lean_status": "not_individually_verified"
+      "source": {
+        "file": "ES_46_RV6.md",
+        "start_line": 1100
+      }
     },
     {
       "id": "T_ISO",
@@ -793,6 +664,10 @@
         "D_f",
         "D_fInv"
       ],
+      "source": {
+        "file": "ES_46_RV6.md",
+        "start_line": 1118
+      },
       "measurement_relationship": "additive",
       "proof": {
         "method": "derivation",
@@ -803,10 +678,7 @@
           "$$ \\boxed{ U_{\\rm VED}^{\\rho}\\cong U_{\\rm Rim}^{\\rho}. } $$",
           "Este teorema se establece antes de aplicar la clasificación de estabilidad y es válido para $\\rho=0$ y para todo $0<\\rho\\le1/2$."
         ]
-      },
-      "source_status": "demonstrated",
-      "prolog_status": "reachable",
-      "lean_status": "not_individually_verified"
+      }
     },
     {
       "id": "P_RHO_ISO",
@@ -816,6 +688,10 @@
       "deps": [
         "T_ISO"
       ],
+      "source": {
+        "file": "ES_46_RV6.md",
+        "start_line": 1133
+      },
       "proof": {
         "method": "derivation",
         "status": "declared",
@@ -829,10 +705,7 @@
           "$$ 0<\\rho\\le\\frac12 \\iff \\text{clase no estable} $$",
           "se conservan tanto por $f$ como por $f^{-1}$."
         ]
-      },
-      "source_status": "demonstrated",
-      "prolog_status": "reachable",
-      "lean_status": "not_individually_verified"
+      }
     },
     {
       "id": "P_RIM_S",
@@ -843,6 +716,10 @@
         "T_ISO",
         "P_RHO_ISO"
       ],
+      "source": {
+        "file": "ES_46_RV6.md",
+        "start_line": 1169
+      },
       "measurement_relationship": "additive",
       "proof": {
         "method": "derivation",
@@ -857,10 +734,7 @@
           "Correspondencia topológica directa $U_{\\rm VED}\\leftrightarrow U_{\\rm Rim}$",
           "En $U_{\\rm VED}$ la estructura transversal alrededor de cada entero es"
         ]
-      },
-      "source_status": "demonstrated",
-      "prolog_status": "reachable",
-      "lean_status": "not_individually_verified"
+      }
     },
     {
       "id": "P_VR_rho",
@@ -870,6 +744,10 @@
       "deps": [
         "P_VED_E"
       ],
+      "source": {
+        "file": "ES_46_RV6.md",
+        "start_line": 1272
+      },
       "proof": {
         "method": "derivation",
         "status": "declared",
@@ -883,10 +761,7 @@
           "$$ \\rho_{\\rm VED}=0 \\iff \\text{estado estable}. $$",
           "Por $P_{\\rm VR}(\\rho)$,"
         ]
-      },
-      "source_status": "demonstrated",
-      "prolog_status": "reachable",
-      "lean_status": "not_individually_verified"
+      }
     },
     {
       "id": "P_VR_E",
@@ -896,6 +771,10 @@
       "deps": [
         "P_VR_rho"
       ],
+      "source": {
+        "file": "ES_46_RV6.md",
+        "start_line": 1312
+      },
       "proof": {
         "method": "derivation",
         "status": "declared",
@@ -909,10 +788,7 @@
           "Hasta este punto intervienen dos informaciones distintas que no deben confundirse.",
           "En $U_{\\rm Rim}$, la condición"
         ]
-      },
-      "source_status": "demonstrated",
-      "prolog_status": "reachable",
-      "lean_status": "not_individually_verified"
+      }
     },
     {
       "id": "P_Z",
@@ -924,6 +800,10 @@
         "P_VR_rho",
         "P_VR_E"
       ],
+      "source": {
+        "file": "ES_46_RV6.md",
+        "start_line": 1454
+      },
       "measurement_relationship": "additive",
       "proof": {
         "method": "derivation",
@@ -933,10 +813,7 @@
           "# 18.",
           "Teorema de localización transversal del cero no trivial"
         ]
-      },
-      "source_status": "demonstrated",
-      "prolog_status": "reachable",
-      "lean_status": "not_individually_verified"
+      }
     },
     {
       "id": "T_RIEMANN",
@@ -951,10 +828,14 @@
         "D_rho_R",
         "P_VR_rho"
       ],
+      "source": {
+        "file": "ES_46_RV6.md",
+        "start_line": 1472
+      },
       "measurement_relationship": "additive",
       "proof": {
         "method": "derivation",
-        "status": "verified",
+        "status": "declared",
         "steps": [
           "**Teorema de localización transversal.** Sea",
           "$$ z=a\\pm ib $$",
@@ -964,128 +845,16 @@
           "## Demostración",
           "Por pertenecer a $Z_{\\rm Rim}^{\\rm nt}$, se sabe en $U_{\\rm Rim}$ que",
           "$$ \\boxed{ \\zeta(z)=0. } $$"
-        ],
-        "system": "Lean 4",
-        "formalization": "ES_46_RV6.lean",
-        "verified": true,
-        "result_theorem": "HR46_RV6.all_nontrivial_zeros_on_half_RV6",
-        "axioms": [
-          "propext",
-          "Classical.choice",
-          "Quot.sound"
-        ],
-        "verification_verdict": "APROBADO",
-        "verification_report": "LEAN_ES_46_RV6.json",
-        "verification_log": "LEAN_ES_46_RV6.log"
-      },
-      "source_status": "demonstrated",
-      "prolog_status": "reachable",
-      "lean_status": "verified"
+        ]
+      }
     }
   ],
-  "lean_verification": {
-    "project": "ES_46_RV6",
-    "tool": "Lean 4",
-    "generated_on": "2026-09-20T02:47:03+00:00",
-    "verdict": "APROBADO",
-    "passed": true,
-    "exit_code": 0,
-    "failure_type": null,
-    "diagnosis": "Lean compilo correctamente todos los archivos evaluados.",
-    "action_required": "No se requiere ninguna accion.",
-    "lean_files": [
-      "ES_46_RV6.lean"
-    ],
-    "result_theorem": "HR46_RV6.all_nontrivial_zeros_on_half_RV6",
-    "result_json_node": "T_RIEMANN",
-    "log": "logs\\LEAN_ES_46_RV6.log",
-    "scope": "Lean 4 solo certifica las definiciones, teoremas e inferencias formalizadas en los archivos Lean evaluados.",
-    "adec": "Evaluacion manual; no automatizada hasta que ADEC admita url_json.",
-    "verified_json_nodes": [
-      "T_RIEMANN"
-    ]
-  },
-  "prolog_verification": {
-    "project": "ES_46_RV6",
-    "tool": "SWI-Prolog",
-    "generated_on": "2026-09-20T02:47:08+00:00",
-    "verdict": "APROBADO",
-    "passed": true,
-    "exit_code": 0,
-    "program": "ES_46_RV6.pl",
-    "goal": "go/0",
-    "diagnosis": "Prolog resolvio el objetivo deductivo declarado.",
-    "action_required": "No se requiere ninguna accion.",
-    "log": "logs\\PROLOG_ES_46_RV6.log",
-    "scope": "Comprueba la resolucion del grafo deductivo; Lean comprueba la formalizacion matematica."
-  },
-  "closure_audit": {
-    "project": "ES_46_RV6",
-    "tool": "DEMUESTRA Closure Audit",
-    "generated_on": "2026-09-20T02:47:08+00:00",
-    "verdict": "CERRADO",
-    "goal": "T_RIEMANN",
-    "checks": {
-      "objetivo_existe": true,
-      "dependencias_resueltas": true,
-      "sin_ciclos": true,
-      "lean_aprobado": true,
-      "prolog_aprobado": true,
-      "nodo_lean_coincide": true,
-      "dependencias_lean_internalizadas": true,
-      "sin_pendientes_ya_demostrados": true
-    },
-    "reachable_nodes": [
-      "A_L",
-      "D_L",
-      "D_U",
-      "D_f",
-      "D_fInv",
-      "D_k",
-      "D_lambda",
-      "D_rho",
-      "D_rho_R",
-      "D_t_prime",
-      "P_COORD",
-      "P_RHO_ISO",
-      "P_RIM_S",
-      "P_ST",
-      "P_VED_E",
-      "P_VED_Inv",
-      "P_VR_E",
-      "P_VR_rho",
-      "P_Z",
-      "P_a",
-      "P_v",
-      "T_ISO",
-      "T_RIEMANN"
-    ],
-    "root_facts": [
-      "A_L",
-      "D_L",
-      "D_U",
-      "D_f",
-      "D_fInv",
-      "D_k",
-      "D_lambda",
-      "D_rho",
-      "D_rho_R",
-      "D_t_prime"
-    ],
-    "missing_dependencies": [],
-    "cycles": [],
-    "pending_with_demonstrated_dependencies": [],
-    "open_lean_hypotheses": [],
-    "lean_axioms": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "scope": "Auditoria tecnica de trazabilidad formal; no mide aceptacion cientifica."
-  },
-  "pending_consistency_check": {
-    "passed": true,
-    "contradictions": []
-  },
-  "final_verdict": "CERRADO"
+  "adec_compatible": true,
+  "adec_node_count": 37,
+  "adec_access": {
+    "engine": "ADEC v0.8.6",
+    "mode": "remote_url_or_file_upload",
+    "automatic_url_json": false,
+    "reason": "La web copia la URL publica y descarga el JSON para cargarlo desde el selector de archivos de ADEC."
+  }
 }
