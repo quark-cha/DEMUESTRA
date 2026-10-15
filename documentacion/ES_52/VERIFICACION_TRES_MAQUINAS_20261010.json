@@ -1,0 +1,264 @@
+{
+  "fecha_utc": "2026-10-10T00:14:38.193912+00:00",
+  "status": "PENDIENTE_REALIZACION",
+  "protocolos": {
+    "Q1_V1": {
+      "scope": "referencia Q1 simulada; V1 relacional sin tabla de amplitudes",
+      "shots_requested": 1,
+      "results": [
+        {
+          "function": "constant_0",
+          "q1_model_probabilities": [
+            0.9999999999999996,
+            1.0573994819069698e-33
+          ],
+          "v1_captures": [
+            {
+              "status": "PENDIENTE_REALIZACION",
+              "etapa": "medida",
+              "motivo": "Los bloques deterministas estan definidos; falta su realizacion conjunta sobre los generadores y la lectura de ese sistema. No se sustituyen por transformaciones de bits ya medidos",
+              "bits_q0_lsb": null,
+              "t0": 0,
+              "preparacion_seconds": 7.950000872369856e-05,
+              "medida_seconds": null,
+              "resources": {
+                "generadores": 2,
+                "operaciones_declaradas": 3,
+                "tabla_amplitudes": false,
+                "distribucion_calculada": false,
+                "bloques_senales_definidos": 3,
+                "realizacion_conectada": false,
+                "recursos_realizacion_verificados": false,
+                "alcance": "conexiones y protocolo de medida; realizacion externa no certificada"
+              }
+            }
+          ],
+          "v1_counts": null,
+          "status": "PENDIENTE_REALIZACION",
+          "task_matches": null,
+          "timing": null
+        },
+        {
+          "function": "constant_1",
+          "q1_model_probabilities": [
+            0.9999999999999996,
+            1.0573994819069698e-33
+          ],
+          "v1_captures": [
+            {
+              "status": "PENDIENTE_REALIZACION",
+              "etapa": "medida",
+              "motivo": "Los bloques deterministas estan definidos; falta su realizacion conjunta sobre los generadores y la lectura de ese sistema. No se sustituyen por transformaciones de bits ya medidos",
+              "bits_q0_lsb": null,
+              "t0": 0,
+              "preparacion_seconds": 7.680000271648169e-05,
+              "medida_seconds": null,
+              "resources": {
+                "generadores": 2,
+                "operaciones_declaradas": 4,
+                "tabla_amplitudes": false,
+                "distribucion_calculada": false,
+                "bloques_senales_definidos": 3,
+                "realizacion_conectada": false,
+                "recursos_realizacion_verificados": false,
+                "alcance": "conexiones y protocolo de medida; realizacion externa no certificada"
+              }
+            }
+          ],
+          "v1_counts": null,
+          "status": "PENDIENTE_REALIZACION",
+          "task_matches": null,
+          "timing": null
+        },
+        {
+          "function": "identity",
+          "q1_model_probabilities": [
+            1.0573994819069698e-33,
+            0.9999999999999996
+          ],
+          "v1_captures": [
+            {
+              "status": "PENDIENTE_REALIZACION",
+              "etapa": "medida",
+              "motivo": "Los bloques deterministas estan definidos; falta su realizacion conjunta sobre los generadores y la lectura de ese sistema. No se sustituyen por transformaciones de bits ya medidos",
+              "bits_q0_lsb": null,
+              "t0": 0,
+              "preparacion_seconds": 6.180000491440296e-05,
+              "medida_seconds": null,
+              "resources": {
+                "generadores": 2,
+                "operaciones_declaradas": 4,
+                "tabla_amplitudes": false,
+                "distribucion_calculada": false,
+                "bloques_senales_definidos": 3,
+                "realizacion_conectada": false,
+                "recursos_realizacion_verificados": false,
+                "alcance": "conexiones y protocolo de medida; realizacion externa no certificada"
+              }
+            }
+          ],
+          "v1_counts": null,
+          "status": "PENDIENTE_REALIZACION",
+          "task_matches": null,
+          "timing": null
+        },
+        {
+          "function": "inverter",
+          "q1_model_probabilities": [
+            1.0573994819069698e-33,
+            0.9999999999999996
+          ],
+          "v1_captures": [
+            {
+              "status": "PENDIENTE_REALIZACION",
+              "etapa": "medida",
+              "motivo": "Los bloques deterministas estan definidos; falta su realizacion conjunta sobre los generadores y la lectura de ese sistema. No se sustituyen por transformaciones de bits ya medidos",
+              "bits_q0_lsb": null,
+              "t0": 0,
+              "preparacion_seconds": 5.970000347588211e-05,
+              "medida_seconds": null,
+              "resources": {
+                "generadores": 2,
+                "operaciones_declaradas": 5,
+                "tabla_amplitudes": false,
+                "distribucion_calculada": false,
+                "bloques_senales_definidos": 3,
+                "realizacion_conectada": false,
+                "recursos_realizacion_verificados": false,
+                "alcance": "conexiones y protocolo de medida; realizacion externa no certificada"
+              }
+            }
+          ],
+          "v1_counts": null,
+          "status": "PENDIENTE_REALIZACION",
+          "task_matches": null,
+          "timing": null
+        }
+      ],
+      "status": "PENDIENTE_REALIZACION",
+      "equivalence_verified": false
+    },
+    "Q2_V2": {
+      "N": "15",
+      "base": 2,
+      "resources": {
+        "input_bits": 4,
+        "work_bits": 4,
+        "control_bits": 8,
+        "register_bits": 12,
+        "v2_representation": "deferred connections; no amplitude or probability table",
+        "q_reference_supported": true
+      },
+      "q2_reference": {
+        "status": "MODELO_LOCAL",
+        "peaks": [
+          {
+            "value": 0,
+            "probability": 0.2499999999999994
+          },
+          {
+            "value": 64,
+            "probability": 0.2499999999999994
+          },
+          {
+            "value": 128,
+            "probability": 0.2499999999999994
+          },
+          {
+            "value": 192,
+            "probability": 0.2499999999999994
+          },
+          {
+            "value": 16,
+            "probability": 1.0204935153900033e-34
+          },
+          {
+            "value": 48,
+            "probability": 1.0204935153900033e-34
+          },
+          {
+            "value": 80,
+            "probability": 1.0204935153900033e-34
+          },
+          {
+            "value": 112,
+            "probability": 1.0204935153900033e-34
+          },
+          {
+            "value": 144,
+            "probability": 1.0204935153900033e-34
+          },
+          {
+            "value": 176,
+            "probability": 1.0204935153900033e-34
+          },
+          {
+            "value": 208,
+            "probability": 1.0204935153900033e-34
+          },
+          {
+            "value": 240,
+            "probability": 1.0204935153900033e-34
+          }
+        ]
+      },
+      "v2_attempts": [
+        {
+          "status": "PENDIENTE_REALIZACION",
+          "etapa": "medida",
+          "motivo": "Los bloques deterministas estan definidos; falta su realizacion conjunta sobre los generadores y la lectura de ese sistema. No se sustituyen por transformaciones de bits ya medidos",
+          "bits_q0_lsb": null,
+          "t0": 0,
+          "preparacion_seconds": 0.0005342999938875437,
+          "medida_seconds": null,
+          "resources": {
+            "generadores": 12,
+            "operaciones_declaradas": 17,
+            "tabla_amplitudes": false,
+            "distribucion_calculada": false,
+            "bloques_senales_definidos": 48,
+            "realizacion_conectada": false,
+            "recursos_realizacion_verificados": false,
+            "alcance": "conexiones y protocolo de medida; realizacion externa no certificada"
+          }
+        }
+      ],
+      "status": "PENDIENTE_REALIZACION",
+      "timing": null,
+      "equivalence_verified": false
+    },
+    "Q3_V3": {
+      "qubits": 4,
+      "gate_count": 14,
+      "circuit_sha256": "afc7ce22eb97f9c13789a1b784597e703ef12a37e218d3115de3c70411ce1a08",
+      "q3_local_seconds": 0.0031036000000312924,
+      "v3_capture": {
+        "status": "PENDIENTE_REALIZACION",
+        "etapa": "medida",
+        "motivo": "Los bloques deterministas estan definidos; falta su realizacion conjunta sobre los generadores y la lectura de ese sistema. No se sustituyen por transformaciones de bits ya medidos",
+        "bits_q0_lsb": null,
+        "t0": 0,
+        "preparacion_seconds": 0.00015410000924021006,
+        "medida_seconds": null,
+        "resources": {
+          "generadores": 4,
+          "operaciones_declaradas": 14,
+          "tabla_amplitudes": false,
+          "distribucion_calculada": false,
+          "bloques_senales_definidos": 14,
+          "realizacion_conectada": false,
+          "recursos_realizacion_verificados": false,
+          "alcance": "conexiones y protocolo de medida; realizacion externa no certificada"
+        }
+      },
+      "status": "PENDIENTE_REALIZACION",
+      "q3_reference_status": "MODELO_LOCAL",
+      "timing": null,
+      "uniform_control_distance": 1.3877787807814457e-16,
+      "equivalence_verified": false,
+      "scope": "Q3 local simulation and V3 single-readout protocol, not Willow"
+    }
+  },
+  "equivalencia_demostrada": false,
+  "nota": "MEDIDO significa registro de salida, no certificacion de su dinamica. Las referencias Q son simulaciones locales; los tiempos no prueban ventaja."
+}

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Evaluacion numerica del proyecto 52</title>
+<style>
+body {
+    font-family: Georgia, serif;
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 20px;
+    line-height: 1.6;
+    background: #fcfcfc;
+    color: #222;
+}
+h1, h2, h3, h4 {
+    color: #1a1a1a;
+}
+table {
+    border-collapse: collapse;
+    width:100%;
+    margin:20px 0;
+}
+th, td {
+    border:1px solid #ccc;
+    padding:8px 12px;
+}
+th {
+    background:#f0f0f0;
+}
+blockquote {
+    border-left:4px solid #0077cc;
+    padding-left:16px;
+}
+code {
+    background:#eee;
+    padding:2px 6px;
+}
+pre {
+    background:#f4f4f4;
+    padding:12px;
+    overflow-x:auto;
+}
+img {
+    max-width:100%;
+    height:auto;
+}
+math {
+    font-size:1.1em;
+}
+</style>
+</head>
+<body>
+<h1>Evaluacion numerica del proyecto 52</h1>
+<p>Estado: <strong>ENSAYO_NO_APLICABLE_A_V</strong>.</p>
+<p><strong>Criterio del autor:</strong> la medida solo debe desencadenarse en <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>t</mi><mo>=</mo><msub><mi>t</mi><mn>0</mn></msub></mrow></math>,
+sin recorrer caminos ni posibles salidas para calcular el resultado.</p>
+<p>La propuesta por caminos no cumple ese criterio. Se retira como candidata
+a ejecucion de V; sus resultados se conservan como ensayo numerico separado.
+Esto no refuta V ni modifica su demostracion: identifica una implementacion
+que no corresponde a las premisas exigidas.</p>
+<h2>Resultados historicos del ensayo</h2>
+<ul>
+<li>V1: los cuatro casos de Deutsch coinciden con la referencia Q local.</li>
+<li>V2: distribucion completa N=3, error maximo 1.39e-34.</li>
+<li>V2: lectura N=15, control 64, factores [3, 5].</li>
+<li>V2: 74.328 segundos; 22199239 visitas; pila maxima 10.</li>
+<li>V3: distribucion de tres unidades, error maximo 1.11e-16.</li>
+</ul>
+<h2>Orden de ejecucion</h2>
+<p>El ensayo conserva el orden de las puertas Q y sus fases. Su memoria evita la tabla
+conjunta, pero la lectura recorre hasta <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msup><mn>2</mn><mi>n</mi></msup></mrow></math> palabras y muchos caminos.
+No se ha demostrado mejor orden temporal ni mejora respecto de un algoritmo
+convencional para la misma tarea. No hay tiempos de hardware Q.</p>
+<h2>Alcance</h2>
+<p>Ensayo numerico conservado como historial. Sus coincidencias no evaluan V: el recorrido de caminos incumple el criterio de medida por disparo.</p>
+<p>La referencia de ensayo es fija, 0.37. Una lectura favorable no determina
+la tasa de exito. La precision es finita. Estos resultados no sustituyen
+ni modifican los veredictos independientes de Lean y Prolog.</p>
+<p><a href="NUMERICO_ES_52_Maquina_V_UNIHOLOG.json">Evaluacion estructurada</a>
+<a href="NUMERICO_DATOS_ES_52_Maquina_V_UNIHOLOG.json">Datos completos del ensayo</a></p>
+
+</body>
+</html>

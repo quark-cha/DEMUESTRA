@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "principal": "ES_52_Maquina_V_UNIHOLOG.md",
+  "documentos": [
+    {"fuente": "ES_52_Maquina_V_UNIHOLOG.md", "titulo": "Documento base", "tipo": "investigacion"},
+    {"fuente": "ES_52_Laminas_Q_V.md", "titulo": "Laminas de construccion y comparacion Q-V", "tipo": "laminas"},
+    {"fuente": "Traductores_V/ES_52_Traductores_y_compiladores_de_V.md", "titulo": "Traductores y compiladores de V", "tipo": "software"},
+    {"fuente": "ES_52_Presentacion_comunidad.md", "titulo": "Máquina V: presentación a la comunidad", "tipo": "presentacion"},
+    {"fuente": "ES_52_Indice_recursos.md", "titulo": "Índice completo de recursos del proyecto", "tipo": "indice"}
+  ],
+  "adjuntos": [
+    "NUMERICO_ES_52_Maquina_V_UNIHOLOG.pdf",
+    "PROLOG_MD_DIRECTO_ES_52_Maquina_V_UNIHOLOG.pdf",
+    "TEMPORAL_ES_52_Maquina_V_UNIHOLOG.pdf",
+    "ES_52_Presentacion_LinkedIn.txt",
+    "CONSISTENCIA_DOCUMENTOS.json",
+    "Traductores_V/gestor_v.py",
+    "Traductores_V/traductor_qasm_v.py",
+    "Traductores_V/v_relacional.py",
+    "Traductores_V/operaciones_senales.py",
+    "Traductores_V/requirements.txt",
+    "Traductores_V/v.bat",
+    "Traductores_V/v.ps1",
+    "Traductores_V/v.sh",
+    "Traductores_V/MaquinasQ/par_h_cnot.q",
+    "Traductores_V/MaquinasV/par_h_cnot/v.py",
+    "Traductores_V/MaquinasV/par_h_cnot/v.pl",
+    "Traductores_V/MaquinasV/par_h_cnot/v.cpp",
+    "Traductores_V/MaquinasV/par_h_cnot/v.hpp",
+    "Traductores_V/MaquinasV/par_h_cnot/v.json"
+  ]
+}

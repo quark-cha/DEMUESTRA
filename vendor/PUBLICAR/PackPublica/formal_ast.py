@@ -89,7 +89,9 @@ def expand_derivative(node):
 
     if subject.kind not in {"binary", "power", "unary"}:
         return None
-    return derive(subject)
+    expanded = derive(subject)
+    # Unsupported expressions stay atomic instead of expanding into themselves.
+    return None if expanded == node else expanded
 
 
 class LatexLexer:
@@ -99,6 +101,7 @@ class LatexLexer:
         "forall": "FORALL",
         "exists": "EXISTS",
         "in": "IN",
+        "mid": "GIVEN",
         "notin": "NOTIN",
         "land": "AND",
         "wedge": "AND",
@@ -128,6 +131,7 @@ class LatexLexer:
         "mathbb": "MATHBB",
         "operatorname": "OPERATOR",
         "Re": "RE",
+        "Im": "RE",
         "frac": "FRAC",
         "tfrac": "FRAC",
         "to": "TO",
@@ -139,6 +143,8 @@ class LatexLexer:
         "infty": "INFINITY",
         "pi": "PI",
         "mathcal": "MODIFIER",
+        "mathsf": "MODIFIER",
+        "mathbf": "MODIFIER",
         "tilde": "MODIFIER",
         "subset": "SUBSET",
         "subseteq": "SUBSETEQ",
@@ -239,6 +245,7 @@ class FormalParser:
 
     PRECEDENCE = {
         "COLON": 5,
+        "GIVEN": 7,
         "MAPSTO": 6,
         "IFF": 10, "CORRESPONDS": 10, "IMPLIES": 20, "OR": 30, "AND": 40,
         "CONTEXT": 45,
@@ -264,6 +271,7 @@ class FormalParser:
         result = self._expr(0)
         comma_values = []
         while self._accept("COMMA"):
+            self._reject_trailing_universal(result)
             if self._current()[0] in {"EOF", "RBRACE", "RBRACK", "RPAREN", "SET_RBRACE"}:
                 break
             comma_values.append(self._expr(0))
@@ -283,9 +291,11 @@ class FormalParser:
                 for value in comma_values[1:]:
                     condition = Ast("binary", "AND", (condition, value))
                 result = Ast("set_builder", None, (result, condition))
-            else:
+            elif all(self._propish(value) for value in (result, *comma_values)):
                 for value in comma_values:
                     result = Ast("binary", "AND", (result, value))
+            else:
+                result = Ast("tuple", None, (result, *comma_values))
         while self._accept("RBRACE"):
             pass
         self._expect("EOF")
@@ -337,7 +347,7 @@ class FormalParser:
             kind = self._current()[0]
             precedence = self.PRECEDENCE.get(kind, -1)
             implicit = kind in {
-                "NUMBER", "IDENT", "IDENT_COMMAND", "MATHBB", "RE", "OPERATOR", "FRAC",
+                "NUMBER", "IDENT", "IDENT_COMMAND", "MATHBB", "MODIFIER", "RE", "OPERATOR", "FRAC",
                 "SQRT", "PI", "INFINITY", "TEXT", "LPAREN", "LBRACE", "LBRACK",
             }
             if implicit and kind == "TEXT" and minimum > self.PRECEDENCE["AND"]:
@@ -407,7 +417,39 @@ class FormalParser:
                 left = Ast("converges", None, (variable, target, expression, right))
             else:
                 left = Ast("binary", operator[0], (left, right))
+        if minimum == 0:
+            self._reject_trailing_universal(left)
         return left
+
+    def _reject_trailing_universal(self, proposition):
+        if self._current()[0] != "FORALL" or not self._propish(proposition):
+            return
+        saved_index = self.index
+        trailing = False
+        try:
+            self.index += 1
+            self._expect("IDENT")
+            if self._accept("IN"):
+                self._expr(51)
+            trailing = all(
+                token[0] in {"EOF", "RBRACE", "RBRACK", "RPAREN", "SET_RBRACE"}
+                for token in self.tokens[self.index:]
+            )
+        except FormalSyntaxError:
+            pass
+        finally:
+            self.index = saved_index
+        if trailing:
+            raise FormalSyntaxError(
+                f"CUANTIFICADOR_UNIVERSAL_AL_FINAL en {self.location or 'formula'}: "
+                "se detecto un 'para todo' al final de la afirmacion. "
+                "Coloque el cuantificador al principio, conservando su dominio y alcance. "
+                "En esta afirmacion el orden no cambia su significado matematico, "
+                "pero la herramienta no procesa correctamente el cuantificador al final. "
+                "Es una limitacion del traductor, no una refutacion matematica. "
+                "No se ha modificado la fuente automaticamente. "
+                f"Formula: {self.source.strip()}"
+            )
 
     @classmethod
     def _last_comparison(cls, node, comparison):
@@ -432,6 +474,16 @@ class FormalParser:
             if operator == "LPAREN":
                 if node.kind not in {"identifier", "subscript", "decorated", "power", "call", "apply"}:
                     break
+                if node.kind == "power" and node.children[0].kind not in {
+                    "identifier", "subscript", "decorated"
+                }:
+                    break
+                if node.kind == "power" and node.children[0].kind == "identifier":
+                    base, exponent = node.children
+                    inverse = (exponent.kind == "unary" and exponent.value == "NEG" and
+                               exponent.children[0].kind == "number" and exponent.children[0].value == "1")
+                    if base.value not in {"sin", "cos", "tan", "sinh", "cosh", "tanh"} and not inverse:
+                        break
                 if (
                     node.kind == "identifier"
                     and re.fullmatch(r"d[A-Za-z]'?", str(node.value))
@@ -444,7 +496,15 @@ class FormalParser:
                     while self._accept("COMMA"):
                         args.append(self._expr(0))
                 self._expect("RPAREN")
-                node = Ast("apply", None, (node, *args))
+                if (
+                    node.kind == "power"
+                    and node.children[0].kind == "identifier"
+                    and node.children[0].value in {"sin", "cos", "tan", "sinh", "cosh", "tanh"}
+                ):
+                    function, exponent = node.children
+                    node = Ast("power", None, (Ast("apply", None, (function, *args)), exponent))
+                else:
+                    node = Ast("apply", None, (node, *args))
                 continue
             self.index += 1
             if operator == "TO":
@@ -488,15 +548,32 @@ class FormalParser:
             variable = Ast("identifier", "n")
             lower = Ast("number", "0")
             upper = Ast("constant", "INFINITY")
+            finite_indices = None
             if self._accept("SUB"):
                 specification = self._group() if self._current()[0] in {"LBRACE", "LPAREN"} else self._prefix()
                 if specification.kind == "binary" and specification.value == "EQ":
                     variable, lower = specification.children
                 else:
                     variable = specification
+                parts = specification.children if specification.kind == "tuple" else (specification,)
+                last = parts[-1]
+                if last.kind == "binary" and last.value == "IN":
+                    final_variable, domain = last.children
+                    indices = (*parts[:-1], final_variable)
+                    if all(index.kind == "identifier" for index in indices) and domain.kind == "set":
+                        if len({index.value for index in indices}) != len(indices):
+                            raise FormalSyntaxError("Una sumatoria no puede ligar dos veces el mismo indice.")
+                        finite_indices = indices, domain
             if self._accept("CARET"):
                 upper = self._group() if self._current()[0] in {"LBRACE", "LPAREN"} else self._prefix()
-            body = self._expr(self.PRECEDENCE["MUL"] + 1)
+            body = self._expr(self.PRECEDENCE["MUL"])
+            if finite_indices:
+                if upper.kind != "constant" or upper.value != "INFINITY":
+                    raise FormalSyntaxError("Una sumatoria sobre conjunto no admite un limite superior adicional.")
+                indices, domain = finite_indices
+                for index in reversed(indices):
+                    body = Ast("summation", "finite_set", (index, domain, upper, body))
+                return body
             return Ast("summation", None, (variable, lower, upper, body))
         if token[0] in {"FORALL", "EXISTS"}:
             self.index += 1
@@ -543,6 +620,10 @@ class FormalParser:
             return Ast("text", token[1])
         if token[0] == "MODIFIER":
             self.index += 1
+            if self._current()[0] == "IDENT":
+                subject = Ast("identifier", self._current()[1])
+                self.index += 1
+                return Ast("decorated", token[1], (subject,))
             return Ast("decorated", token[1], (self._fraction_operand(),))
         if token[0] == "SET_LBRACE":
             self.index += 1
@@ -585,11 +666,15 @@ class FormalParser:
             return Ast("identifier", "text_" + "_".join(words))
         if token[0] == "RE":
             self.index += 1
-            argument = self._group_or_parenthesized()
+            argument = self._operator_argument()
             return Ast("call", token[1], (argument,))
         if token[0] == "OPERATOR":
             self.index += 1
-            return Ast("identifier", self._group_identifier())
+            name = self._group_identifier()
+            if name in {"Re", "Im"}:
+                argument = self._operator_argument()
+                return Ast("call", name, (argument,))
+            return Ast("identifier", name)
         if token[0] == "BAR":
             self.index += 1
             value = self._expr(0)
@@ -603,6 +688,7 @@ class FormalParser:
             name = token[1]
             if token[0] == "MATHBB":
                 name = self._group_identifier()
+                name = {"N": "Nat", "Z": "Int", "R": "Real", "C": "Complex"}.get(name, name)
             node = Ast("identifier", name)
             if (
                 not re.fullmatch(r"d[A-Za-z]'?", str(name))
@@ -631,9 +717,15 @@ class FormalParser:
         self.index += 1
         values = [self._expr(0)]
         while self._accept("COMMA"):
+            self._reject_trailing_universal(values[0])
             if self._current()[0] == closing:
                 break
             values.append(self._expr(0))
+        if len(values) == 2 and (opening, self._current()[0]) in {
+            ("LPAREN", "RBRACK"), ("LBRACK", "RPAREN"),
+        }:
+            self.index += 1
+            return Ast("interval", "Ioc" if opening == "LPAREN" else "Ico", tuple(values))
         self._expect(closing)
         if len(values) == 1:
             return values[0]
@@ -713,6 +805,11 @@ class FormalParser:
         if self._current()[0] in {"LPAREN", "LBRACE", "LBRACK"}:
             return self._group()
         return self._prefix()
+
+    def _operator_argument(self):
+        if self._current()[0] in {"LPAREN", "LBRACE", "LBRACK"}:
+            return self._group()
+        return self._postfix(self._prefix())
 
 
 def parse_formula(source, location=None):

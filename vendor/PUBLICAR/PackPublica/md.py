@@ -1,6 +1,9 @@
 ﻿from pathlib import Path
+import base64
 import hashlib
+import mimetypes
 import re
+from urllib.parse import unquote, urlsplit
 print("PUBLICAR: cargando conversor LaTeX/Markdown...", flush=True)
 try:
     import latex2mathml.converter
@@ -14,6 +17,8 @@ except ModuleNotFoundError as error:
     ) from error
 from markdown_it import MarkdownIt
 from .html import Html
+from .autoria import resolve_authors, author_html
+from .seleccion_md import es_markdown_demostracion
 print("PUBLICAR: conversor LaTeX/Markdown cargado.", flush=True)
 
 
@@ -50,9 +55,9 @@ class Md:
         Convierte expresiones LaTeX a MathML W3C.
         Admite $formula$ y $$formula$$.
         """
-        def conversion(match):
+        def conversion(match, display="inline"):
             latex = match.group(1)
-            mathml = latex2mathml.converter.convert(latex)
+            mathml = latex2mathml.converter.convert(latex, display=display)
             # Garantizar namespace MathML W3C
             mathml = re.sub(
                 r'<math\b(?![^>]*xmlns=)',
@@ -62,10 +67,33 @@ class Md:
             return mathml
 
         # Primero fÃ³rmulas display
-        texto = re.sub(r'\$\$(.+?)\$\$', conversion, texto, flags=re.DOTALL)
+        texto = re.sub(r'\$\$(.+?)\$\$', lambda m: conversion(m, "block"), texto, flags=re.DOTALL)
         # DespuÃ©s fÃ³rmulas inline
         texto = re.sub(r'\$(?!\$)(.+?)(?<!\$)\$', conversion, texto, flags=re.DOTALL)
         return texto
+
+    def _configurar_imagenes_locales(self, renderer):
+        """Embed document-relative images so relocated HTML and PDF keep them."""
+        image_rule = renderer.renderer.rules["image"]
+        directory = self.fichero.resolve().parent
+
+        def image(tokens, idx, options, env):
+            token = tokens[idx]
+            source = token.attrGet("src") or ""
+            url = urlsplit(source)
+            if source and not url.scheme and not url.netloc and url.path:
+                relative = Path(unquote(url.path).replace("\\", "/"))
+                if not relative.is_absolute():
+                    path = (directory / relative).resolve()
+                    if not path.is_file():
+                        raise FileNotFoundError(f"Imagen del Markdown no encontrada: {path}")
+                    mime = mimetypes.guess_type(path.name)[0]
+                    if mime and mime.startswith("image/"):
+                        encoded = base64.b64encode(path.read_bytes()).decode("ascii")
+                        token.attrSet("src", f"data:{mime};base64,{encoded}")
+            return image_rule(tokens, idx, options, env)
+
+        renderer.renderer.rules["image"] = image
 
     def html(self, forzar=False):
         """
@@ -76,13 +104,17 @@ class Md:
           Si lo estÃ¡, muestra un mensaje y retorna None (sin crear objeto).
           Si no, regenera, guarda y devuelve el objeto Html.
         """
+        forzar = forzar or self.forzado
+        authors_meta = author_html(resolve_authors(self.texto))
         # Ruta del HTML en la carpeta htmls/
         html_dir = Path("htmls")
         destino = html_dir / (self.fichero.stem + ".html")
 
         # COMPROBACIÃ“N: si no se fuerza y el HTML existe y es mÃ¡s reciente
         if not forzar and destino.exists():
-            if self.fichero.stat().st_mtime <= destino.stat().st_mtime:
+            if (self.fichero.stat().st_mtime <= destino.stat().st_mtime
+                    and all(line in destino.read_text(encoding="utf-8")
+                            for line in authors_meta.splitlines())):
                 nombre = self.fichero.stem
                 #print(f"Trabajo hecho con {nombre}")  # o Log.info si usas logging
                 return None  # No se crea objeto Html
@@ -116,6 +148,7 @@ class Md:
 
         # Markdown -> HTML
         renderer = MarkdownIt("commonmark", {"html": True}).enable("table")
+        self._configurar_imagenes_locales(renderer)
         cuerpo = renderer.render(texto_modificado)
 
         # Segunda protecciÃ³n MathML
@@ -137,6 +170,7 @@ class Md:
 <html lang="{idioma}">
 <head>
 <meta charset="UTF-8">
+{authors_meta}
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>{titulo}</title>
 <style>
@@ -205,16 +239,23 @@ math {{
         return html_obj
 
     def json(self):
+        self._exigir_fuente_demostracion()
         from .json import Json
         return Json(self)
 
     def lean(self):
+        self._exigir_fuente_demostracion()
         from .lean import Lean
         return Lean(self)
 
     def prolog(self):
+        self._exigir_fuente_demostracion()
         from .prolog import Prolog
         return Prolog(self)
+
+    def _exigir_fuente_demostracion(self):
+        if not es_markdown_demostracion(self.fichero):
+            raise ValueError(f"{self.fichero.name}: No es un archivo para demostracion")
 
     def generar_derivados(
         self,
@@ -228,6 +269,8 @@ math {{
     ):
         md_antes = self.fichero.read_bytes()
         hash_md_antes = hashlib.sha256(md_antes).hexdigest()
+        if not es_markdown_demostracion(self.fichero):
+            generar_json = generar_lean = generar_prolog = False
 
         resultados = {
             "html": None,

@@ -1,0 +1,456 @@
+{
+  "fecha_utc": "2026-10-10T00:25:23.031170+00:00",
+  "tipo": "VERIFICACION_MODELO_NUMERICO_PROPUESTO",
+  "umbral_de_ensayo": 0.37,
+  "umbral_conocido_por_el_comprobador": true,
+  "Q1_V1": {
+    "scope": "referencia Q1 simulada; V1 relacional sin tabla de amplitudes",
+    "shots_requested": 1,
+    "results": [
+      {
+        "function": "constant_0",
+        "q1_model_probabilities": [
+          0.9999999999999996,
+          1.0573994819069698e-33
+        ],
+        "v1_captures": [
+          {
+            "status": "MEDIDO",
+            "bits_q0_lsb": [
+              0,
+              0
+            ],
+            "t0": 0,
+            "preparacion_seconds": 0.000199099988094531,
+            "medida_seconds": 0.0002195999986724928,
+            "resources": {
+              "generadores": 2,
+              "operaciones_declaradas": 3,
+              "tabla_amplitudes": false,
+              "distribucion_calculada": false,
+              "bloques_senales_definidos": 3,
+              "realizacion_conectada": true,
+              "recursos_realizacion_verificados": false,
+              "alcance_recursos": "nucleo de conexiones; no incluye la realizacion externa",
+              "alcance": "conexiones y protocolo de medida; realizacion externa no certificada"
+            },
+            "realizacion": {
+              "tipo": "PROPUESTA_NUMERICA_POR_CAMINOS",
+              "realizacion_fisica": false,
+              "tabla_amplitudes": false,
+              "tabla_probabilidades": false,
+              "visitas": 55,
+              "max_pila": 4,
+              "consultas_salida": 5,
+              "masa_total": 0.9999999999999996,
+              "umbral_final": 0.37,
+              "salida_registrada": true,
+              "limite_visitas": 80000000,
+              "tiempo_puede_ser_exponencial": true
+            },
+            "modalidad": "MODELO_NUMERICO_PROPUESTO"
+          }
+        ],
+        "v1_counts": [
+          1,
+          0
+        ],
+        "status": "MEDIDO",
+        "task_matches": true,
+        "timing": {
+          "q_modelo_local_seconds": 0.0015452000079676509,
+          "v_preparacion_y_medida_seconds": 0.0004186999867670238,
+          "comparables_para_ventaja": false,
+          "alcance": "Q calcula una distribucion simulada; V registra una medida. Son cargas distintas, no una prueba de igualdad de orden temporal"
+        }
+      },
+      {
+        "function": "constant_1",
+        "q1_model_probabilities": [
+          0.9999999999999996,
+          1.0573994819069698e-33
+        ],
+        "v1_captures": [
+          {
+            "status": "MEDIDO",
+            "bits_q0_lsb": [
+              0,
+              0
+            ],
+            "t0": 0,
+            "preparacion_seconds": 0.00014769998961128294,
+            "medida_seconds": 0.00018940000154543668,
+            "resources": {
+              "generadores": 2,
+              "operaciones_declaradas": 4,
+              "tabla_amplitudes": false,
+              "distribucion_calculada": false,
+              "bloques_senales_definidos": 3,
+              "realizacion_conectada": true,
+              "recursos_realizacion_verificados": false,
+              "alcance_recursos": "nucleo de conexiones; no incluye la realizacion externa",
+              "alcance": "conexiones y protocolo de medida; realizacion externa no certificada"
+            },
+            "realizacion": {
+              "tipo": "PROPUESTA_NUMERICA_POR_CAMINOS",
+              "realizacion_fisica": false,
+              "tabla_amplitudes": false,
+              "tabla_probabilidades": false,
+              "visitas": 65,
+              "max_pila": 4,
+              "consultas_salida": 5,
+              "masa_total": 0.9999999999999996,
+              "umbral_final": 0.37,
+              "salida_registrada": true,
+              "limite_visitas": 80000000,
+              "tiempo_puede_ser_exponencial": true
+            },
+            "modalidad": "MODELO_NUMERICO_PROPUESTO"
+          }
+        ],
+        "v1_counts": [
+          1,
+          0
+        ],
+        "status": "MEDIDO",
+        "task_matches": true,
+        "timing": {
+          "q_modelo_local_seconds": 0.001105699993786402,
+          "v_preparacion_y_medida_seconds": 0.0003370999911567196,
+          "comparables_para_ventaja": false,
+          "alcance": "Q calcula una distribucion simulada; V registra una medida. Son cargas distintas, no una prueba de igualdad de orden temporal"
+        }
+      },
+      {
+        "function": "identity",
+        "q1_model_probabilities": [
+          1.0573994819069698e-33,
+          0.9999999999999996
+        ],
+        "v1_captures": [
+          {
+            "status": "MEDIDO",
+            "bits_q0_lsb": [
+              1,
+              0
+            ],
+            "t0": 0,
+            "preparacion_seconds": 0.00013349999790079892,
+            "medida_seconds": 0.00020719999156426638,
+            "resources": {
+              "generadores": 2,
+              "operaciones_declaradas": 4,
+              "tabla_amplitudes": false,
+              "distribucion_calculada": false,
+              "bloques_senales_definidos": 3,
+              "realizacion_conectada": true,
+              "recursos_realizacion_verificados": false,
+              "alcance_recursos": "nucleo de conexiones; no incluye la realizacion externa",
+              "alcance": "conexiones y protocolo de medida; realizacion externa no certificada"
+            },
+            "realizacion": {
+              "tipo": "PROPUESTA_NUMERICA_POR_CAMINOS",
+              "realizacion_fisica": false,
+              "tabla_amplitudes": false,
+              "tabla_probabilidades": false,
+              "visitas": 78,
+              "max_pila": 4,
+              "consultas_salida": 6,
+              "masa_total": 0.9999999999999996,
+              "umbral_final": 0.37,
+              "salida_registrada": true,
+              "limite_visitas": 80000000,
+              "tiempo_puede_ser_exponencial": true
+            },
+            "modalidad": "MODELO_NUMERICO_PROPUESTO"
+          }
+        ],
+        "v1_counts": [
+          0,
+          1
+        ],
+        "status": "MEDIDO",
+        "task_matches": true,
+        "timing": {
+          "q_modelo_local_seconds": 0.000988499989034608,
+          "v_preparacion_y_medida_seconds": 0.0003406999894650653,
+          "comparables_para_ventaja": false,
+          "alcance": "Q calcula una distribucion simulada; V registra una medida. Son cargas distintas, no una prueba de igualdad de orden temporal"
+        }
+      },
+      {
+        "function": "inverter",
+        "q1_model_probabilities": [
+          1.0573994819069698e-33,
+          0.9999999999999996
+        ],
+        "v1_captures": [
+          {
+            "status": "MEDIDO",
+            "bits_q0_lsb": [
+              1,
+              0
+            ],
+            "t0": 0,
+            "preparacion_seconds": 0.00013509999553207308,
+            "medida_seconds": 0.00021220000053290278,
+            "resources": {
+              "generadores": 2,
+              "operaciones_declaradas": 5,
+              "tabla_amplitudes": false,
+              "distribucion_calculada": false,
+              "bloques_senales_definidos": 3,
+              "realizacion_conectada": true,
+              "recursos_realizacion_verificados": false,
+              "alcance_recursos": "nucleo de conexiones; no incluye la realizacion externa",
+              "alcance": "conexiones y protocolo de medida; realizacion externa no certificada"
+            },
+            "realizacion": {
+              "tipo": "PROPUESTA_NUMERICA_POR_CAMINOS",
+              "realizacion_fisica": false,
+              "tabla_amplitudes": false,
+              "tabla_probabilidades": false,
+              "visitas": 90,
+              "max_pila": 4,
+              "consultas_salida": 6,
+              "masa_total": 0.9999999999999996,
+              "umbral_final": 0.37,
+              "salida_registrada": true,
+              "limite_visitas": 80000000,
+              "tiempo_puede_ser_exponencial": true
+            },
+            "modalidad": "MODELO_NUMERICO_PROPUESTO"
+          }
+        ],
+        "v1_counts": [
+          0,
+          1
+        ],
+        "status": "MEDIDO",
+        "task_matches": true,
+        "timing": {
+          "q_modelo_local_seconds": 0.0010100999934365973,
+          "v_preparacion_y_medida_seconds": 0.00034729999606497586,
+          "comparables_para_ventaja": false,
+          "alcance": "Q calcula una distribucion simulada; V registra una medida. Son cargas distintas, no una prueba de igualdad de orden temporal"
+        }
+      }
+    ],
+    "status": "MEDIDO",
+    "equivalence_verified": false
+  },
+  "Q2_V2": {
+    "distribucion_completa_N3_error_maximo": 1.394265051860899e-34,
+    "captura": {
+      "N": "15",
+      "base": 2,
+      "resources": {
+        "input_bits": 4,
+        "work_bits": 4,
+        "control_bits": 8,
+        "register_bits": 12,
+        "v2_representation": "deferred connections; no amplitude or probability table",
+        "q_reference_supported": true
+      },
+      "q2_reference": {
+        "status": "MODELO_LOCAL",
+        "peaks": [
+          {
+            "value": 0,
+            "probability": 0.2499999999999994
+          },
+          {
+            "value": 64,
+            "probability": 0.2499999999999994
+          },
+          {
+            "value": 128,
+            "probability": 0.2499999999999994
+          },
+          {
+            "value": 192,
+            "probability": 0.2499999999999994
+          },
+          {
+            "value": 16,
+            "probability": 1.0204935153900033e-34
+          },
+          {
+            "value": 48,
+            "probability": 1.0204935153900033e-34
+          },
+          {
+            "value": 80,
+            "probability": 1.0204935153900033e-34
+          },
+          {
+            "value": 112,
+            "probability": 1.0204935153900033e-34
+          },
+          {
+            "value": 144,
+            "probability": 1.0204935153900033e-34
+          },
+          {
+            "value": 176,
+            "probability": 1.0204935153900033e-34
+          },
+          {
+            "value": 208,
+            "probability": 1.0204935153900033e-34
+          },
+          {
+            "value": 240,
+            "probability": 1.0204935153900033e-34
+          }
+        ]
+      },
+      "v2_attempts": [
+        {
+          "status": "MEDIDO",
+          "bits_q0_lsb": [
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "t0": 0,
+          "preparacion_seconds": 0.0007541999948443845,
+          "medida_seconds": 74.32823169999756,
+          "resources": {
+            "generadores": 12,
+            "operaciones_declaradas": 17,
+            "tabla_amplitudes": false,
+            "distribucion_calculada": false,
+            "bloques_senales_definidos": 48,
+            "realizacion_conectada": true,
+            "recursos_realizacion_verificados": false,
+            "alcance_recursos": "nucleo de conexiones; no incluye la realizacion externa",
+            "alcance": "conexiones y protocolo de medida; realizacion externa no certificada"
+          },
+          "realizacion": {
+            "tipo": "PROPUESTA_NUMERICA_POR_CAMINOS",
+            "realizacion_fisica": false,
+            "tabla_amplitudes": false,
+            "tabla_probabilidades": false,
+            "visitas": 22199239,
+            "max_pila": 10,
+            "consultas_salida": 5123,
+            "masa_total": 0.9999999999999976,
+            "umbral_final": 0.37,
+            "salida_registrada": true,
+            "limite_visitas": 80000000,
+            "tiempo_puede_ser_exponencial": true
+          },
+          "modalidad": "MODELO_NUMERICO_PROPUESTO",
+          "outcome": {
+            "factors": [
+              3,
+              5
+            ],
+            "verified_order_multiple": 4
+          },
+          "postprocessing_seconds": 6.320000102277845e-05,
+          "control_value": 64
+        }
+      ],
+      "status": "MEDIDO",
+      "timing": {
+        "q_modelo_local_seconds": 0.017445600009523332,
+        "v_preparacion_y_medida_seconds": 74.3289858999924,
+        "comparables_para_ventaja": false,
+        "alcance": "Q calcula una distribucion simulada; V registra una medida. Son cargas distintas, no una prueba de igualdad de orden temporal"
+      },
+      "equivalence_verified": false
+    }
+  },
+  "Q3_V3": {
+    "distribucion_completa_3_unidades_error_maximo": 1.1102230246251565e-16,
+    "captura": {
+      "qubits": 3,
+      "gate_count": 17,
+      "circuit_sha256": "d8bcbd3769649bcd583810bf282ef3be6085b55fea20af41983510f2f54a626e",
+      "q3_local_seconds": 0.002584700006991625,
+      "v3_capture": {
+        "status": "MEDIDO",
+        "bits_q0_lsb": [
+          1,
+          0,
+          0
+        ],
+        "t0": 0,
+        "preparacion_seconds": 0.000566999995498918,
+        "medida_seconds": 0.01187569998728577,
+        "resources": {
+          "generadores": 3,
+          "operaciones_declaradas": 17,
+          "tabla_amplitudes": false,
+          "distribucion_calculada": false,
+          "bloques_senales_definidos": 17,
+          "realizacion_conectada": true,
+          "recursos_realizacion_verificados": false,
+          "alcance_recursos": "nucleo de conexiones; no incluye la realizacion externa",
+          "alcance": "conexiones y protocolo de medida; realizacion externa no certificada"
+        },
+        "realizacion": {
+          "tipo": "PROPUESTA_NUMERICA_POR_CAMINOS",
+          "realizacion_fisica": false,
+          "tabla_amplitudes": false,
+          "tabla_probabilidades": false,
+          "visitas": 5830,
+          "max_pila": 8,
+          "consultas_salida": 10,
+          "masa_total": 0.9999999999999999,
+          "umbral_final": 0.37,
+          "salida_registrada": true,
+          "limite_visitas": 80000000,
+          "tiempo_puede_ser_exponencial": true
+        },
+        "modalidad": "MODELO_NUMERICO_PROPUESTO"
+      },
+      "status": "MEDIDO",
+      "q3_reference_status": "MODELO_LOCAL",
+      "timing": {
+        "q_modelo_local_seconds": 0.002584700006991625,
+        "v_preparacion_y_medida_seconds": 0.012442699982784688,
+        "comparables_para_ventaja": false,
+        "alcance": "Q calcula una distribucion simulada; V registra una medida. Son cargas distintas, no una prueba de igualdad de orden temporal"
+      },
+      "uniform_control_distance": 0.39016504294495524,
+      "equivalence_verified": false,
+      "scope": "Q3 local simulation and V3 single-readout protocol, not Willow"
+    }
+  },
+  "contrastes_numericos_superados": true,
+  "maquina_fisica_construida": false,
+  "igualdad_orden_temporal_demostrada": false,
+  "memoria_exponencial_tabular": false,
+  "tiempo_puede_ser_exponencial": true,
+  "notas": [
+    "La coincidencia comprueba la propuesta basada en matrices unitarias y regla de Born.",
+    "No demuestra que esas leyes se deduzcan solo del desconocimiento del resultado.",
+    "Una lectura favorable de Shor no establece su tasa de exito.",
+    "La precision es numerica finita, no aritmetica exacta.",
+    "Esta propuesta no sustituye automaticamente la arquitectura V del autor."
+  ],
+  "sha256": {
+    "propuesta_lectura.py": "9fe26d98cf1dbeb09020aa6bdf26b1860637b7185484c35b4c12c8ab14c9f8dd",
+    "verificar_propuesta.py": "14d3876d69807bb7f6556f0f92bdab502c28028c6e026d21ae04002d0bbeafaf",
+    "v_relacional.py": "32aaa004a76e4df3a0e2c6d9d1623be6477d7fccf05fbcaea15bb005285a5405",
+    "operaciones_senales.py": "371be2ace508020de03938afa54c5805a6ff8e0aac59d69e2664b687cac3af06",
+    "ejecucion_v.py": "32b46daa87dcd230e238bac3c2d702215aea7cd470a77f46657a3e12b98950f8",
+    "q1_v1.py": "9fcf86246a301554dea5048fc63d681d62bf41c01ffb72d11b6181f9120f1c2e",
+    "q2_v2.py": "fdcc9a062788e69b69a5650ebb17d6ec1aaa176a395e840e4ece8fe4e51ed4d2",
+    "q3.py": "dbb07409478c4f6b256ba70ab95de6e46bd93250b8b6104f275675ee5f24d9c7",
+    "protocolo_q3.py": "1459edec2be68c2739a41875c4c34671a14175abdfc6ff186d6559f06b4214bf",
+    "comparar_q3_v3.py": "b72ca923218e8dedf399dca7d6de32802dc461cd0946aaf512b76c8c0cd80e30"
+  }
+}

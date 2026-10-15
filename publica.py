@@ -38,6 +38,8 @@ from PackPublica.ZenodoClient import ZenodoClient
 from PackPublica.ZenodoPublisher import ZenodoPublisher
 from PackPublica.WebPublisher import WebPublisher
 from PackPublica.formal_ast import parse_formula
+from PackPublica.autoria import resolve_authors
+from PackPublica.adec_contract import validate_nodes, validate_artifact
 
 # ============================================================
 # CONFIGURACION DEL PROYECTO
@@ -46,6 +48,11 @@ TEST = 2 + 64 #  + 4 + 8 + 16 + 32 + 64
 PAGE_SIZE = "6x9"
 LOCAL_ONLY = os.environ.get("DEMUESTRA_LOCAL_ONLY", "").strip().lower() in {
     "1", "true", "yes", "si", "sí",
+}
+PROYECTOS_FORZADOS_WEB = {
+    nombre.strip()
+    for nombre in re.split(r"[,;]", os.environ.get("DEMUESTRA_FORZAR_PROYECTOS", ""))
+    if nombre.strip()
 }
 
 #ZENODO_TITLE = "The theory that will reconcile Quantum Mechanics with Einstein's Relativity"
@@ -69,20 +76,21 @@ PROYECTOS_PUBLICABLES_WEB = [
 
 DEMOSTRACIONES_WEB_EXTENSIONS = {".json", ".lean", ".pl", ".md", ".pdf", ".log", ".php", ".html", ".jpg", ".jpeg", ".png", ".webp", ".svg", ".ico", ".abstract", ".es", ".en", ".bat"}
 MARKDOWNS_DEMOSTRACIONES_WEB_PREPARADOS = {}
+DIRECTORIOS_PROYECTOS = {}
 CONFIG_ORIGEN_NOMBRE = "config.txt"
 
-# Solo estos Markdown son fuentes de demostraciones. Ejemplo: ES_46_RV6.md.
-PATRON_MARKDOWN_DEMOSTRACION = re.compile(
-    r"^[A-Za-z]{2}_\d+_.+\.md$",
-    re.IGNORECASE,
+from PckDemuestra.seleccion_md import (
+    aviso_no_demostracion, es_markdown_demostracion, fuente_principal,
+    proyecto_evaluable,
 )
+from PckDemuestra.salida_archivos import enlace_archivo
 PATRON_BARRA_ACTIVIDAD = re.compile(
     r"\r[^\r\n]*\[[#-]{10,}\][^\r\n]*"
 )
 
 
 def _es_markdown_demostracion(ruta):
-    return bool(PATRON_MARKDOWN_DEMOSTRACION.fullmatch(Path(ruta).name))
+    return es_markdown_demostracion(ruta)
 
 
 def _limpiar_barras_actividad(salida):
@@ -104,60 +112,119 @@ def _primer_archivo(candidatos):
 
 
 def _index_proyectos_web():
-    return _primer_archivo([PROJECT_ROOT / "web-base" / "index.php"])
+    from PckDemuestra.publicacion_web import indice_comun
+    return indice_comun(PROJECT_ROOT)
+
+
+def sincronizar_indices_web(project_names):
+    from PckDemuestra.publicacion_web import sincronizar_indices
+    directorios = [PROJECT_ROOT / 'Proyectos']
+    directorios.extend(_proyecto_dir(_nombre_proyecto_web(name)) for name in project_names)
+    return sincronizar_indices(PROJECT_ROOT, directorios)
 
 
 def _proyecto_dir(project_name):
+    if project_name in DIRECTORIOS_PROYECTOS:
+        return DIRECTORIOS_PROYECTOS[project_name]
     pendiente = PROJECT_ROOT / "Proyectos" / project_name
     evaluado = PROJECT_ROOT / "YaEvaluado" / project_name
     return pendiente if pendiente.is_dir() else evaluado
 
 
+def _extraer_proyectos_forzados_cli(argv):
+    """Retira de argv la seleccion explicita de proyectos a reevaluar."""
+    forzados = []
+    restantes = [argv[0]]
+    index = 1
+    while index < len(argv):
+        argumento = argv[index]
+        if argumento.lower().startswith("forzado="):
+            valor = argumento.split("=", 1)[1]
+            nombres = [nombre.strip() for nombre in re.split(r"[,;]", valor) if nombre.strip()]
+            if not nombres:
+                raise SystemExit("forzado= exige un numero, un nombre de proyecto o todos.")
+            forzados.extend(nombres)
+            index += 1
+            continue
+        if argumento in {"--forzar-proyecto", "--proyecto"}:
+            index += 1
+            if index >= len(argv):
+                raise SystemExit(f"{argumento} exige al menos un nombre de proyecto.")
+            while index < len(argv) and not argv[index].startswith("-"):
+                forzados.append(argv[index])
+                index += 1
+            continue
+        if argumento.startswith("--forzar-proyecto="):
+            valor = argumento.split("=", 1)[1]
+            forzados.extend(nombre for nombre in re.split(r"[,;]", valor) if nombre)
+            index += 1
+            continue
+        if argumento.startswith("--proyecto="):
+            valor = argumento.split("=", 1)[1]
+            forzados.extend(nombre for nombre in re.split(r"[,;]", valor) if nombre)
+            index += 1
+            continue
+        restantes.append(argumento)
+        index += 1
+    return {nombre.strip() for nombre in forzados if nombre.strip()}, restantes
+
+
+def _forzado_todos():
+    return any(nombre.casefold() == "todos" for nombre in PROYECTOS_FORZADOS_WEB)
+
+
+def _proyecto_forzado(project_name):
+    if _forzado_todos():
+        return True
+    nombres = {project_name, _proyecto_dir(project_name).name}
+    seleccion = {nombre.casefold() for nombre in PROYECTOS_FORZADOS_WEB}
+    if {nombre.casefold() for nombre in nombres} & seleccion:
+        return True
+    numeros = {int(nombre) for nombre in seleccion if nombre.isascii() and nombre.isdigit()}
+    for nombre in nombres:
+        coincidencia = re.match(r"^[A-Za-z]{2}_(\d+)(?:_|$)", nombre)
+        if coincidencia and int(coincidencia.group(1)) in numeros:
+            return True
+    return False
+
+
 def _validar_nodos_adec(datos):
     """Comprueba el contrato de nodos que consume ADEC v0.8.6."""
-    nodes = datos.get("nodes")
-    if not isinstance(nodes, list) or not nodes:
-        raise ValueError("ADEC exige un atributo nodes no vacio.")
+    return validate_nodes(datos)
 
-    ids = []
-    for index, node in enumerate(nodes):
-        if not isinstance(node, dict):
-            raise ValueError(f"ADEC nodes[{index}] no es un objeto.")
-        for field in ("id", "kind", "name", "description"):
-            if not str(node.get(field) or "").strip():
-                raise ValueError(
-                    f"ADEC nodes[{index}] carece del campo obligatorio {field}."
-                )
-        if not isinstance(node.get("deps"), list):
-            raise ValueError(f"ADEC nodes[{index}].deps debe ser una lista.")
-        ids.append(str(node["id"]))
 
-    if len(ids) != len(set(ids)):
-        raise ValueError("ADEC no admite identificadores de nodo duplicados.")
+def _autoria_adec(datos, proyecto, fallback=None):
+    existing = datos.get("authors") or (fallback or {}).get("authors")
+    source = fuente_principal(proyecto)
+    text = source.read_text(encoding="utf-8") if source and source.is_file() else ""
+    datos["authors"] = resolve_authors(text, existing)
+    return datos
 
-    conocidos = set(ids)
-    for node in nodes:
-        desconocidas = [dep for dep in node["deps"] if str(dep) not in conocidos]
-        if desconocidas:
-            raise ValueError(
-                f"ADEC: {node['id']} referencia dependencias inexistentes: "
-                + ", ".join(map(str, desconocidas))
-            )
-        if len(node["deps"]) >= 2 and node.get("measurement_relationship") not in {
-            "additive", "substitutive", "overlapping", "unclear"
-        }:
-            raise ValueError(
-                f"ADEC: {node['id']} necesita measurement_relationship."
-            )
-        proof = node.get("proof")
-        if proof is not None and (
-            not isinstance(proof, dict)
-            or not str(proof.get("status") or "").strip()
-            or not isinstance(proof.get("steps"), list)
-            or not proof["steps"]
-        ):
-            raise ValueError(f"ADEC: proof incompleto en {node['id']}.")
-    return len(nodes)
+
+def _normalizar_relaciones_adec(datos, fuente=None):
+    """Completa metadatos de formato, nunca premisas ni estados de prueba."""
+    fuentes = {node.get("id"): node for node in (fuente or {}).get("nodes", [])
+               if isinstance(node, dict)}
+    cambios = []
+    for node in datos.get("nodes", []):
+        if not isinstance(node, dict) or not isinstance(node.get("deps"), list):
+            continue
+        if len(node["deps"]) < 2 or node.get("measurement_relationship") not in (None, ""):
+            continue
+        original = fuentes.get(node.get("id"), {})
+        mismos = all(field in node and field in original and node[field] == original[field]
+                     for field in ("id", "kind", "description", "deps"))
+        relacion = original.get("measurement_relationship") if mismos else None
+        declarada = relacion in {"additive", "substitutive", "overlapping", "unclear"}
+        node["measurement_relationship"] = relacion if declarada else "unclear"
+        cambios.append({
+            "node": node.get("id"), "field": "measurement_relationship",
+            "value": node["measurement_relationship"],
+            "origin": "identical_source_node" if declarada else "unspecified_in_artifact",
+        })
+    if cambios:
+        datos.setdefault("adec_metadata_repairs", []).extend(cambios)
+    return datos
 
 
 def _adec_compatibilizar(
@@ -225,8 +292,9 @@ def _adec_compatibilizar(
     datos["validation_mode"] = "article_analysis"
     datos["artifact_stage"] = artifact_stage
     datos["source"] = base.get("source") or datos.get("source") or f"{project_name}.md"
-    datos["authors"] = base.get("authors") or datos.get("authors") or []
-    node_count = _validar_nodos_adec(datos)
+    _autoria_adec(datos, proyecto, base)
+    _normalizar_relaciones_adec(datos, base)
+    node_count = validate_artifact(datos)
     datos["adec_compatible"] = True
     datos["adec_node_count"] = node_count
     datos["adec_access"] = {
@@ -262,7 +330,11 @@ def normalizar_informes_adec_proyecto(project_name):
             continue
         datos = json.loads(path.read_text(encoding="utf-8"))
         datos.setdefault("schema", "ADEC_nodes_input_v1")
-        node_count = _validar_nodos_adec(datos)
+        datos.setdefault("title", project_name)
+        datos.setdefault("version", "1.0")
+        _autoria_adec(datos, proyecto)
+        _normalizar_relaciones_adec(datos)
+        node_count = validate_artifact(datos)
         datos["adec_compatible"] = True
         datos["adec_node_count"] = node_count
         datos["adec_access"] = {
@@ -283,6 +355,12 @@ def normalizar_informes_adec_proyecto(project_name):
 
     especificaciones = (
         (
+            f"TRADUCCION_{project_name}.json",
+            "translation_tool_diagnostic",
+            f"TRADUCCION_{project_name}",
+            "Diagnostico de la herramienta de traduccion; no es un veredicto cientifico",
+        ),
+        (
             f"LEAN_{project_name}.json",
             "lean_kernel_evaluation",
             f"EVAL_LEAN_{project_name}",
@@ -293,6 +371,18 @@ def normalizar_informes_adec_proyecto(project_name):
             "prolog_structural_evaluation",
             f"EVAL_PROLOG_{project_name}",
             "Resultado del evaluador Prolog estructural",
+        ),
+        (
+            f"PROLOG_DESDE_LEAN_{project_name}.json",
+            "prolog_from_lean_structural_audit",
+            f"EVAL_PROLOG_DESDE_LEAN_{project_name}",
+            "Resultado independiente de Prolog desde Lean",
+        ),
+        (
+            f"PROLOG_JSON_{project_name}.json",
+            "prolog_initial_json_dependency_reachability",
+            f"EVAL_PROLOG_JSON_{project_name}",
+            "Resultado independiente de Prolog desde el JSON inicial",
         ),
         (
             f"PROLOG_MD_DIRECTO_{project_name}.json",
@@ -337,15 +427,12 @@ def normalizar_informes_adec_proyecto(project_name):
             or _objetivo_formal_desde_nodos(datos)
         )
         deps = [objetivo] if objetivo else []
-        _adec_compatibilizar(
-            project_name,
-            datos,
-            etapa,
-            result_id,
-            titulo,
-            descripcion,
-            deps,
-        )
+        try:
+            _adec_compatibilizar(
+                project_name, datos, etapa, result_id, titulo, descripcion, deps,
+            )
+        except ValueError as exc:
+            raise ValueError(f"{path}: {exc}") from exc
         contenido = json.dumps(datos, ensure_ascii=False, indent=2) + "\n"
         path.write_text(contenido, encoding="utf-8")
         copia_evaluacion = evaluaciones / nombre
@@ -428,17 +515,30 @@ def _metricas_evaluacion(base, project_name):
     }
 
 
+def _reemplazar_directorio_con_reintentos(origen, destino):
+    import time
+
+    for intento in range(5):
+        try:
+            origen.replace(destino)
+            return
+        except PermissionError:
+            if intento == 4:
+                raise
+            time.sleep(0.2 * (intento + 1))
+
+
 def guardar_evaluacion_anterior(project_name):
     """Rota la evaluacion actual al unico registro anterior permitido."""
     proyecto = _proyecto_dir(project_name)
     if not (proyecto / f"AUDITORIA_{project_name}.json").is_file():
         return False
     anterior = proyecto / "anterior"
-    nuevo = proyecto / ".anterior_nuevo"
-    descartado = proyecto / ".anterior_descartado"
-    for temporal in (nuevo, descartado):
-        if temporal.exists():
-            shutil.rmtree(temporal)
+    from uuid import uuid4
+
+    identificador = uuid4().hex
+    nuevo = proyecto / f".anterior_nuevo_{identificador}"
+    descartado = proyecto / f".anterior_descartado_{identificador}"
     nuevo.mkdir(parents=True)
     rutas = _rutas_estado_evaluacion(proyecto, project_name)
     hashes = {}
@@ -467,11 +567,32 @@ def guardar_evaluacion_anterior(project_name):
         json.dumps(registro, ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",
     )
-    if anterior.exists():
-        anterior.replace(descartado)
-    nuevo.replace(anterior)
+    anterior_rotado = False
+    try:
+        if anterior.exists():
+            _reemplazar_directorio_con_reintentos(anterior, descartado)
+            anterior_rotado = True
+        _reemplazar_directorio_con_reintentos(nuevo, anterior)
+    except OSError as error:
+        if anterior_rotado and not anterior.exists():
+            try:
+                _reemplazar_directorio_con_reintentos(descartado, anterior)
+            except OSError as recuperacion:
+                raise RuntimeError(
+                    f"No se pudo recuperar anterior. Sus datos permanecen en {descartado}; "
+                    f"la copia nueva permanece en {nuevo}. No se borran evaluaciones."
+                ) from recuperacion
+        raise RuntimeError(
+            f"No se pudo rotar el respaldo de {project_name}. Se conserva anterior "
+            f"y la copia nueva en {nuevo}; no se borran evaluaciones."
+        ) from error
     if descartado.exists():
-        shutil.rmtree(descartado)
+        if descartado.resolve().parent != proyecto.resolve():
+            raise RuntimeError("La ruta del respaldo descartado queda fuera del proyecto.")
+        try:
+            shutil.rmtree(descartado)
+        except OSError as error:
+            print(f"  [AVISO] Respaldo anterior conservado en {descartado}: {error}")
     return True
 
 
@@ -649,25 +770,150 @@ def restaurar_evaluacion_anterior(project_name, confirmar=False):
 def _nombres_proyectos(base):
     if not base.is_dir():
         return []
-    return sorted(
-        path.name for path in base.iterdir()
-        if path.is_dir() and _es_markdown_demostracion(f"{path.name}.md")
-    )
+    nombres = []
+    for path in sorted(base.iterdir()):
+        if not path.is_dir():
+            continue
+        markdown = _markdown_proyecto(path)
+        nombre = markdown.stem if markdown is not None else path.name
+        anterior = DIRECTORIOS_PROYECTOS.get(nombre)
+        if anterior is not None and anterior != path and anterior.is_dir():
+            raise ValueError(f"Fuente duplicada {nombre}: {anterior} y {path}")
+        DIRECTORIOS_PROYECTOS[nombre] = path
+        nombres.append(nombre)
+    return nombres
 
 
 def _proyectos_pendientes_web():
-    return _nombres_proyectos(PROJECT_ROOT / "Proyectos")
+    pendientes = []
+    for project_name in _nombres_proyectos(PROJECT_ROOT / "Proyectos"):
+        if _proyecto_forzado(project_name):
+            pendientes.append(project_name)
+            print(
+                f"  {project_name}: seleccion forzada; se reevaluara aunque "
+                "tenga certificado vigente."
+            )
+            continue
+        if _proyecto_completado_con_hash_vigente(project_name):
+            print(
+                f"  {project_name}: evaluacion terminada con hash de fuente "
+                "coincidente; se omite en esta ejecucion."
+            )
+            continue
+        pendientes.append(project_name)
+    return pendientes
 
 
 def _proyectos_publicables_web():
     nombres = set(PROYECTOS_PUBLICABLES_WEB)
-    nombres.update(_proyectos_pendientes_web())
+    nombres.update(_nombres_proyectos(PROJECT_ROOT / "Proyectos"))
     nombres.update(_nombres_proyectos(PROJECT_ROOT / "YaEvaluado"))
     return sorted(nombres)
 
 
 def _markdown_proyecto(proyecto):
-    return _primer_archivo([proyecto / f"{proyecto.name}.md"])
+    if (proyecto / "documentos_proyecto.json").is_file():
+        from PckDemuestra.documentos_proyecto import leer_catalogo, ruta_local
+        catalogo = leer_catalogo(proyecto)
+        return ruta_local(proyecto, catalogo["principal"])
+    esperado = proyecto / f"{proyecto.name}.md"
+    if esperado.is_file():
+        return esperado
+    fuentes = sorted(path for path in proyecto.glob("*.md")
+                     if _es_markdown_demostracion(path))
+    if len(fuentes) > 1:
+        raise ValueError(f"Varias fuentes cientificas en {proyecto}: {fuentes}")
+    return fuentes[0] if fuentes else None
+
+
+def _proyecto_completado_con_hash_vigente(project_name):
+    proyecto = _proyecto_dir(project_name)
+    if not proyecto.is_dir():
+        return False
+
+    markdown = _markdown_proyecto(proyecto)
+    if markdown is None or not markdown.is_file():
+        return False
+
+    semaforo = _leer_json_opcional(proyecto / f"SEMAFORO_{project_name}.json")
+    marcado = semaforo.get("evaluation_processing")
+    if isinstance(marcado, dict):
+        informes = marcado.get("reports_sha256")
+        return (
+            marcado.get("completed") is True
+            and marcado.get("source_sha256") == _sha256_archivo(markdown)
+            and isinstance(informes, dict)
+            and set(informes) == set(_nombres_informes_evaluacion(project_name))
+            and all((proyecto / nombre).is_file()
+                    and _sha256_archivo(proyecto / nombre) == sha
+                    for nombre, sha in informes.items())
+        )
+
+    certificado = _leer_json_opcional(proyecto / f"CERTIFICADO_{project_name}.json")
+    if (
+        certificado.get("project") != project_name
+        or certificado.get("certificate_type") != "DEMUESTRA_FORMAL_VERIFICATION"
+        or certificado.get("status") != "EMITIDO"
+    ):
+        return False
+
+    evidencias = certificado.get("evidence_sha256")
+    if not isinstance(evidencias, dict):
+        return False
+
+    hash_guardado = evidencias.get(f"{project_name}.md")
+    if not hash_guardado:
+        return False
+    return hash_guardado == _sha256_archivo(markdown)
+
+
+def _nombres_informes_evaluacion(project_name):
+    return [f"{prefijo}_{project_name}.json" for prefijo in
+            ("LEAN", "PROLOG", "PROLOG_MD_DIRECTO", "AUDITORIA")]
+
+
+def _marcar_evaluacion_terminada(project_name, hash_fuente, cerrado):
+    proyecto = _proyecto_dir(project_name)
+    markdown = proyecto / f"{project_name}.md"
+    if not markdown.is_file() or _sha256_archivo(markdown) != hash_fuente:
+        return False
+    informes = _nombres_informes_evaluacion(project_name)
+    if not all((proyecto / nombre).is_file() for nombre in informes):
+        return False
+    archivo = proyecto / f"SEMAFORO_{project_name}.json"
+    semaforo = _leer_json_opcional(archivo)
+    if not semaforo:
+        return False
+    semaforo["evaluation_processing"] = {
+        "completed": True,
+        "source_sha256": hash_fuente,
+        "formally_certified": bool(cerrado),
+        "reports_sha256": {nombre: _sha256_archivo(proyecto / nombre)
+                           for nombre in informes},
+    }
+    temporal = archivo.with_suffix(".json.tmp")
+    temporal.write_text(json.dumps(semaforo, ensure_ascii=False, indent=2) + "\n",
+                         encoding="utf-8")
+    os.replace(temporal, archivo)
+    return True
+
+
+def _documento_raiz_vigente(nombre, hash_fuente):
+    estado = _leer_json_opcional(PROJECT_ROOT / "hashes_documentos_raiz.json")
+    registro = estado.get(nombre, {})
+    return (isinstance(registro, dict)
+            and registro.get("completed") is True
+            and registro.get("source_sha256") == hash_fuente
+            and (PROJECT_ROOT / "pdfs" / f"{Path(nombre).stem}.pdf").is_file())
+
+
+def _marcar_documento_raiz(nombre, hash_fuente):
+    archivo = PROJECT_ROOT / "hashes_documentos_raiz.json"
+    estado = _leer_json_opcional(archivo)
+    estado[nombre] = {"completed": True, "source_sha256": hash_fuente}
+    temporal = archivo.with_suffix(".tmp")
+    temporal.write_text(json.dumps(estado, indent=2) + "\n", encoding="utf-8")
+    os.replace(temporal, archivo)
 
 
 def _leer_proyecto_origen(proyecto, preguntar=False):
@@ -690,7 +936,7 @@ def _leer_proyecto_origen(proyecto, preguntar=False):
             respuesta = ""
         nombre = respuesta or "UNIHOLOG"
         config.write_text(f"proyecto_origen={nombre}\n", encoding="utf-8")
-        print(f"  Configuracion de origen guardada: {config}")
+        print(f"  Configuracion de origen guardada: {enlace_archivo(config)}")
 
     if not nombre:
         return None
@@ -753,8 +999,8 @@ def devolver_fuentes_verificadas(project_names):
         pdf = proyecto / f"{project_name}.pdf"
         _copiar_markdown_verificado_sin_lean(markdown, raiz_origen / markdown.name)
         _copiar_verificado(pdf, raiz_origen / "pdfs" / pdf.name)
-        print(f"  [OK] {markdown.name} copiado a {raiz_origen}")
-        print(f"  [OK] {pdf.name} copiado a {raiz_origen / 'pdfs'}")
+        print(f"  [OK] {enlace_archivo(raiz_origen / markdown.name)} copiado a {raiz_origen}")
+        print(f"  [OK] {enlace_archivo(raiz_origen / 'pdfs' / pdf.name)} copiado a {raiz_origen / 'pdfs'}")
 
 
 def preparar_markdowns_demostraciones_web(project_names):
@@ -762,12 +1008,6 @@ def preparar_markdowns_demostraciones_web(project_names):
 
     for project_spec in project_names:
         project_name = _nombre_proyecto_web(project_spec)
-        if not _es_markdown_demostracion(f"{project_name}.md"):
-            print(
-                f"Se omite {project_name}: el nombre no cumple "
-                "<idioma>_<numero>_<nombre>.md."
-            )
-            continue
         markdown = _markdown_proyecto(_proyecto_dir(project_name))
         if markdown is None:
             proyecto = _proyecto_dir(project_name)
@@ -780,21 +1020,23 @@ def preparar_markdowns_demostraciones_web(project_names):
                 markdown_destino = proyecto / candidato.name
                 shutil.copy2(candidato, markdown_destino)
                 markdown = markdown_destino
-                print(f"  {project_name}.md copiado temporalmente desde {raiz_origen}")
+                print(f"  {enlace_archivo(markdown_destino)} copiado temporalmente desde {raiz_origen}")
         if markdown is None:
             print(f"[AVISO] Falta {project_name}.md; no se preparara para generar PDF.")
+            continue
+        if not _es_markdown_demostracion(markdown):
+            print(aviso_no_demostracion(markdown))
             continue
 
         destino = PROJECT_ROOT / f"{project_name}.md"
         if destino.exists() and destino.resolve() != markdown.resolve():
             if destino.read_bytes() != markdown.read_bytes():
-                print(f"[AVISO] Ya existe {destino.name} en la raiz y no coincide con {markdown}; no se reemplaza.")
+                print(f"[AVISO] Ya existe {enlace_archivo(destino)} en la raiz y no coincide con {enlace_archivo(markdown)}; no se reemplaza.")
                 continue
 
         if destino.exists() and destino.resolve() != markdown.resolve():
             destino.unlink()
-        shutil.move(str(markdown), str(destino))
-        os.utime(destino, None)
+        shutil.copy2(markdown, destino)
         MARKDOWNS_DEMOSTRACIONES_WEB_PREPARADOS[project_name] = markdown
 
 def _restaurar_markdown_preparado(public_name):
@@ -823,9 +1065,11 @@ def _mover_pdf_generado_al_proyecto(project_name, proyecto):
     return pdf_proyecto
 
 
-def _mover_derivados_generados_al_proyecto(project_name, proyecto):
+def _mover_derivados_generados_al_proyecto(project_name, proyecto, incluir_formales=True):
     destinos = {}
     for carpeta, extension in (("json", ".json"), ("lean", ".lean"), ("prolog", ".pl")):
+        if extension != ".json" and not incluir_formales:
+            continue
         origen = PROJECT_ROOT / carpeta / f"{project_name}{extension}"
         nombre_destino = (
             f"{project_name}.extracted.json"
@@ -840,7 +1084,7 @@ def _mover_derivados_generados_al_proyecto(project_name, proyecto):
             destino.unlink()
         shutil.move(str(origen), str(destino))
         destinos[extension] = destino
-        print(f"  {destino.name} devuelto al proyecto desde {carpeta}/")
+        print(f"  {enlace_archivo(destino)} devuelto al proyecto desde {carpeta}/")
     return destinos
 
 
@@ -856,13 +1100,63 @@ def _preparar_evaluacion_lean_existente(project_name, proyecto):
         proyecto / "evaluaciones" / f"AUDITORIA_{project_name}.md",
         proyecto / "evaluaciones" / f"AUDITORIA_{project_name}.json",
         proyecto / "logs" / f"AUDITORIA_{project_name}.log",
+        proyecto / "evaluaciones" / f"NUMERICO_{project_name}.md",
+        proyecto / "evaluaciones" / f"NUMERICO_{project_name}.json",
+        proyecto / "evaluaciones" / f"NUMERICO_{project_name}.log",
+        proyecto / "evaluaciones" / f"NUMERICO_DATOS_{project_name}.json",
+        proyecto / "evaluaciones" / f"TEMPORAL_{project_name}.md",
+        proyecto / "evaluaciones" / f"TEMPORAL_{project_name}.json",
+        proyecto / "evaluaciones" / f"TEMPORAL_{project_name}.log",
     ]
     for origen in candidatos:
         if origen.is_file():
             shutil.copy2(origen, proyecto / origen.name)
 
 
-def preparar_demostraciones_web(project_names):
+def _generar_derivados_publicables(md_obj, fuente, project_name):
+    from PackPublica.lean import LeanCompilationError
+
+    hash_antes = _sha256_archivo(fuente)
+    diagnostico = None
+    try:
+        derivados = md_obj.generar_derivados(page_size=PAGE_SIZE)
+    except LeanCompilationError as error:
+        if _sha256_archivo(fuente) != hash_antes:
+            raise RuntimeError("La fuente cambio durante la traduccion; se cancela la publicacion.") from error
+        # Reintenta solo los formatos editoriales; no reutiliza Lean como prueba.
+        derivados = md_obj.generar_derivados(
+            page_size=PAGE_SIZE, generar_lean=False, generar_prolog=False,
+        )
+        diagnostico = {
+            "project": project_name,
+            "source_sha256": hash_antes,
+            "status": "ERROR_HERRAMIENTA_TRADUCCION_LEAN",
+            "category": "tool_error",
+            "document_verdict": "NO_EMITIDO",
+            "formal_certification": "PENDIENTE",
+            "publication_blocked_by_translation": False,
+            "detail": str(error),
+            "message": (
+                "Evaluacion Lean pendiente por limitacion del traductor. "
+                "Esta via no emite un juicio sobre la validez del documento "
+                "ni altera los resultados de los otros evaluadores. "
+                "La vigencia de cada certificado se comprueba con sus propias evidencias."
+            ),
+        }
+    if _sha256_archivo(fuente) != hash_antes:
+        raise RuntimeError("La fuente cambio durante la generacion; se cancela la publicacion.")
+    reporte = _proyecto_dir(project_name) / f"TRADUCCION_{project_name}.json"
+    if diagnostico is not None or reporte.exists():
+        estado = diagnostico or {
+            "project": project_name, "source_sha256": hash_antes,
+            "status": "TRADUCCION_GENERADA", "formal_certification": "PENDIENTE",
+            "document_verdict": "NO_EMITIDO",
+        }
+        reporte.write_text(json.dumps(estado, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    return derivados, diagnostico
+
+
+def preparar_demostraciones_web(project_names, sin_evaluacion=()):
     index_php = _index_proyectos_web()
 
     for project_spec in project_names:
@@ -874,11 +1168,16 @@ def preparar_demostraciones_web(project_names):
         else:
             shutil.copy2(index_php, proyecto / "index.php")
 
-        _mover_derivados_generados_al_proyecto(project_name, proyecto)
+        _mover_derivados_generados_al_proyecto(
+            project_name, proyecto, incluir_formales=project_name not in sin_evaluacion,
+        )
 
         # El Markdown se movio temporalmente a la raiz para PUBLICAR. Debe
         # regresar antes de comprobar y publicar los artefactos del proyecto.
         _restaurar_markdown_preparado(project_name)
+
+        # La extraccion actual ya esta instalada, incluso si fallo Lean.
+        normalizar_informes_adec_proyecto(project_name)
 
         if not (proyecto / f"{project_name}.md").exists():
             print(f"[AVISO] Falta {project_name}.md; no se publicara ese artefacto.")
@@ -886,7 +1185,8 @@ def preparar_demostraciones_web(project_names):
         if _mover_pdf_generado_al_proyecto(project_name, proyecto) is None:
             print(f"[AVISO] Falta {project_name}.pdf; no se publicara ese artefacto.")
 
-        _preparar_evaluacion_lean_existente(project_name, proyecto)
+        if project_name not in sin_evaluacion:
+            _preparar_evaluacion_lean_existente(project_name, proyecto)
 
 
 def _nodos_verificados_por_lean(aseveraciones, compilacion_correcta):
@@ -914,6 +1214,17 @@ def _leer_auditoria_lean(contenido_lean):
     aseveraciones = []
     source_claims = []
     obligaciones_deductivas = []
+    def leer_marcadores(nombre):
+        registros = []
+        for match in re.finditer(r"^[ \t]*-- " + re.escape(nombre) + r": (.+)$", contenido_lean, re.MULTILINE):
+            try:
+                registro = json.loads(match.group(1))
+                if not isinstance(registro, dict):
+                    raise ValueError("El marcador debe contener un objeto")
+                registros.append(registro)
+            except (json.JSONDecodeError, ValueError):
+                registros.append({"status": "INVALID_AUDIT_MARKER", "source": match.group(1)})
+        return registros
     for match in re.finditer(r"^-- DEMUESTRA_SOURCE_CLAIM: (.+)$", contenido_lean, re.MULTILINE):
         try:
             source_claims.append(json.loads(match.group(1)))
@@ -985,6 +1296,13 @@ def _leer_auditoria_lean(contenido_lean):
     return {
         "assertions": aseveraciones,
         "source_claims": source_claims,
+        "source_prose": leer_marcadores("DEMUESTRA_SOURCE_PROSE"),
+        "pending_proof_details": leer_marcadores("DEMUESTRA_PENDING_PROOF"),
+        "source_domains": leer_marcadores("DEMUESTRA_SOURCE_DOMAIN"),
+        "source_transports": leer_marcadores("DEMUESTRA_TRANSPORT_DEFINITION"),
+        "source_coordinates": leer_marcadores("DEMUESTRA_COORDINATE_DEFINITION"),
+        "source_coordinate_scopes": leer_marcadores("DEMUESTRA_TEXT_COORDINATE_SCOPE"),
+        "source_transversal_maps": leer_marcadores("DEMUESTRA_TRANSVERSAL_MAP"),
         "deductive_obligations": obligaciones_deductivas,
         "formalization_status": estado_match.group(1) if estado_match else None,
         "pending_result": pendiente_match.group(1) if pendiente_match else None,
@@ -1250,7 +1568,7 @@ def evaluar_lean_proyecto(project_name):
         veredicto = (
             "COMPILA; TRADUCCION COMPLETA"
             if demostracion_completa is True else
-            "COMPILA; TRADUCCION COMPLETA; DEMOSTRACION NO CERTIFICADA"
+            "COMPILA; FORMALIZACION AUTOMATICA INCOMPLETA; DEMOSTRACION NO CERTIFICADA"
         )
         tipo_fallo = None
         diagnostico = (
@@ -1386,6 +1704,13 @@ def evaluar_lean_proyecto(project_name):
         "proof_complete_declared_by_generator": demostracion_completa,
         "assertions": aseveraciones_informadas,
         "source_claims": source_claims,
+        "source_prose": auditoria_lean.get("source_prose", []),
+        "pending_proof_details": auditoria_lean.get("pending_proof_details", []),
+        "source_domains": auditoria_lean.get("source_domains", []),
+        "source_transports": auditoria_lean.get("source_transports", []),
+        "source_coordinates": auditoria_lean.get("source_coordinates", []),
+        "source_coordinate_scopes": auditoria_lean.get("source_coordinate_scopes", []),
+        "source_transversal_maps": auditoria_lean.get("source_transversal_maps", []),
         "evidence_traces": trazas,
         "conditional_premises": premisas_condicionales,
         "deductive_obligations": obligaciones_deductivas,
@@ -1647,6 +1972,20 @@ def evaluar_lean_proyecto(project_name):
         "",
         lista_aseveraciones,
         "",
+        "## Pendientes del generador",
+        "",
+        "Estos registros localizan pruebas que el generador no ha construido. "
+        "No significan que el contenido falte en el Markdown ni constituyen una refutacion.",
+        "",
+        "\n".join(
+            f"- `{item.get('node')}`: origen `{item.get('location')}`; "
+            "no se ha generado la derivacion completa. "
+            "Pruebas parciales emitidas: "
+            + (", ".join(f"`{part['theorem']}`" for part in item.get("partial_theorems", [])) or "ninguna")
+            + "."
+            for item in auditoria_lean.get("pending_proof_details", [])
+        ) or "Sin registros de pendientes del generador en esta fuente.",
+        "",
         "## Afirmaciones traducidas y estado de certificacion",
         "",
         lista_fuente,
@@ -1709,10 +2048,11 @@ def evaluar_lean_proyecto(project_name):
     for item in premisas_condicionales:
         print(f"  Premisa condicional pendiente: {item['node']} ({item['location']}); A y B son necesarios para concluir C.")
     print(f"  Accion: {accion}")
-    print(f"  Veredicto: {veredicto_md}")
+    print(f"  Veredicto: {enlace_archivo(veredicto_md)}")
     print(
         "  Evidencias preparadas para la web: "
-        f"LEAN_{project_name}.md, LEAN_{project_name}.json y LEAN_{project_name}.log"
+        + ", ".join(enlace_archivo(proyecto / f"LEAN_{project_name}{ext}")
+                    for ext in (".md", ".json", ".log"))
     )
     return aprobado
 
@@ -1788,6 +2128,99 @@ def _trazas_prolog_markdown(trazas, prefix):
         )
         lineas.append("")
     return "\n".join(lineas)
+
+
+def evaluar_prolog_json_inicial(project_name):
+    """Comprueba solo el grafo JSON inicial, sin leer Lean ni Markdown."""
+    proyecto = _proyecto_dir(project_name)
+    source = proyecto / f"{project_name}.extracted.json"
+    datos = {
+        "project": project_name, "tool": "SWI-Prolog",
+        "branch": "INITIAL_JSON_TO_PROLOG",
+        "input_file": source.name,
+        "generated_on": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "passed": False, "refuted": False, "mathematical_status": "NO DETERMINADO",
+        "scope": "Alcanzabilidad en el grafo de dependencias declarado del JSON inicial. No verifica la validez matematica de las reglas ni consulta las otras ramas.",
+        "verdict": "INCONCLUSO", "exit_code": None,
+    }
+    output = ""
+    if source.is_file():
+        initial = json.loads(source.read_text(encoding="utf-8"))
+        _normalizar_relaciones_adec(initial)
+        try:
+            validate_artifact(initial)
+        except ValueError as exc:
+            raise ValueError(f"{source}: {exc}") from exc
+        if initial.get("adec_metadata_repairs"):
+            datos["input_metadata_repairs"] = initial["adec_metadata_repairs"]
+        goal = _objetivo_formal_desde_nodos(initial)
+        datos.update(input_sha256=_sha256_archivo(source), goal=goal)
+        executable = shutil.which("swipl")
+        if executable is None:
+            for candidate in (Path(r"C:\Program Files\swipl\bin\swipl.exe"),
+                              Path(r"C:\Program Files\SWI-Prolog\bin\swipl.exe")):
+                if candidate.is_file():
+                    executable = str(candidate)
+                    break
+        if executable and goal:
+            result = subprocess.run([executable, "-q", "-s",
+                str(PROJECT_ROOT / "PckDemuestra/audita_json.pl"), "--", str(source), goal],
+                cwd=proyecto, capture_output=True, text=True, encoding="utf-8", errors="replace", check=False)
+            output = (result.stdout or "") + (result.stderr or "")
+            marker = "RESULTADO PROLOG JSON: OBJETIVO_ALCANZABLE_DESDE_PREMISAS_DECLARADAS"
+            datos.update(exit_code=result.returncode, passed=result.returncode == 0 and marker in output,
+                         verdict="ALCANZABLE_EN_GRAFO_DECLARADO" if result.returncode == 0 and marker in output else "NO_VERIFICADO")
+    datos["diagnosis"] = datos["verdict"] + ". " + datos["scope"]
+    datos["output"] = output
+    _adec_compatibilizar(project_name, datos, "prolog_initial_json_dependency_reachability",
+                        f"EVAL_PROLOG_JSON_{project_name}", "Prolog desde el JSON inicial", datos["diagnosis"])
+    evaluations = proyecto / "evaluaciones"
+    logs = proyecto / "logs"
+    evaluations.mkdir(parents=True, exist_ok=True)
+    logs.mkdir(parents=True, exist_ok=True)
+    name = f"PROLOG_JSON_{project_name}"
+    path = evaluations / f"{name}.json"
+    path.write_text(json.dumps(datos, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    shutil.copy2(path, proyecto / path.name)
+    (logs / f"{name}.log").write_text(output, encoding="utf-8")
+    return datos["passed"]
+
+
+def guardar_resultado_prolog_desde_lean(project_name, codigo, estado, salida):
+    """Conserva el auditor del Lean separado del Prolog originado en MD."""
+    proyecto = _proyecto_dir(project_name)
+    lean = proyecto / f"{project_name}.lean"
+    datos = {
+        "project": project_name, "tool": "SWI-Prolog",
+        "generated_on": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "branch": "MD_TO_LEAN_TO_PROLOG",
+        "input_file": lean.name,
+        "input_sha256": _sha256_archivo(lean) if lean.is_file() else None,
+        "verdict": estado or "INCONCLUSO",
+        "exit_code": codigo,
+        "passed": False,
+        "structural_checks_passed": estado in {"CERTIFICADO_ESTRUCTURAL", "TRADUCCION_COMPLETA"},
+        "goal_reachability_verified": False,
+        "kernel_executed": False,
+        "refuted": False,
+        "mathematical_status": "NO DETERMINADO",
+        "diagnosis": "Auditoria independiente de la estructura del codigo Lean; no sustituye una prueba del objetivo.",
+        "scope": "Lee exclusivamente el archivo Lean. El auditor actual no acredita por si solo la alcanzabilidad completa del objetivo matematico.",
+        "output": salida,
+    }
+    _adec_compatibilizar(project_name, datos, "prolog_from_lean_structural_audit",
+                        f"EVAL_PROLOG_DESDE_LEAN_{project_name}",
+                        "Auditoria Prolog independiente del archivo Lean", datos["diagnosis"])
+    evaluations = proyecto / "evaluaciones"
+    logs = proyecto / "logs"
+    evaluations.mkdir(parents=True, exist_ok=True)
+    logs.mkdir(parents=True, exist_ok=True)
+    name = f"PROLOG_DESDE_LEAN_{project_name}"
+    path = evaluations / f"{name}.json"
+    path.write_text(json.dumps(datos, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    shutil.copy2(path, proyecto / path.name)
+    (logs / f"{name}.log").write_text(salida, encoding="utf-8")
+    return datos
 
 
 def evaluar_prolog_proyecto(project_name):
@@ -1889,63 +2322,11 @@ def evaluar_prolog_proyecto(project_name):
             re.MULTILINE,
         )
         auditoria_lean_estado = estado_match.group(1) if estado_match else None
-        salida += "\n--- AUDITORIA DEL RECORRIDO LEAN ---\n" + auditoria_lean_salida
-        if veredicto == "ARBOL COMPLETO":
-            if auditoria_lean_estado == "CERTIFICADO_ESTRUCTURAL":
-                diagnostico = (
-                    "Prolog cerro independientemente el arbol declarado. La "
-                    "auditoria estatica del archivo Lean certifico su estructura "
-                    "y sus conteos, sin ejecutar el kernel de Lean en esta ruta."
-                )
-                accion = (
-                    "Consultar por separado el informe del evaluador Lean para "
-                    "conocer el estado de compilacion y prueba."
-                )
-            elif auditoria_lean_estado == "CERTIFICADO":
-                diagnostico = (
-                    "Prolog cerro independientemente el arbol declarado. En su "
-                    "propia ejecucion, el auditor Lean compilo y certifico el "
-                    "archivo evaluado."
-                )
-            elif auditoria_lean_estado == "TRADUCCION_COMPLETA":
-                diagnostico = (
-                    "PUBLICAR traslado a codigo Lean los nodos y relaciones "
-                    "deductivas reconocidos en el Markdown, y Lean compilo esa "
-                    "representacion. La auditoria deductiva corresponde al "
-                    "Prolog independiente; este estado no inventa una prueba Lean."
-                )
-                accion = "No se requiere reparar la traduccion MD-a-Lean."
-            elif auditoria_lean_estado == "ERROR_PROPIO_DEL_AUDITOR":
-                auditoria_lean_error = True
-                diagnostico = (
-                    "Prolog cerro el arbol declarado. El auditor Lean registro un "
-                    "error propio aislado; se conserva como ERROR_EVALUADOR y no "
-                    "refuta el Markdown ni degrada el resultado estructural Prolog."
-                )
-                accion = (
-                    "Revisar el auditor Lean y repetir esa auditoria; mantener "
-                    "las evaluaciones independientes ya producidas."
-                )
-            elif auditoria_lean_estado in {"INCOMPLETO", "NO_DECIDIBLE"}:
-                veredicto = auditoria_lean_estado.replace("_", " ")
-                diagnostico = (
-                    "El archivo Lean compila, pero el auditor no encontro una "
-                    "certificacion completa de todas sus consecuencias. Esto no "
-                    "declara incorrecta ninguna formula."
-                )
-                accion = (
-                    "Revisar los enlaces que el auditor identifica sin derivacion "
-                    "o fuera de su fragmento decidible."
-                )
-            else:
-                veredicto = "INCONCLUSO"
-                diagnostico = (
-                    "El auditor independiente no produjo un estado reconocible."
-                )
-                accion = (
-                    "Revisar el entorno y el propio auditor; no emitir ningun "
-                    "juicio sobre la entrada."
-                )
+        auditoria_lean_error = auditoria_lean_estado == "ERROR_PROPIO_DEL_AUDITOR"
+
+    guardar_resultado_prolog_desde_lean(
+        project_name, auditoria_lean_codigo, auditoria_lean_estado, auditoria_lean_salida,
+    )
 
     enlaces_ausentes = [
         {"node": node, "provider": provider, "symbol": symbol}
@@ -1959,6 +2340,9 @@ def evaluar_prolog_proyecto(project_name):
     datos = {
         "project": project_name,
         "tool": "SWI-Prolog",
+        "branch": "MD_TO_PROLOG_FORMAL_GRAPH",
+        "lean_route_audit_report": f"PROLOG_DESDE_LEAN_{project_name}.json",
+        "lean_route_audit_affects_verdict": False,
         "generated_on": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "verdict": veredicto,
         "passed": veredicto == "ARBOL COMPLETO",
@@ -2086,7 +2470,7 @@ def evaluar_prolog_md_directo(project_name):
     veredicto = (
         "TEOREMA DERIVADO DESDE PREMISAS DECLARADAS"
         if aprobado else
-        "NO DEMOSTRADO" if codigo not in {40, 127} else
+        "EVALUACION PENDIENTE" if codigo == 2 else
         "ERROR EVALUADOR"
     )
 
@@ -2102,6 +2486,22 @@ def evaluar_prolog_md_directo(project_name):
             re.MULTILINE,
         )
     }
+    estados_nodos = {
+        nombre.upper(): estado.upper()
+        for nombre, estado in re.findall(
+            r"^COBERTURA_MD\|([^|]+)\|([^\r\n]+)$", salida, re.MULTILINE
+        )
+    }
+    cobertura = {
+        "scope": "dependency_closure_under_declared_markdown_premises",
+        "certified_nodes": sorted(n for n, s in estados_nodos.items() if s == "CERTIFICADO_ESTRUCTURAL"),
+        "pending_nodes": sorted(n for n, s in estados_nodos.items() if s == "PENDIENTE"),
+        "declared_premises": sorted(n for n, s in estados_nodos.items() if s == "PREMISA_DECLARADA"),
+        "refutations": 0,
+        "not_a_global_mathematical_certificate": True,
+    }
+    cobertura["total"] = len(cobertura["certified_nodes"]) + len(cobertura["pending_nodes"])
+    condiciones_pendientes = re.findall(r"^FALTA: ([^\r\n]+)$", salida, re.MULTILINE)
     prueba_match = re.search(
         r"^(?:ARBOL_DE_PRUEBA|ARBOL_PARCIAL_DE_DEPENDENCIAS):\s*\n(?P<tree>[\s\S]+)$",
         salida,
@@ -2187,6 +2587,7 @@ def evaluar_prolog_md_directo(project_name):
                 "end_line": end_line,
             },
         }
+        node["structural_verification"] = estados_nodos.get(canonical_id, "SIN_EVALUAR")
         if kind in {"proposition", "theorem"}:
             estado = teoremas.get(canonical_id)
             node["proof"] = {
@@ -2210,25 +2611,7 @@ def evaluar_prolog_md_directo(project_name):
         adec_nodes.append(node)
 
     title_match = re.search(r"^#\s+(.+?)\s*$", markdown_text, re.MULTILINE)
-    author_match = re.search(
-        r"^\*\*Autor:\*\*\s*(.+?)\s*$",
-        markdown_text,
-        re.MULTILINE,
-    )
-    framework_match = re.search(
-        r"^\*\*Marco:\*\*\s*(.+?)\s*$",
-        markdown_text,
-        re.MULTILINE,
-    )
-    authors = []
-    if author_match:
-        author = {
-            "name": author_match.group(1).strip(),
-            "conflict_of_interest": "none",
-        }
-        if framework_match:
-            author["affiliation"] = framework_match.group(1).strip()
-        authors.append(author)
+    authors = resolve_authors(markdown_text)
 
     def linea(campo):
         match = re.search(rf"^{re.escape(campo)}: (\d+)$", salida, re.MULTILINE)
@@ -2286,7 +2669,6 @@ def evaluar_prolog_md_directo(project_name):
         "goal": objetivo,
         "goal_declaration_line": linea("DECLARACION_MD_LINEA"),
         "goal_rule_line": linea("REGLA_MD_LINEA"),
-        "goal_qed_line": linea("QED_MD_LINEA"),
         "goal_conclusion": texto("CONCLUSION_OBJETIVO"),
         "nodes_extracted_from_md": numero("NODOS_EXTRAIDOS_MD"),
         "dependency_rules_extracted_from_md": numero("REGLAS_DEPS_EXTRAIDAS_MD"),
@@ -2297,6 +2679,8 @@ def evaluar_prolog_md_directo(project_name):
         ),
         "recovered_dependencies": dependencias_recuperadas,
         "open_obligations": obligaciones_abiertas,
+        "goal_conditions_missing": condiciones_pendientes,
+        "coverage": cobertura,
         "premises_used_by_goal_proof": premisas_usadas,
         "theorems": teoremas,
         "proof_tree": arbol.splitlines() if arbol else [],
@@ -2311,10 +2695,12 @@ def evaluar_prolog_md_directo(project_name):
                 "no convierte automaticamente cada premisa declarada en verdad "
                 "matematica externa."
                 if aprobado else
-                "Conserva el cierre parcial alcanzado, pero no certifica "
-                f"{objetivo or 'el objetivo'} mientras existan obligaciones "
-                "de declaracion o dependencias abiertas. "
-                "El resultado es no demostrado, no refutado."
+                "Conserva los cierres de dependencias verificados por nodo. "
+                f"La evaluacion global de {objetivo or 'el objetivo'} queda pendiente: "
+                + ("; ".join(condiciones_pendientes) if condiciones_pendientes else
+                   "consultar el diagnostico del evaluador") + ". "
+                "La verificacion formal queda pendiente; esto no refuta el argumento "
+                "ni afirma que el Markdown carezca de demostracion."
             )
         ),
     }
@@ -2345,6 +2731,10 @@ def evaluar_prolog_md_directo(project_name):
         "## Veredicto",
         "",
         f"**{veredicto}**",
+        "",
+        f"Certificados estructurales: {len(cobertura['certified_nodes'])}/{cobertura['total']}. Refutaciones: 0.",
+        "Alcance: cierre de dependencias bajo premisas declaradas; no certificacion matematica global.",
+        *[f"Condicion pendiente del evaluador: {condition}" for condition in condiciones_pendientes],
         "",
         f"Entrada unica: `{markdown.name}`",
         f"Nodos extraidos: `{datos['nodes_extracted_from_md']}`",
@@ -2403,6 +2793,10 @@ def evaluar_prolog_md_directo(project_name):
         f"  Evaluacion Prolog directa MD {project_name}: "
         f"{veredicto} (codigo {codigo})"
     )
+    print(
+        f"  Certificados estructurales {len(cobertura['certified_nodes'])}/{cobertura['total']}; "
+        f"premisas declaradas: {len(cobertura['declared_premises'])}; refutaciones: 0."
+    )
     if aprobado:
         print(
             f"  Objetivo {objetivo} derivado desde las premisas y reglas "
@@ -2428,10 +2822,14 @@ def evaluar_formalizaciones_proyectos(project_names):
         prolog_ok = False
         prolog_md_ok = False
         cierre = "ERROR_INTERNO"
+        ejecucion_completa = True
+        fuente = _proyecto_dir(project_name) / f"{project_name}.md"
+        hash_fuente = _sha256_archivo(fuente) if fuente.is_file() else None
 
         try:
             lean_ok = evaluar_lean_proyecto(project_name)
         except Exception as exc:
+            ejecucion_completa = False
             print(
                 f"  [ERROR Lean {project_name}] {type(exc).__name__}: {exc}. "
                 "Se continua con los evaluadores independientes."
@@ -2440,6 +2838,7 @@ def evaluar_formalizaciones_proyectos(project_names):
         try:
             prolog_ok = evaluar_prolog_proyecto(project_name)
         except Exception as exc:
+            ejecucion_completa = False
             print(
                 f"  [ERROR Prolog {project_name}] {type(exc).__name__}: {exc}. "
                 "Se continua con los evaluadores independientes."
@@ -2448,14 +2847,23 @@ def evaluar_formalizaciones_proyectos(project_names):
         try:
             prolog_md_ok = evaluar_prolog_md_directo(project_name)
         except Exception as exc:
+            ejecucion_completa = False
             print(
                 f"  [ERROR Prolog MD {project_name}] {type(exc).__name__}: {exc}. "
                 "Se continua con los evaluadores independientes."
             )
 
         try:
+            evaluar_prolog_json_inicial(project_name)
+        except Exception as exc:
+            ejecucion_completa = False
+            print(f"  [ERROR Prolog JSON {project_name}] {type(exc).__name__}: {exc}. "
+                  "Se conserva el resultado de las otras ramas.")
+
+        try:
             cierre = auditar_cierre_proyecto(project_name)
         except Exception as exc:
+            ejecucion_completa = False
             print(
                 f"  [ERROR Auditoria {project_name}] {type(exc).__name__}: {exc}. "
                 "El error queda aislado en esta evaluacion."
@@ -2469,6 +2877,7 @@ def evaluar_formalizaciones_proyectos(project_names):
                 "ADEC v0.8.6 requiere pegado o carga de archivo."
             )
         except Exception as exc:
+            ejecucion_completa = False
             print(
                 f"  [ERROR ADEC {project_name}] {type(exc).__name__}: {exc}. "
                 "Los veredictos independientes se conservan sin alteracion."
@@ -2489,6 +2898,7 @@ def evaluar_formalizaciones_proyectos(project_names):
                 f"balance {balance:+.1f}%."
             )
         except Exception as exc:
+            ejecucion_completa = False
             print(
                 f"  [ERROR Semaforo {project_name}] {type(exc).__name__}: {exc}. "
                 "Los informes actuales y anteriores permanecen separados."
@@ -2503,6 +2913,8 @@ def evaluar_formalizaciones_proyectos(project_names):
         if cerrado:
             consolidar_json_final(project_name)
             emitir_certificado_proyecto(project_name)
+        if ejecucion_completa and hash_fuente and cierre != "ERROR_INTERNO":
+            _marcar_evaluacion_terminada(project_name, hash_fuente, cerrado)
         resultados.append(cerrado)
 
     return all(resultados)
@@ -2531,7 +2943,22 @@ def preparar_json_publico_no_certificado(project_name):
     temporal = definitivo.with_suffix(".json.tmp")
     temporal.write_text(contenido.rstrip() + "\n", encoding="utf-8")
     os.replace(temporal, definitivo)
-    print(f"  JSON publico independiente: {definitivo.name}")
+    print(f"  JSON publico independiente: {enlace_archivo(definitivo)}")
+
+
+def _clasificacion_evaluacion_lean(lean):
+    if lean.get("passed") is True:
+        estado, categoria, color = "CERTIFICADO", "certified", "green"
+    elif lean.get("compiled") is True or lean.get("execution_passed") is True:
+        estado, categoria, color = "CERTIFICACION_GLOBAL_PENDIENTE", "inconclusive", "gray"
+    elif lean.get("failure_type") or lean.get("exit_code") not in {None, 0}:
+        estado, categoria, color = "ERROR_EVALUADOR", "tool_error", "blue"
+    else:
+        estado, categoria, color = "SIN_EVALUACION_CONCLUYENTE", "inconclusive", "gray"
+    return {
+        "evaluator": "Lean", "state": estado, "category": categoria,
+        "color": color, "detail": lean.get("diagnosis") or lean.get("verdict"),
+    }
 
 
 def _clasificar_fallos_lean_por_nodo(lean_source, lean_log, failed_nodes):
@@ -2576,11 +3003,12 @@ def _clasificar_fallos_lean_por_nodo(lean_source, lean_log, failed_nodes):
             color = "blue"
             detail = joined or "Lean rechazo la construccion tecnica del nodo."
         elif node_messages:
-            state = "NO_DEMOSTRADO"
+            state = "VERIFICACION_FORMAL_PENDIENTE"
             category = "undetermined"
             color = "gray"
             detail = (
-                "Las premisas formalizadas no cerraron el objetivo: " + joined
+                "El evaluador no cerro el objetivo formalizado; esto no refuta "
+                "el argumento del Markdown. Diagnostico: " + joined
             )
         else:
             state = "NO_DETERMINADO"
@@ -2593,6 +3021,8 @@ def _clasificar_fallos_lean_por_nodo(lean_source, lean_log, failed_nodes):
             "category": category,
             "color": color,
             "detail": detail,
+            "scope": "FORMALIZED_REPRESENTATION_ONLY",
+            "source_refuted": False,
         })
     return diagnostics
 
@@ -2735,13 +3165,7 @@ def auditar_cierre_proyecto(project_name):
         item for item in diagnosticos_lean if item["category"] == "undetermined"
     ]
     clasificaciones = [
-        {
-            "evaluator": "Lean",
-            "state": "CERTIFICADO" if lean.get("passed") is True else "ERROR_EVALUADOR",
-            "category": "certified" if lean.get("passed") is True else "tool_error",
-            "color": "green" if lean.get("passed") is True else "blue",
-            "detail": lean.get("diagnosis") or lean.get("verdict"),
-        },
+        _clasificacion_evaluacion_lean(lean),
         {
             "evaluator": "Lean parcial",
             "state": "CERTIFICADO_PARCIAL" if certificados_parciales else "SIN_CERTIFICADO",
@@ -2793,13 +3217,13 @@ def auditar_cierre_proyecto(project_name):
         )
         impacto = (
             f"Hay {numero_tecnicos} {etiqueta_tecnicos} con error tecnico y "
-            f"{len(no_demostrados_lean)} no demostrados con las premisas formalizadas. "
+            f"{len(no_demostrados_lean)} pendientes de verificacion formal. "
             "Corregir los errores tecnicos puede aumentar los positivos sin presentar "
             "las obligaciones abiertas como fallos del Markdown."
         )
     elif no_demostrados_lean:
         recomendacion_primaria = (
-            "Completar o enlazar las premisas formales de los nodos no demostrados, "
+            "Interpretar y enlazar el argumento fuente de los nodos pendientes de verificacion, "
             "sin convertir sus propias conclusiones en hipotesis."
         )
         impacto = (
@@ -2812,6 +3236,15 @@ def auditar_cierre_proyecto(project_name):
             "unicamente nodos y premisas declarados en el Markdown."
         )
         impacto = "Puede completar la derivacion sin inventar nodos ni hipotesis."
+    elif bloqueos_certificado:
+        recomendacion_primaria = (
+            "Conservar los resultados positivos y completar el enlace del resultado "
+            "con una prueba aceptada por el kernel antes de emitir certificado global."
+        )
+        impacto = (
+            "La ausencia de obligaciones en un informe no elimina los bloqueos "
+            "de certificacion registrados ni demuestra el resultado global."
+        )
     else:
         recomendacion_primaria = "Repetir la auditoria completa y emitir el certificado final."
         impacto = "Confirma que todos los evaluadores independientes permanecen en verde."
@@ -2851,6 +3284,8 @@ def auditar_cierre_proyecto(project_name):
         "lean_axioms_status": (
             "INFORMADOS" if axiomas else
             "NINGUNO" if lean.get("passed") is True else
+            "NO_DETERMINADOS_SIN_CERTIFICACION_GLOBAL"
+            if lean.get("compiled") is True or lean.get("execution_passed") is True else
             "NO_DETERMINADOS_POR_ERROR_EVALUADOR"
         ),
         "prolog_direct_markdown": {
@@ -3003,7 +3438,7 @@ def consolidar_json_final(project_name):
     temporal.write_text(contenido.rstrip() + "\n", encoding="utf-8")
     json.loads(temporal.read_text(encoding="utf-8"))
     os.replace(temporal, definitivo)
-    print(f"  JSON final independiente: {definitivo.name}")
+    print(f"  JSON final independiente: {enlace_archivo(definitivo)}")
     print("  Los informes Lean, Prolog y de auditoria permanecen separados.")
     return definitivo
 
@@ -3103,14 +3538,181 @@ def emitir_certificado_proyecto(project_name):
         ]),
         encoding="utf-8",
     )
-    print(f"  Certificado formal emitido: {certificado_json.name}")
+    print(f"  Certificado formal emitido: {enlace_archivo(certificado_json)}")
     return certificado_json
 
 
 # ============================================================
 # MAIN
 # ============================================================
+def diagnosticar_traduccion_proyecto(project_name):
+    """Diagnostica el traductor sin generar derivados ni alterar evidencias."""
+    from types import SimpleNamespace
+    from PackPublica.lean import Lean, LeanCompilationError
+    from PackPublica.formal_symbols import SymbolInference
+    from PackPublica.formal_semantic import SemanticAnalyzer, FormalSemanticError
+
+    proyecto = _proyecto_dir(project_name)
+    source = _markdown_proyecto(proyecto)
+    if source is None:
+        raise ValueError("El proyecto no contiene una fuente cientifica unica.")
+    original = source.read_bytes()
+    frontend = object.__new__(Lean)
+    frontend.md = SimpleNamespace(texto=source.read_text(encoding="utf-8-sig"), fichero=source)
+    report = {
+        "project": project_name,
+        "source_sha256": hashlib.sha256(original).hexdigest(),
+        "diagnostic_scope": "TRANSLATOR_ONLY",
+        "document_verdict": "NO_EMITIDO",
+        "kernel_executed": False,
+        "generated_on": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "semantic_diagnostics": [],
+        "emission_blockers": [],
+    }
+    try:
+        _, classified = frontend._frontend()
+        symbols = SymbolInference().infer(classified)
+        formulas = [formula for node in classified for formula in node.source.formulas]
+        report["formula_count"] = len(formulas)
+        for formula in formulas:
+            try:
+                SemanticAnalyzer(symbols, formula.location).analyze(formula.ast)
+            except FormalSemanticError as error:
+                report["semantic_diagnostics"].append({
+                    "location": formula.location, "source": formula.source, "detail": str(error),
+                })
+        code = frontend._generar()
+        report["status"] = "EMISION_GENERADA_SIN_VERIFICACION_KERNEL"
+        report["executable_sha256"] = hashlib.sha256(
+            "\n".join(line for line in code.splitlines() if not line.startswith("--")).encode("utf-8")
+        ).hexdigest()
+    except (LeanCompilationError, ValueError) as error:
+        report["status"] = "TRADUCCION_PENDIENTE"
+        report["detail"] = str(error)
+        report["emission_blockers"] = [line for line in str(error).splitlines() if line.startswith("- ")]
+    if source.read_bytes() != original:
+        raise RuntimeError("La fuente cambio durante el diagnostico; no se guarda el informe.")
+    output = PROJECT_ROOT / "documentacion" / proyecto.name / "DIAGNOSTICO_TRADUCTOR_ACTUAL.json"
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    print(f"Diagnostico {project_name}: {report['status']}; "
+          f"{len(report['emission_blockers'])} bloqueos de emision. Markdown intacto.")
+    return report
+
+
+def plan_adjuntos_proyecto(project_name):
+    """Rutas completas de los materiales declarados, sin acceder a la red."""
+    proyecto = _proyecto_dir(project_name)
+    files = []
+    if (proyecto / "documentos_proyecto.json").is_file():
+        from PckDemuestra.documentos_proyecto import archivos_publicables
+        for archivo in archivos_publicables(proyecto):
+            relativa = archivo.relative_to(proyecto).as_posix()
+            remoto = f"/estradad.es/teorias/pdf/DEMUESTRA/proyectos/{proyecto.name}/{relativa}"
+            files.append((archivo, remoto))
+        index = _index_proyectos_web()
+        files.append((index, f"/estradad.es/teorias/pdf/DEMUESTRA/proyectos/{proyecto.name}/index.php"))
+    manifest = _proyecto_dir(project_name) / "publicacion_adjuntos.txt"
+    if not manifest.is_file():
+        return files
+    root = PROJECT_ROOT.resolve()
+    for line in manifest.read_text(encoding="utf-8").splitlines():
+        relative = line.strip()
+        if not relative or relative.startswith("#"):
+            continue
+        path = (root / relative).resolve()
+        if (not path.is_relative_to(root)
+                or path.relative_to(root).parts[0] not in {"comparacion", "documentacion"}
+                or any(part.startswith(".") or part == "respaldos"
+                       for part in path.relative_to(root).parts)
+                or path.suffix.lower() not in {".py", ".md", ".json", ".txt", ".pdf"}
+                or not path.is_file()):
+            raise ValueError(f"Adjunto de publicacion no permitido: {relative}")
+        remote = "/estradad.es/teorias/pdf/DEMUESTRA/" + path.relative_to(root).as_posix()
+        files.append((path, remote))
+    return files
+
+
+def publicar_adjuntos_proyecto(ftp, project_name):
+    """Sube materiales con sus rutas relativas; publica la ficha al final."""
+    sincronizar_indices_web([project_name])
+    files = plan_adjuntos_proyecto(project_name)
+    directories = sorted({remote.rsplit('/', 1)[0] for _, remote in files},
+                         key=lambda path: (path.count('/'), path))
+    for directory in directories:
+        ftp.mkdir(directory)
+        print(f"  Directorio remoto preparado: {directory}")
+    def orden(item):
+        path, remote = item
+        priority = 2 if path.name == 'index.php' else 1 if path.name == 'documentos_proyecto.json' else 0
+        return priority, remote
+    for path, remote in sorted(files, key=orden):
+        try:
+            ftp.upload(path, remote)
+        except Exception as exc:
+            raise OSError(f"No se pudo publicar {path} en {remote}: {exc}") from exc
+        print(f"  Adjunto publicado: {enlace_archivo(path)} -> {remote}")
+    return len(files)
+
+
 if __name__ == "__main__":
+    if len(sys.argv) == 2 and sys.argv[1] == "--sincronizar-indices":
+        nombres = _nombres_proyectos(PROJECT_ROOT / "Proyectos") + _nombres_proyectos(PROJECT_ROOT / "YaEvaluado")
+        for path in sincronizar_indices_web(nombres):
+            print(f"  Indice comun sincronizado: {enlace_archivo(path)}")
+        print("Todas las fichas locales coinciden con el indice comun. Sin publicar.")
+        sys.exit(0)
+    if len(sys.argv) == 3 and sys.argv[1] == "--plan-publicacion":
+        nombres = _nombres_proyectos(PROJECT_ROOT / "Proyectos") + _nombres_proyectos(PROJECT_ROOT / "YaEvaluado")
+        matches = [nombre for nombre in nombres
+                   if nombre == sys.argv[2] or _proyecto_dir(nombre).name == sys.argv[2]]
+        if len(matches) != 1:
+            raise SystemExit("Debe indicar un proyecto existente y no ambiguo.")
+        files = plan_adjuntos_proyecto(matches[0])
+        for path, remote in files:
+            print(f"  {enlace_archivo(path)} -> {remote}")
+        print(f"{len(files)} archivos preparados. Sin subir archivos ni modificar la web.")
+        sys.exit(0)
+    if len(sys.argv) == 3 and sys.argv[1] == "--sincronizar-locales":
+        from PckDemuestra.documentos_proyecto import sincronizar_locales
+        if sys.argv[2] not in {"ES_42", "ES_52"}:
+            raise SystemExit("La sincronizacion con UNIHOLOG se limita a los proyectos 42 y 52.")
+        destinos = sincronizar_locales(_proyecto_dir(sys.argv[2]), PROJECT_ROOT.parent / "UNIHOLOG")
+        for destino in destinos:
+            print(f"  Sincronizado: {enlace_archivo(destino)}")
+        print(f"{len(destinos)} copias locales verificadas. Sin publicar ni certificar.")
+        sys.exit(0)
+    if len(sys.argv) == 3 and sys.argv[1] == "--documentos-locales":
+        from PckDemuestra.documentos_proyecto import generar_locales
+        proyecto = _proyecto_dir(sys.argv[2])
+        informe = generar_locales(proyecto)
+        for documento in informe["documentos"]:
+            print(f"  Fuente: {enlace_archivo(proyecto / documento['fuente'])}")
+            for derivado in documento['derivados'].values():
+                print(f"  Generado: {enlace_archivo(proyecto / derivado['ruta'])}")
+        print(f"{len(informe['documentos'])} documentos locales generados. Sin publicar ni certificar.")
+        sys.exit(0)
+    if len(sys.argv) == 3 and sys.argv[1] in {"--auditar-proyecto", "--diagnosticar-traduccion"}:
+        requested = _nombre_proyecto_web(sys.argv[2])
+        names = _nombres_proyectos(PROJECT_ROOT / "Proyectos")
+        names += _nombres_proyectos(PROJECT_ROOT / "YaEvaluado")
+        matches = [name for name in names
+                   if name == requested or _proyecto_dir(name).name == requested]
+        if len(matches) != 1:
+            raise SystemExit("Debe indicar un proyecto existente y no ambiguo.")
+        project_name = matches[0]
+        if not proyecto_evaluable(_proyecto_dir(project_name)):
+            print(aviso_no_demostracion(fuente_principal(_proyecto_dir(project_name)) or f"{project_name}.md"))
+            sys.exit(0)
+        if sys.argv[1] == "--diagnosticar-traduccion":
+            report = diagnosticar_traduccion_proyecto(project_name)
+            sys.exit(1 if report["status"] == "TRADUCCION_PENDIENTE" else 0)
+        guardar_evaluacion_anterior(project_name)
+        auditar_cierre_proyecto(project_name)
+        actualizar_semaforo_evaluacion(project_name)
+        print(f"Auditoria actualizada por publica.py: {project_name}. Sin generar certificados.")
+        sys.exit(0)
+
     if len(sys.argv) == 3 and sys.argv[1] == "--restaurar-anterior":
         resultado = restaurar_evaluacion_anterior(sys.argv[2], confirmar=True)
         print(
@@ -3119,8 +3721,33 @@ if __name__ == "__main__":
         )
         sys.exit(0)
 
+    _forzados_cli, _argv_limpio = _extraer_proyectos_forzados_cli(sys.argv)
+    PROYECTOS_FORZADOS_WEB.update(_forzados_cli)
+    seleccion_aislada = "--solo-proyecto" in _argv_limpio
+    if seleccion_aislada:
+        if not PROYECTOS_FORZADOS_WEB or _forzado_todos():
+            raise SystemExit("--solo-proyecto requiere forzado=<proyecto>, no todos.")
+        _argv_limpio.remove("--solo-proyecto")
+    sys.argv[:] = _argv_limpio
+    proyectos_pendientes_ejecucion = _proyectos_pendientes_web()
+    seleccion_evaluable = []
+    for nombre in proyectos_pendientes_ejecucion:
+        if proyecto_evaluable(_proyecto_dir(nombre)):
+            seleccion_evaluable.append(nombre)
+        else:
+            print(aviso_no_demostracion(fuente_principal(_proyecto_dir(nombre)) or f"{nombre}.md"))
+    proyectos_pendientes_ejecucion = seleccion_evaluable
+    if seleccion_aislada:
+        proyectos_pendientes_ejecucion = [
+            name for name in proyectos_pendientes_ejecucion if _proyecto_forzado(name)
+        ]
+        if not proyectos_pendientes_ejecucion:
+            raise SystemExit("No se encontro el proyecto solicitado.")
+    errores_derivados = []
+    fallos_traduccion = {}
+
     if TEST & 64:
-        for _project_name in _proyectos_pendientes_web():
+        for _project_name in proyectos_pendientes_ejecucion:
             if guardar_evaluacion_anterior(_project_name):
                 print(
                     f"  Evaluacion anterior conservada: "
@@ -3129,7 +3756,7 @@ if __name__ == "__main__":
 
     p = Publicar(__file__)
 
-    preparar_markdowns_demostraciones_web(_proyectos_pendientes_web())
+    preparar_markdowns_demostraciones_web(proyectos_pendientes_ejecucion)
 
     # Procesar documentos (TEST & 1, 2...)
     if TEST & 1:
@@ -3138,38 +3765,39 @@ if __name__ == "__main__":
         if md_obj is None:
             print("[ERROR] Documento de prueba no encontrado.")
             sys.exit(1)
-        print(f"[INFO] Modo prueba: {md_obj.documento.nombre}")
-        md_objects = (
-            [md_obj]
-            if _es_markdown_demostracion(Path(md_obj.documento.nombre).with_suffix(".md"))
-            else []
-        )
+        print(f"[INFO] Modo prueba: {enlace_archivo(PROJECT_ROOT / Path(md_obj.documento.nombre).with_suffix('.md'))}")
+        md_objects = [md_obj]
+        fuente_prueba = PROJECT_ROOT / Path(md_obj.documento.nombre).with_suffix(".md")
+        if not _es_markdown_demostracion(fuente_prueba):
+            print(aviso_no_demostracion(fuente_prueba))
 
     if TEST & 2:
         print(f"TEST{TEST}: Procesando documentos...")
         print("[INFO] Explorando todos los documentos...")
-        p.FORZADO = False
+        p.FORZADO = _forzado_todos()
 
         md_objects = p.explorar()
 
-        md_objects_omitidos = [
-            md_obj for md_obj in md_objects
-            if not _es_markdown_demostracion(
-                Path(md_obj.documento.nombre).with_suffix(".md")
-            )
-        ]
-        md_objects = [
-            md_obj for md_obj in md_objects
-            if _es_markdown_demostracion(
-                Path(md_obj.documento.nombre).with_suffix(".md")
-            )
-        ]
-
-        for md_obj in md_objects_omitidos:
-            print(
-                "  Se omite sin generar PDF/Lean/JSON: "
-                f"{Path(md_obj.documento.nombre).with_suffix('.md').name}"
-            )
+        seleccionados = []
+        proyectos_conocidos = set(_proyectos_publicables_web())
+        for md_obj in md_objects:
+            nombre = Path(md_obj.documento.nombre).with_suffix(".md").name
+            fuente = PROJECT_ROOT / nombre
+            proyecto = Path(nombre).stem
+            if not _es_markdown_demostracion(fuente):
+                print(aviso_no_demostracion(fuente))
+                if _forzado_todos() or not _documento_raiz_vigente(nombre, _sha256_archivo(fuente)):
+                    seleccionados.append(md_obj)
+                continue
+            if proyecto in proyectos_conocidos:
+                if proyecto not in proyectos_pendientes_ejecucion:
+                    print(f"  Se omite proyecto ya evaluado sin cambios: {enlace_archivo(fuente)}")
+                    continue
+            elif not _forzado_todos() and _documento_raiz_vigente(nombre, _sha256_archivo(fuente)):
+                print(f"  Se omite documento raiz sin cambios: {enlace_archivo(fuente)}")
+                continue
+            seleccionados.append(md_obj)
+        md_objects = seleccionados
 
         print(f"[INFO] Encontrados {len(md_objects)} archivos .md")
 
@@ -3181,46 +3809,65 @@ if __name__ == "__main__":
             tipo = type(doc).__name__
             # print(f"\nProcesando: {doc.nombre} ({tipo})")
             try:
+                nombre_fuente = Path(doc.nombre).with_suffix(".md").name
+                fuente = PROJECT_ROOT / nombre_fuente
+                hash_fuente = _sha256_archivo(fuente)
+                es_proyecto = Path(nombre_fuente).stem in proyectos_pendientes_ejecucion
+                md_obj.forzado = _forzado_todos() or (es_proyecto and _proyecto_forzado(fuente.stem))
                 if hasattr(md_obj, "generar_derivados"):
-                    # Como en todos los proyectos PUBLICAR, JSON y Lean se
-                    # generan siempre. DEMUESTRA valida despues que el Lean no
-                    # sea solo el esqueleto generico antes de evaluarlo.
-                    derivados = md_obj.generar_derivados(page_size=PAGE_SIZE)
+                    # Los documentos editoriales no entran en la ruta formal.
+                    if es_proyecto:
+                        project_name = Path(nombre_fuente).stem
+                        derivados, diagnostico = _generar_derivados_publicables(
+                            md_obj, fuente, project_name,
+                        )
+                        if diagnostico is not None:
+                            fallos_traduccion[project_name] = diagnostico
+                            print(
+                                f"  [ERROR HERRAMIENTA] {project_name}: fallo de traduccion Lean. "
+                                "No es un error cientifico demostrado del MD. "
+                                "La publicacion continua; certificacion pendiente."
+                            )
+                    else:
+                        derivados = md_obj.generar_derivados(
+                            page_size=PAGE_SIZE, generar_json=False,
+                            generar_lean=False, generar_prolog=False,
+                        )
 
                     if derivados.get("html") is not None:
-                        print("  [OK] HTML guardado en htmls/")
+                        print(f"  [OK] HTML guardado: {enlace_archivo(PROJECT_ROOT / 'htmls' / fuente.with_suffix('.html').name)}")
                     else:
-                        print("  [OK] HTML ya actualizado; no se regenera.")
+                        print(f"  [OK] HTML ya actualizado: {enlace_archivo(PROJECT_ROOT / 'htmls' / fuente.with_suffix('.html').name)}; no se regenera.")
 
                     if derivados.get("pdf") is not None:
-                        print("  [OK] PDF guardado en pdfs/")
+                        print(f"  [OK] PDF guardado: {enlace_archivo(PROJECT_ROOT / 'pdfs' / fuente.with_suffix('.pdf').name)}")
 
                     if derivados.get("docx") is not None:
-                        print("  [OK] DOCX guardado en docxs/ (y ODT generado automaticamente)")
+                        print(f"  [OK] DOCX guardado: {enlace_archivo(PROJECT_ROOT / 'docxs' / fuente.with_suffix('.docx').name)}; ODT: {enlace_archivo(PROJECT_ROOT / 'odts' / fuente.with_suffix('.odt').name)}")
 
                     if derivados.get("json") is not None:
-                        print("  [OK] JSON generado en json/")
+                        print(f"  [OK] JSON generado: {enlace_archivo(PROJECT_ROOT / 'json' / fuente.with_suffix('.json').name)}")
 
                     if derivados.get("lean") is not None:
                         print(
-                            "  [OK] Lean generado en lean/; DEMUESTRA comprobara "
+                            f"  [OK] Lean generado: {enlace_archivo(PROJECT_ROOT / 'lean' / fuente.with_suffix('.lean').name)}; DEMUESTRA comprobara "
                             "su compilacion en la siguiente fase"
                         )
                     if derivados.get("prolog") is not None:
-                        print("  [OK] Prolog deductivo generado en prolog/")
+                        print(f"  [OK] Prolog deductivo generado: {enlace_archivo(PROJECT_ROOT / 'prolog' / fuente.with_suffix('.pl').name)}")
                 else:
                     html_obj = md_obj.html()
                     if html_obj is None:
                         continue
 
                     html_obj.save()
-                    print("  [OK] HTML guardado en htmls/")
+                    print(f"  [OK] HTML guardado: {enlace_archivo(PROJECT_ROOT / 'htmls' / fuente.with_suffix('.html').name)}")
 
                     if html_obj.contenido:
                         html_obj.pdf(page_size=PAGE_SIZE).save()
-                        print("  [OK] PDF guardado en pdfs/")
+                        print(f"  [OK] PDF guardado: {enlace_archivo(PROJECT_ROOT / 'pdfs' / fuente.with_suffix('.pdf').name)}")
                         html_obj.docx().save()
-                        print("  [OK] DOCX guardado en docxs/ (y ODT generado automaticamente)")
+                        print(f"  [OK] DOCX guardado: {enlace_archivo(PROJECT_ROOT / 'docxs' / fuente.with_suffix('.docx').name)}; ODT: {enlace_archivo(PROJECT_ROOT / 'odts' / fuente.with_suffix('.odt').name)}")
                     else:
                         print("  [AVISO] HTML vacio, no se generan formatos derivados.")
 
@@ -3232,8 +3879,13 @@ if __name__ == "__main__":
                         page_size=PAGE_SIZE
                     )
 
+                if not es_proyecto and (PROJECT_ROOT / "pdfs" / f"{fuente.stem}.pdf").is_file():
+                    if _sha256_archivo(fuente) != hash_fuente:
+                        raise RuntimeError(f"La fuente cambio durante la generacion: {nombre_fuente}")
+                    _marcar_documento_raiz(nombre_fuente, hash_fuente)
+
             except Exception as e:
-                print(f"  [ERROR] Error en la lista de documentos: {e}")
+                print(f"  [ERROR] {enlace_archivo(PROJECT_ROOT / Path(doc.nombre).with_suffix('.md'))}: {e}")
                 import traceback
                 traceback.print_exc()
                 nombre_fallido = Path(doc.nombre).with_suffix("").name
@@ -3241,22 +3893,16 @@ if __name__ == "__main__":
 
         if errores_derivados:
             for nombre_fallido, _ in errores_derivados:
-                for carpeta, extension in (
-                    ("json", ".json"),
-                    ("lean", ".lean"),
-                    ("prolog", ".pl"),
-                ):
-                    provisional = PROJECT_ROOT / carpeta / f"{nombre_fallido}{extension}"
-                    if provisional.is_file():
-                        provisional.unlink()
-                        print(f"  [LIMPIADO] Derivado provisional: {provisional}")
-            for project_name in list(MARKDOWNS_DEMOSTRACIONES_WEB_PREPARADOS):
-                _restaurar_markdown_preparado(project_name)
+                _restaurar_markdown_preparado(nombre_fallido)
+            fallidos = {nombre for nombre, _ in errores_derivados}
+            proyectos_pendientes_ejecucion = [
+                nombre for nombre in proyectos_pendientes_ejecucion
+                if nombre not in fallidos
+            ]
             print(
-                "\n[NO VERIFICADO] La generacion de derivados no termino. "
-                "No se evaluara ni publicara ningun proyecto."
+                "\n[FALLO DE GENERACION] No se han preparado todos los formatos editoriales. "
+                "Se conservan sus archivos y se continua con los demas proyectos."
             )
-            sys.exit(1)
 
         print(f"\n[OK] Procesamiento de documentos completado. Total: {len(md_objects)} archivos.")
 
@@ -3345,33 +3991,70 @@ if __name__ == "__main__":
         # DEMOSTRACIONES FIJADAS PARA WEB
         # ============================================================
         proyectos_publicables = _proyectos_publicables_web()
-        proyectos_pendientes = _proyectos_pendientes_web()
+        if seleccion_aislada:
+            proyectos_publicables = list(proyectos_pendientes_ejecucion)
+        fallidos = {nombre for nombre, _ in errores_derivados}
+        proyectos_publicables = [nombre for nombre in proyectos_publicables
+                                if nombre not in fallidos]
+        proyectos_pendientes = proyectos_pendientes_ejecucion
         try:
-            preparar_demostraciones_web(proyectos_publicables)
+            preparar_demostraciones_web(proyectos_pendientes, sin_evaluacion=fallos_traduccion)
         except Exception:
             for project_name in list(MARKDOWNS_DEMOSTRACIONES_WEB_PREPARADOS):
                 _restaurar_markdown_preparado(project_name)
             raise
 
-        index_php = _index_proyectos_web()
-        if index_php is not None:
-            shutil.copy2(index_php, PROJECT_ROOT / "Proyectos" / "index.php")
+        for path in sincronizar_indices_web(proyectos_publicables):
+            print(f"  Indice comun sincronizado: {enlace_archivo(path)}")
 
         # Esta es la ultima fase local: el Lean generado ya esta colocado
         # dentro del proyecto y su veredicto se incluye en la publicacion.
         # Los JSON publicos incluyen esquema ADEC y acceso por URL o archivo.
-        cerrado = not proyectos_pendientes or evaluar_formalizaciones_proyectos(proyectos_pendientes)
-        if not cerrado:
-            for project_name in proyectos_pendientes:
+        proyectos_evaluables = [nombre for nombre in proyectos_pendientes
+                               if nombre not in fallos_traduccion]
+        for project_name in proyectos_pendientes:
+            if project_name not in fallos_traduccion:
+                continue
+            # A failed Lean translation does not block independent inputs.
+            for evaluator in (evaluar_prolog_md_directo, evaluar_prolog_json_inicial):
+                try:
+                    evaluator(project_name)
+                except Exception as exc:
+                    print(f"[ERROR rama independiente {project_name}] {type(exc).__name__}: {exc}")
+        proyectos_cerrados = []
+        for project_name in proyectos_evaluables:
+            if evaluar_formalizaciones_proyectos([project_name]):
+                proyectos_cerrados.append(project_name)
+            else:
                 preparar_json_publico_no_certificado(project_name)
+        cerrado = len(proyectos_cerrados) == len(proyectos_pendientes)
+        if not cerrado:
             print(
                 "Se publicara el dossier completo con los resultados formales "
                 "declarados en sus informes independientes."
             )
 
+        # Los anexos editoriales y las copias de UNIHOLOG no dependen de que
+        # el evaluador formal pueda emitir un certificado.
+        for project_name in proyectos_publicables:
+            proyecto = _proyecto_dir(project_name)
+            if proyecto.name not in {"ES_42", "ES_52"} or not (proyecto / "documentos_proyecto.json").is_file():
+                continue
+            from PckDemuestra.documentos_proyecto import generar_locales, sincronizar_locales
+            informe = generar_locales(proyecto)
+            for documento in informe['documentos']:
+                fuente = proyecto / documento['fuente']
+                html = fuente.with_suffix('.html')
+                for carpeta in (PROJECT_ROOT / 'htmls', PROJECT_ROOT.parent / 'htmls'):
+                    carpeta.mkdir(parents=True, exist_ok=True)
+                    shutil.copy2(html, carpeta / html.name)
+            destinos = sincronizar_locales(proyecto, PROJECT_ROOT.parent / 'UNIHOLOG')
+            for destino in destinos:
+                print(f"  Sincronizado: {enlace_archivo(destino)}")
+
         if LOCAL_ONLY:
-            print("[OK] Compilacion local terminada; publicacion web omitida.")
-            sys.exit(0)
+            print("[OK] Preparacion local terminada; publicacion web omitida.")
+            sys.exit(1 if errores_derivados else 0)
 
         ftp = FTPClient()
 
@@ -3414,10 +4097,11 @@ if __name__ == "__main__":
 
         for project_spec in proyectos_publicables:
             project_name = _nombre_proyecto_web(project_spec)
+            publicar_adjuntos_proyecto(ftp, project_name)
             wp_demo = WebPublisher(
                 ftp,
                 local_dir=_proyecto_dir(project_name),
-                remote_dir=f"/estradad.es/teorias/pdf/DEMUESTRA/proyectos/{project_name}",
+                remote_dir=f"/estradad.es/teorias/pdf/DEMUESTRA/proyectos/{_proyecto_dir(project_name).name}",
                 extensions=DEMOSTRACIONES_WEB_EXTENSIONS,
                 hash_name=f"hashes_{project_name}.json",
                 forzado=True
@@ -3426,7 +4110,15 @@ if __name__ == "__main__":
 
         # Solo despues de aprobar Lean/Prolog/auditoria y completar la subida
         # se devuelven las fuentes verificadas a su proyecto de procedencia.
-        if cerrado:
-            devolver_fuentes_verificadas(proyectos_pendientes)
+        if proyectos_cerrados:
+            devolver_fuentes_verificadas(proyectos_cerrados)
 
+    if errores_derivados:
+        print("\n[CON ERRORES] Proceso terminado; documentos pendientes: "
+              + ", ".join(nombre for nombre, _ in errores_derivados))
+        sys.exit(1)
+    if fallos_traduccion:
+        print("\n[AVISO] Publicacion preparada sin certificacion Lean actual: "
+              + ", ".join(fallos_traduccion)
+              + ". Fallos de la herramienta, no errores cientificos demostrados del MD.")
     print("\n[OK] Proceso completado.")

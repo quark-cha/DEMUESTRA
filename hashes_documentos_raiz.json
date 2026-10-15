@@ -1,0 +1,22 @@
+{
+  "EN_INSTRUCTIONS.md": {
+    "completed": true,
+    "source_sha256": "819692aeaeecc69fbd00de02f03e98c151ae79720c9de41f65168378d83d9c5a"
+  },
+  "ES_INTRUCCIONES.md": {
+    "completed": true,
+    "source_sha256": "043245012438721d763eecfdd044958f7e759ea6424c2c8137567c3c971dbb52"
+  },
+  "FR_INSTRUCTIONS.md": {
+    "completed": true,
+    "source_sha256": "fc558d978394e42fa3efaa3c85b6eefff39bb2576ce322eb6c0e75770f23b421"
+  },
+  "IT_INSTRUCTIONS.md": {
+    "completed": true,
+    "source_sha256": "b5adf8e88a29302e7f74f55e444e874c39e609335428447b423b40dc5d386e3d"
+  },
+  "README.md": {
+    "completed": true,
+    "source_sha256": "c2a624e7d5590dead0955c769df1fdbf6471f2233c2ed64495c873280861eda4"
+  }
+}

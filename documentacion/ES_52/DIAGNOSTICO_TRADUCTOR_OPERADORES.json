@@ -1,0 +1,383 @@
+{
+  "source_sha256": "569c3a48464d4f094763739ed0f0b3c18ede1dbfe19642c489f8273a9a7d9f51",
+  "document_verdict": "NO_EMITIDO",
+  "diagnostic_scope": "TRANSLATOR_ONLY",
+  "before": {
+    "formula_count": 220,
+    "semantic_errors": [
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:12:D_PROTOCOLO:formula-6",
+        "formula": "K(Q(t))",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:12:D_PROTOCOLO:formula-6: argumento de K: se esperaba Real, se obtuvo Prop."
+      },
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:12:D_PROTOCOLO:formula-7",
+        "formula": "K(V(t))",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:12:D_PROTOCOLO:formula-7: argumento de K: se esperaba Real, se obtuvo Prop."
+      },
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:267:D_LECTURA:formula-5",
+        "formula": "K(Q(t))=\\xi,\\qquad K(V(t))=\\xi.",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:267:D_LECTURA:formula-5: argumento de K: se esperaba Real, se obtuvo Prop."
+      },
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:267:D_LECTURA:formula-9",
+        "formula": "K(A)=\\xi,\\qquad B=(1-A),\\qquad C=B,\\qquad D=(1-C),",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:267:D_LECTURA:formula-9: EQ compara tipos incompatibles: Set[Complex] y Real."
+      },
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:348:D_RELACIONES:formula-1",
+        "formula": "\\mathcal R_j=T_j(\\mathcal R_{j-1}),\\qquad j\\in\\{1,\\ldots,n\\}.",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:348:D_RELACIONES:formula-1: nombre simbolico no valido: binary."
+      },
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:1924:D_REGISTROBINARIO:formula-4",
+        "formula": "\\boxed{\\text{n valores desconocidos}\\neq\\text{una representación física de }2^n\\text{ estados}.}",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1924:D_REGISTROBINARIO:formula-4: MUL requiere operandos numericos; obtuvo Prop y Real."
+      },
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:390:D_TIEMPO:formula-1",
+        "formula": "K(V(t))=\\xi",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:390:D_TIEMPO:formula-1: argumento de K: se esperaba Real, se obtuvo Prop."
+      },
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:741:P_INTERFERENCIA:formula-4",
+        "formula": "R_C\\propto e^{i\\phi_A}(1+e^{i\\phi}),",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:741:P_INTERFERENCIA:formula-4: nombre simbolico no valido: power."
+      },
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:741:P_INTERFERENCIA:formula-5",
+        "formula": "R_D\\propto e^{i\\phi_A}(1-e^{i\\phi}).",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:741:P_INTERFERENCIA:formula-5: nombre simbolico no valido: power."
+      },
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:741:P_INTERFERENCIA:formula-7",
+        "formula": "K(C)=\\xi,\\qquad K(D)=\\xi.",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:741:P_INTERFERENCIA:formula-7: argumento de K: se esperaba Real, se obtuvo Set[Complex]."
+      },
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:1280:D_DISTRIBUCIONCONJUNTA:formula-5",
+        "formula": "E(x,y)=\\sum_{a,b\\in\\{0,1\\}}(2a-1)(2b-1)\\,P(a,b,x,y).",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1280:D_DISTRIBUCIONCONJUNTA:formula-5: la variable de sumatoria debe ser un identificador."
+      },
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:604:P_SOLUCION:formula-1",
+        "formula": "G_X=\\operatorname{mat}((\\omega_{0X},\\kappa_X e^{-i\\chi_X}),(\\kappa_X e^{i\\chi_X},\\omega_{1X})),\\qquad X\\in\\{Q,V\\}.",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:604:P_SOLUCION:formula-1: nombre simbolico no valido: binary."
+      },
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:1341:D_CORRELACIONES:formula-1",
+        "formula": "E(x,y)=\\sum_{a,b\\in\\{0,1\\}}(2a-1)(2b-1)P(a,b, x,y).",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1341:D_CORRELACIONES:formula-1: la variable de sumatoria debe ser un identificador."
+      },
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:1467:D_REGISTROREF:formula-1",
+        "formula": "s_0=0,\\qquad s_{j+1}=s_j+p_j,\\qquad s_D=1.",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1467:D_REGISTROREF:formula-1: nombre simbolico no valido: binary."
+      },
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:1467:D_REGISTROREF:formula-2",
+        "formula": "P_{V_{\\mathrm{ref}}}(j)=s_{j+1}-s_j=|z_j|^2=P_Q(j).",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1467:D_REGISTROREF:formula-2: nombre simbolico no valido: binary."
+      },
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:1467:D_REGISTROREF:formula-6",
+        "formula": "\\sum_{a,\\nu}K_{a\\nu}^{\\dagger}K_{a\\nu}=I.",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1467:D_REGISTROREF:formula-6: la variable de sumatoria debe ser un identificador."
+      },
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:1467:D_REGISTROREF:formula-7",
+        "formula": "\\rho_{a,\\mathrm{post}}=\n\\frac{\\sum_\\nu K_{a\\nu}\\rho K_{a\\nu}^{\\dagger}}\n{\\operatorname{tr}\\left(\\sum_\\nu K_{a\\nu}\\rho K_{a\\nu}^{\\dagger}\\right)}.",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1467:D_REGISTROREF:formula-7: nombre simbolico no valido: binary."
+      },
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:2007:D_EQUIVALENCIA:formula-6",
+        "formula": "\\boxed{\n\\text{componentes convencionales}\n+\\text{valores desconocidos}\n+\\text{relaciones conocidas}\n+\\text{propagación}\n+\\text{medida}\n}",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:2007:D_EQUIVALENCIA:formula-6: PLUS requiere operandos numericos; obtuvo Prop y Prop."
+      },
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:1372:P_CHSHLOCAL:formula-4",
+        "formula": "V_n=R_n\\circ R_{n-1}\\circ\\cdots\\circ R_1(V_0).",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1372:P_CHSHLOCAL:formula-4: nombre simbolico no valido: binary."
+      },
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:1372:P_CHSHLOCAL:formula-10",
+        "formula": "\\forall i,\\quad K(V_i)=\\xi.",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1372:P_CHSHLOCAL:formula-10: el cuantificador de i necesita un dominio tipado."
+      },
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:1640:D_CONEXIONREF:formula-4",
+        "formula": "C=\\operatorname{mat}((1,0,0,0),(0,1,0,0),(0,0,0,1),(0,0,1,0)),\\qquad z'_{AB}=Cz_{AB}.",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1640:D_CONEXIONREF:formula-4: EQ compara tipos incompatibles: Set[Complex] y Real."
+      },
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:1966:D_OBJETIVORELACIONAL:formula-1",
+        "formula": "\\operatorname{ket}(\\Psi)=\\sum_{j=0}^{2^n-1}\\alpha_j e_{j}.",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1966:D_OBJETIVORELACIONAL:formula-1: simbolo no declarado: alpha_j."
+      },
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:1966:D_OBJETIVORELACIONAL:formula-5",
+        "formula": "\\alpha_0,\\ldots,\\alpha_{2^n-1}",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1966:D_OBJETIVORELACIONAL:formula-5: nombre simbolico no valido: binary."
+      },
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:1052:D_ACTUALIZACION:formula-3",
+        "formula": "\\operatorname{col}(\\operatorname{Re}z',\\operatorname{Im}z')\n=\\operatorname{mat}((A,-B),(B,A))\n\\operatorname{col}(\\operatorname{Re}z,\\operatorname{Im}z).",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1052:D_ACTUALIZACION:formula-3: simbolo no declarado: Re."
+      },
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:1052:D_ACTUALIZACION:formula-6",
+        "formula": "r_k\\mid(h_{k-1},C)\\sim\\operatorname{Uniforme}(0,1).",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1052:D_ACTUALIZACION:formula-6: nombre simbolico no valido: binary."
+      },
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:1156:T_SECUENCIACOND:formula-1",
+        "formula": "P_V(a_1,\\ldots,a_m,c_{\\mathrm{protocolo}})\n=\\prod_{k=1}^m P_V(a_k, a_1,\\ldots,a_{k-1},c_{\\mathrm{protocolo}})\n=P_Q(a_1,\\ldots,a_m,c_{\\mathrm{protocolo}}).",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1156:T_SECUENCIACOND:formula-1: nombre simbolico no valido: binary."
+      },
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:1747:T_COMPOSICIONCOND:formula-1",
+        "formula": "F(z)=\\operatorname{col}(\\operatorname{Re}z,\\operatorname{Im}z),\n\\qquad\n\\mathsf R(U)=\\operatorname{mat}((\\operatorname{Re}U,-\\operatorname{Im}U),(\\operatorname{Im}U,\\operatorname{Re}U)).",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1747:T_COMPOSICIONCOND:formula-1: simbolo no declarado: Re."
+      }
+    ],
+    "lean_emission": "ERROR_HERRAMIENTA",
+    "emission_error": "No se pueden emitir formulas sin tipo:\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:267:D_LECTURA:formula-5: argumento de K: se esperaba Real, se obtuvo Prop.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:267:D_LECTURA:formula-9: EQ compara tipos incompatibles: Set[Complex] y Real.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:348:D_RELACIONES:formula-1: nombre simbolico no valido: binary.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:390:D_TIEMPO:formula-1: argumento de K: se esperaba Real, se obtuvo Prop.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1280:D_DISTRIBUCIONCONJUNTA:formula-5: la variable de sumatoria debe ser un identificador.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1341:D_CORRELACIONES:formula-1: la variable de sumatoria debe ser un identificador.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1467:D_REGISTROREF:formula-1: nombre simbolico no valido: binary.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1467:D_REGISTROREF:formula-2: nombre simbolico no valido: binary.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1467:D_REGISTROREF:formula-6: la variable de sumatoria debe ser un identificador.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1467:D_REGISTROREF:formula-7: nombre simbolico no valido: binary.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1640:D_CONEXIONREF:formula-4: EQ compara tipos incompatibles: Set[Complex] y Real.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1966:D_OBJETIVORELACIONAL:formula-1: simbolo no declarado: alpha_j.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1052:D_ACTUALIZACION:formula-3: simbolo no declarado: Re.",
+    "emission_blockers": [
+      "- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:267:D_LECTURA:formula-5: argumento de K: se esperaba Real, se obtuvo Prop.",
+      "- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:267:D_LECTURA:formula-9: EQ compara tipos incompatibles: Set[Complex] y Real.",
+      "- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:348:D_RELACIONES:formula-1: nombre simbolico no valido: binary.",
+      "- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:390:D_TIEMPO:formula-1: argumento de K: se esperaba Real, se obtuvo Prop.",
+      "- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1280:D_DISTRIBUCIONCONJUNTA:formula-5: la variable de sumatoria debe ser un identificador.",
+      "- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1341:D_CORRELACIONES:formula-1: la variable de sumatoria debe ser un identificador.",
+      "- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1467:D_REGISTROREF:formula-1: nombre simbolico no valido: binary.",
+      "- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1467:D_REGISTROREF:formula-2: nombre simbolico no valido: binary.",
+      "- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1467:D_REGISTROREF:formula-6: la variable de sumatoria debe ser un identificador.",
+      "- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1467:D_REGISTROREF:formula-7: nombre simbolico no valido: binary.",
+      "- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1640:D_CONEXIONREF:formula-4: EQ compara tipos incompatibles: Set[Complex] y Real.",
+      "- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1966:D_OBJETIVORELACIONAL:formula-1: simbolo no declarado: alpha_j.",
+      "- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1052:D_ACTUALIZACION:formula-3: simbolo no declarado: Re."
+    ]
+  },
+  "before_indices": {
+    "formula_count": 220,
+    "semantic_errors": [
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:12:D_PROTOCOLO:formula-6",
+        "formula": "K(Q(t))",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:12:D_PROTOCOLO:formula-6: argumento de K: se esperaba Real, se obtuvo Prop."
+      },
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:12:D_PROTOCOLO:formula-7",
+        "formula": "K(V(t))",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:12:D_PROTOCOLO:formula-7: argumento de K: se esperaba Real, se obtuvo Prop."
+      },
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:267:D_LECTURA:formula-5",
+        "formula": "K(Q(t))=\\xi,\\qquad K(V(t))=\\xi.",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:267:D_LECTURA:formula-5: argumento de K: se esperaba Real, se obtuvo Prop."
+      },
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:267:D_LECTURA:formula-9",
+        "formula": "K(A)=\\xi,\\qquad B=(1-A),\\qquad C=B,\\qquad D=(1-C),",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:267:D_LECTURA:formula-9: EQ compara tipos incompatibles: Set[Complex] y Real."
+      },
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:348:D_RELACIONES:formula-1",
+        "formula": "\\mathcal R_j=T_j(\\mathcal R_{j-1}),\\qquad j\\in\\{1,\\ldots,n\\}.",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:348:D_RELACIONES:formula-1: nombre simbolico no valido: binary."
+      },
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:1216:D_FRECUENCIAS:formula-1",
+        "formula": "F(0)=\\frac{N_0}{n_{\\mathrm{ensayos}}},\\qquad F(1)=\\frac{N_1}{n_{\\mathrm{ensayos}}}.",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1216:D_FRECUENCIAS:formula-1: argumento de F: se esperaba Complex, se obtuvo Nat."
+      },
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:1924:D_REGISTROBINARIO:formula-4",
+        "formula": "\\boxed{\\text{n valores desconocidos}\\neq\\text{una representación física de }2^n\\text{ estados}.}",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1924:D_REGISTROBINARIO:formula-4: MUL requiere operandos numericos; obtuvo Prop y Real."
+      },
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:390:D_TIEMPO:formula-1",
+        "formula": "K(V(t))=\\xi",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:390:D_TIEMPO:formula-1: argumento de K: se esperaba Real, se obtuvo Prop."
+      },
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:741:P_INTERFERENCIA:formula-4",
+        "formula": "R_C\\propto e^{i\\phi_A}(1+e^{i\\phi}),",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:741:P_INTERFERENCIA:formula-4: nombre simbolico no valido: power."
+      },
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:741:P_INTERFERENCIA:formula-5",
+        "formula": "R_D\\propto e^{i\\phi_A}(1-e^{i\\phi}).",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:741:P_INTERFERENCIA:formula-5: nombre simbolico no valido: power."
+      },
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:741:P_INTERFERENCIA:formula-7",
+        "formula": "K(C)=\\xi,\\qquad K(D)=\\xi.",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:741:P_INTERFERENCIA:formula-7: argumento de K: se esperaba Real, se obtuvo Set[Complex]."
+      },
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:1280:D_DISTRIBUCIONCONJUNTA:formula-5",
+        "formula": "E(x,y)=\\sum_{a,b\\in\\{0,1\\}}(2a-1)(2b-1)\\,P(a,b,x,y).",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1280:D_DISTRIBUCIONCONJUNTA:formula-5: la variable de sumatoria debe ser un identificador."
+      },
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:604:P_SOLUCION:formula-1",
+        "formula": "G_X=\\operatorname{mat}((\\omega_{0X},\\kappa_X e^{-i\\chi_X}),(\\kappa_X e^{i\\chi_X},\\omega_{1X})),\\qquad X\\in\\{Q,V\\}.",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:604:P_SOLUCION:formula-1: nombre simbolico no valido: binary."
+      },
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:1341:D_CORRELACIONES:formula-1",
+        "formula": "E(x,y)=\\sum_{a,b\\in\\{0,1\\}}(2a-1)(2b-1)P(a,b, x,y).",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1341:D_CORRELACIONES:formula-1: la variable de sumatoria debe ser un identificador."
+      },
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:1467:D_REGISTROREF:formula-1",
+        "formula": "s_0=0,\\qquad s_{j+1}=s_j+p_j,\\qquad s_D=1.",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1467:D_REGISTROREF:formula-1: nombre simbolico no valido: binary."
+      },
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:1467:D_REGISTROREF:formula-2",
+        "formula": "P_{V_{\\mathrm{ref}}}(j)=s_{j+1}-s_j=|z_j|^2=P_Q(j).",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1467:D_REGISTROREF:formula-2: nombre simbolico no valido: binary."
+      },
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:1467:D_REGISTROREF:formula-3",
+        "formula": "y_a=\\Pi_a z,\\qquad p_a=\\operatorname{norm}(y_a)^2.",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1467:D_REGISTROREF:formula-3: argumento de norm: se esperaba Complex, se obtuvo Real."
+      },
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:1467:D_REGISTROREF:formula-6",
+        "formula": "\\sum_{a,\\nu}K_{a\\nu}^{\\dagger}K_{a\\nu}=I.",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1467:D_REGISTROREF:formula-6: la variable de sumatoria debe ser un identificador."
+      },
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:1467:D_REGISTROREF:formula-7",
+        "formula": "\\rho_{a,\\mathrm{post}}=\n\\frac{\\sum_\\nu K_{a\\nu}\\rho K_{a\\nu}^{\\dagger}}\n{\\operatorname{tr}\\left(\\sum_\\nu K_{a\\nu}\\rho K_{a\\nu}^{\\dagger}\\right)}.",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1467:D_REGISTROREF:formula-7: nombre simbolico no valido: binary."
+      },
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:2007:D_EQUIVALENCIA:formula-6",
+        "formula": "\\boxed{\n\\text{componentes convencionales}\n+\\text{valores desconocidos}\n+\\text{relaciones conocidas}\n+\\text{propagación}\n+\\text{medida}\n}",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:2007:D_EQUIVALENCIA:formula-6: PLUS requiere operandos numericos; obtuvo Prop y Prop."
+      },
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:1372:P_CHSHLOCAL:formula-4",
+        "formula": "V_n=R_n\\circ R_{n-1}\\circ\\cdots\\circ R_1(V_0).",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1372:P_CHSHLOCAL:formula-4: nombre simbolico no valido: binary."
+      },
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:1372:P_CHSHLOCAL:formula-10",
+        "formula": "\\forall i,\\quad K(V_i)=\\xi.",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1372:P_CHSHLOCAL:formula-10: el cuantificador de i necesita un dominio tipado."
+      },
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:1640:D_CONEXIONREF:formula-4",
+        "formula": "C=\\operatorname{mat}((1,0,0,0),(0,1,0,0),(0,0,0,1),(0,0,1,0)),\\qquad z'_{AB}=Cz_{AB}.",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1640:D_CONEXIONREF:formula-4: EQ compara tipos incompatibles: Set[Complex] y Real."
+      },
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:1966:D_OBJETIVORELACIONAL:formula-1",
+        "formula": "\\operatorname{ket}(\\Psi)=\\sum_{j=0}^{2^n-1}\\alpha_j e_{j}.",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1966:D_OBJETIVORELACIONAL:formula-1: simbolo no declarado: alpha_j."
+      },
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:1966:D_OBJETIVORELACIONAL:formula-5",
+        "formula": "\\alpha_0,\\ldots,\\alpha_{2^n-1}",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1966:D_OBJETIVORELACIONAL:formula-5: nombre simbolico no valido: binary."
+      },
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:1052:D_ACTUALIZACION:formula-6",
+        "formula": "r_k\\mid(h_{k-1},C)\\sim\\operatorname{Uniforme}(0,1).",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1052:D_ACTUALIZACION:formula-6: nombre simbolico no valido: binary."
+      },
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:1156:T_SECUENCIACOND:formula-1",
+        "formula": "P_V(a_1,\\ldots,a_m,c_{\\mathrm{protocolo}})\n=\\prod_{k=1}^m P_V(a_k, a_1,\\ldots,a_{k-1},c_{\\mathrm{protocolo}})\n=P_Q(a_1,\\ldots,a_m,c_{\\mathrm{protocolo}}).",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1156:T_SECUENCIACOND:formula-1: nombre simbolico no valido: binary."
+      },
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:1747:T_COMPOSICIONCOND:formula-2",
+        "formula": "F(Uz)=\\mathsf R(U)F(z),\\qquad\n\\mathsf R(UW)=\\mathsf R(U)\\mathsf R(W),\\qquad\n\\operatorname{norm}(F(z))=\\operatorname{norm}(z).",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1747:T_COMPOSICIONCOND:formula-2: argumento de F: se esperaba Complex, se obtuvo Real."
+      },
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:1747:T_COMPOSICIONCOND:formula-3",
+        "formula": "\\boxed{T_{COMPOSICIONCOND}:\\quad\n\\mathsf R(U_m)\\cdots\\mathsf R(U_1)F(z)\n=F(U_m\\cdots U_1z).}",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1747:T_COMPOSICIONCOND:formula-3: argumento de mathsf_R: se esperaba Complex, se obtuvo Real."
+      },
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:1747:T_COMPOSICIONCOND:formula-4",
+        "formula": "\\operatorname{norm}(\\mathsf R(\\Pi_a)F(z))^2=\\operatorname{norm}(\\Pi_a z)^2,",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1747:T_COMPOSICIONCOND:formula-4: argumento de mathsf_R: se esperaba Complex, se obtuvo Real."
+      }
+    ],
+    "lean_emission": "ERROR_HERRAMIENTA",
+    "emission_error": "No se pueden emitir formulas sin tipo:\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:267:D_LECTURA:formula-5: argumento de K: se esperaba Real, se obtuvo Prop.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:267:D_LECTURA:formula-9: EQ compara tipos incompatibles: Set[Complex] y Real.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:348:D_RELACIONES:formula-1: nombre simbolico no valido: binary.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1216:D_FRECUENCIAS:formula-1: argumento de F: se esperaba Complex, se obtuvo Nat.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:390:D_TIEMPO:formula-1: argumento de K: se esperaba Real, se obtuvo Prop.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1280:D_DISTRIBUCIONCONJUNTA:formula-5: la variable de sumatoria debe ser un identificador.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1341:D_CORRELACIONES:formula-1: la variable de sumatoria debe ser un identificador.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1467:D_REGISTROREF:formula-1: nombre simbolico no valido: binary.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1467:D_REGISTROREF:formula-2: nombre simbolico no valido: binary.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1467:D_REGISTROREF:formula-3: argumento de norm: se esperaba Complex, se obtuvo Real.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1467:D_REGISTROREF:formula-6: la variable de sumatoria debe ser un identificador.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1467:D_REGISTROREF:formula-7: nombre simbolico no valido: binary.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1640:D_CONEXIONREF:formula-4: EQ compara tipos incompatibles: Set[Complex] y Real.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1966:D_OBJETIVORELACIONAL:formula-1: simbolo no declarado: alpha_j.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1747:T_COMPOSICIONCOND:formula-3: argumento de mathsf_R: se esperaba Complex, se obtuvo Real.",
+    "emission_blockers": [
+      "- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:267:D_LECTURA:formula-5: argumento de K: se esperaba Real, se obtuvo Prop.",
+      "- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:267:D_LECTURA:formula-9: EQ compara tipos incompatibles: Set[Complex] y Real.",
+      "- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:348:D_RELACIONES:formula-1: nombre simbolico no valido: binary.",
+      "- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1216:D_FRECUENCIAS:formula-1: argumento de F: se esperaba Complex, se obtuvo Nat.",
+      "- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:390:D_TIEMPO:formula-1: argumento de K: se esperaba Real, se obtuvo Prop.",
+      "- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1280:D_DISTRIBUCIONCONJUNTA:formula-5: la variable de sumatoria debe ser un identificador.",
+      "- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1341:D_CORRELACIONES:formula-1: la variable de sumatoria debe ser un identificador.",
+      "- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1467:D_REGISTROREF:formula-1: nombre simbolico no valido: binary.",
+      "- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1467:D_REGISTROREF:formula-2: nombre simbolico no valido: binary.",
+      "- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1467:D_REGISTROREF:formula-3: argumento de norm: se esperaba Complex, se obtuvo Real.",
+      "- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1467:D_REGISTROREF:formula-6: la variable de sumatoria debe ser un identificador.",
+      "- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1467:D_REGISTROREF:formula-7: nombre simbolico no valido: binary.",
+      "- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1640:D_CONEXIONREF:formula-4: EQ compara tipos incompatibles: Set[Complex] y Real.",
+      "- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1966:D_OBJETIVORELACIONAL:formula-1: simbolo no declarado: alpha_j.",
+      "- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1747:T_COMPOSICIONCOND:formula-3: argumento de mathsf_R: se esperaba Complex, se obtuvo Real."
+    ]
+  },
+  "after": {
+    "formula_count": 220,
+    "semantic_errors": [
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:1924:D_REGISTROBINARIO:formula-4",
+        "formula": "\\boxed{\\text{n valores desconocidos}\\neq\\text{una representación física de }2^n\\text{ estados}.}",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1924:D_REGISTROBINARIO:formula-4: MUL requiere operandos numericos; obtuvo Prop y Real."
+      },
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:1467:D_REGISTROREF:formula-6",
+        "formula": "\\sum_{a,\\nu}K_{a\\nu}^{\\dagger}K_{a\\nu}=I.",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1467:D_REGISTROREF:formula-6: la variable de sumatoria debe ser un identificador."
+      },
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:1467:D_REGISTROREF:formula-7",
+        "formula": "\\rho_{a,\\mathrm{post}}=\n\\frac{\\sum_\\nu K_{a\\nu}\\rho K_{a\\nu}^{\\dagger}}\n{\\operatorname{tr}\\left(\\sum_\\nu K_{a\\nu}\\rho K_{a\\nu}^{\\dagger}\\right)}.",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1467:D_REGISTROREF:formula-7: nombre simbolico no valido: binary."
+      },
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:2007:D_EQUIVALENCIA:formula-6",
+        "formula": "\\boxed{\n\\text{componentes convencionales}\n+\\text{valores desconocidos}\n+\\text{relaciones conocidas}\n+\\text{propagación}\n+\\text{medida}\n}",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:2007:D_EQUIVALENCIA:formula-6: PLUS requiere operandos numericos; obtuvo Prop y Prop."
+      },
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:1372:P_CHSHLOCAL:formula-10",
+        "formula": "\\forall i,\\quad K(V_i)=\\xi.",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1372:P_CHSHLOCAL:formula-10: el cuantificador de i necesita un dominio tipado."
+      },
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:1966:D_OBJETIVORELACIONAL:formula-1",
+        "formula": "\\operatorname{ket}(\\Psi)=\\sum_{j=0}^{2^n-1}\\alpha_j e_{j}.",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1966:D_OBJETIVORELACIONAL:formula-1: simbolo no declarado: e_j."
+      },
+      {
+        "location": "ES_52_Maquina_V_UNIHOLOG.md:1156:T_SECUENCIACOND:formula-1",
+        "formula": "P_V(a_1,\\ldots,a_m,c_{\\mathrm{protocolo}})\n=\\prod_{k=1}^m P_V(a_k, a_1,\\ldots,a_{k-1},c_{\\mathrm{protocolo}})\n=P_Q(a_1,\\ldots,a_m,c_{\\mathrm{protocolo}}).",
+        "error": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1156:T_SECUENCIACOND:formula-1: nombre simbolico no valido: binary."
+      }
+    ],
+    "lean_emission": "ERROR_HERRAMIENTA",
+    "emission_error": "No se pueden emitir formulas sin tipo:\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1467:D_REGISTROREF:formula-6: la variable de sumatoria debe ser un identificador.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1467:D_REGISTROREF:formula-7: nombre simbolico no valido: binary.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1966:D_OBJETIVORELACIONAL:formula-1: simbolo no declarado: e_j.",
+    "emission_blockers": [
+      "- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1467:D_REGISTROREF:formula-6: la variable de sumatoria debe ser un identificador.",
+      "- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1467:D_REGISTROREF:formula-7: nombre simbolico no valido: binary.",
+      "- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1966:D_OBJETIVORELACIONAL:formula-1: simbolo no declarado: e_j."
+    ]
+  }
+}

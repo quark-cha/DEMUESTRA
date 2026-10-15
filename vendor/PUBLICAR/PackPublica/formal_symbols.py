@@ -21,6 +21,7 @@ class SymbolInference:
         })
         self.table.functions.update({
             "Re": FunctionType(("Complex",), "Real"),
+            "Im": FunctionType(("Complex",), "Real"),
             "abs": FunctionType(("Real",), "Real"),
             "zeta": FunctionType(("Complex",), "Complex"),
         })
@@ -68,15 +69,75 @@ class SymbolInference:
                 result_type = "Real"
             self.table.functions.setdefault(name, FunctionType(argument_types, result_type))
         for name, element in self._set_nodes.items():
-            self.table.values[name] = f"Set[{self._node_type(element)}]"
+            self.table.values[name] = f"Set[{self._widest(self._node_type(value) for value in element)}]"
         for ast in formulas:
             self._harmonize_set_equalities(ast)
+        self._infer_indexed_families(formulas)
         return self.table
+
+    def _infer_indexed_families(self, formulas):
+        occurrences = {}
+        occurrence_types = {}
+        bound_families = set()
+        def visit(node, bound=None):
+            bound = {} if bound is None else bound
+            if node.kind == "summation":
+                variable, lower, upper, body = node.children
+                visit(lower, bound)
+                visit(upper, bound)
+                scope = dict(bound)
+                if variable.kind == "identifier":
+                    scope[variable.value] = "Real" if node.value == "finite_set" else "Nat"
+                visit(body, scope)
+                return
+            if node.kind == "subscript":
+                base = self._name(node.children[0])
+                if base:
+                    occurrences.setdefault(base, []).append(node)
+                    index = node.children[1]
+                    occurrence_types[id(node)] = (
+                        bound[index.value] if index.kind == "identifier" and index.value in bound
+                        else self._node_type(index)
+                    )
+                    if index.kind == "identifier" and index.value in bound:
+                        bound_families.add(base)
+            for child in node.children:
+                if isinstance(child, Ast):
+                    visit(child, bound)
+        for ast in formulas:
+            visit(ast)
+        for base, nodes in occurrences.items():
+            if base not in bound_families and not any(node.children[1].kind == "binary" and
+                       node.children[1].value in {"PLUS", "MINUS", "MUL", "DIV"}
+                       for node in nodes):
+                continue
+            index_types = [occurrence_types[id(node)] for node in nodes]
+            if any(kind not in {"Nat", "Int", "Real"} for kind in index_types):
+                continue
+            result_types = [self.table.values.get(self._name(node), "Real") for node in nodes]
+            signature = FunctionType((self._widest(index_types),), self._widest(result_types))
+            existing = self.table.functions.get(base)
+            if existing is not None and existing != signature:
+                numeric = {"Nat", "Int", "Real", "Complex"}
+                if (len(existing.arguments) != 1 or
+                    existing.arguments[0] not in {"Nat", "Int", "Real"} or
+                    existing.result not in numeric or signature.result not in numeric):
+                    raise SymbolInferenceError(f"Tipos incompatibles de {base}: funcion y familia indexada.")
+                signature = FunctionType((self._widest((existing.arguments[0], signature.arguments[0])),),
+                                         self._widest((existing.result, signature.result)))
+            self.table.functions[base] = signature
+            self.table.indexed_families.add(base)
 
     @staticmethod
     def _widest(types):
         order = ["Nat", "Int", "Real", "Complex"]
         values = list(types)
+        if values and all(value.startswith("Tuple[") and value.endswith("]") for value in values):
+            components = [value[6:-1].split(",") for value in values]
+            if len({len(value) for value in components}) == 1 and not any(
+                "[" in item or "]" in item for value in components for item in value
+            ):
+                return "Tuple[" + ",".join(SymbolInference._widest(column) for column in zip(*components)) + "]"
         numeric = [item for item in values if item in order]
         return order[max(order.index(item) for item in numeric)] if len(numeric) == len(values) else values[-1]
 
@@ -96,9 +157,11 @@ class SymbolInference:
             function, arrow = node.children
             name = self._name(function)
             domain, codomain = arrow.children
+            output = (codomain.children[0] if codomain.kind == "binary" and
+                      codomain.value == "IN" else codomain)
             if name:
                 self._calls.setdefault(name, []).append(
-                    ((domain,), self._node_type(codomain))
+                    ((domain,), self._node_type(output))
                 )
             self._constraints(domain)
             self._constraints(codomain)
@@ -132,11 +195,16 @@ class SymbolInference:
         if node.kind == "binary" and node.value == "EQ":
             left, right = node.children
             left_name = self._name(left)
+            if (left.kind == "identifier" and left_name in {"N", "Z", "R", "C"}
+                and right.kind not in {"set", "set_builder"}
+                and self._node_type(right) in {"Nat", "Int", "Real", "Complex"}):
+                self.table.domains.pop(left_name, None)
+                self.table.values[left_name] = self._node_type(right)
             if left_name and right.kind in {"set", "set_builder"}:
                 element = right.children[0] if right.children else None
                 element_name = self._name(element) if element else None
                 self._sets[left_name] = "Real"
-                self._set_nodes[left_name] = element
+                self._set_nodes.setdefault(left_name, []).append(element)
                 if element_name:
                     self._set_elements[left_name] = element_name
             if left_name:
@@ -160,7 +228,12 @@ class SymbolInference:
             if domain:
                 self._constraints(left, domain)
             if left_name and domain:
-                self.table.values[left_name] = domain
+                previous = self.table.values.get(left_name)
+                numeric = {"Nat", "Int", "Real", "Complex"}
+                self.table.values[left_name] = (
+                    self._widest((previous, domain))
+                    if previous in numeric and domain in numeric else domain
+                )
             elif left_name and right_name:
                 self._sets[right_name] = "Real"
                 self._set_elements[right_name] = left_name
@@ -186,7 +259,7 @@ class SymbolInference:
             name, args = self._call(node)
             if name:
                 self._calls.setdefault(name, []).append((args, expected))
-            if name == "Re" and args:
+            if name in {"Re", "Im"} and args:
                 arg = self._name(args[0])
                 if arg:
                     self._complex.add(arg)
@@ -196,9 +269,17 @@ class SymbolInference:
                     self._complex.add(arg)
         if node.kind == "summation":
             variable, _lower, _upper, body = node.children
+            previous = self.table.values.get(variable.value) if variable.kind == "identifier" else None
             if variable.kind == "identifier":
-                self.table.values[variable.value] = "Nat"
-            self._constraints(body, expected)
+                self.table.values[variable.value] = "Real" if node.value == "finite_set" else "Nat"
+            try:
+                self._constraints(body, expected)
+            finally:
+                if variable.kind == "identifier":
+                    if previous is None:
+                        self.table.values.pop(variable.value, None)
+                    else:
+                        self.table.values[variable.value] = previous
             return
         child_expected = "Prop" if node.kind == "binary" and node.value in {"AND", "OR", "IMPLIES", "IFF"} else None
         for child in node.children:

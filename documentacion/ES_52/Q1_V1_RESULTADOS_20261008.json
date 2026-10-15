@@ -1,0 +1,115 @@
+{
+  "scope": "Q1 local Qiskit model versus V1_ref signed-real-channel candidate",
+  "not_claimed": [
+    "physical construction",
+    "hidden-generator-only realization",
+    "quantum speedup",
+    "universal equivalence"
+  ],
+  "utc": "2026-10-08T01:36:34.655421+00:00",
+  "shots_per_case": 1000,
+  "capture": "deterministic oscillator phase latched at logical t0",
+  "sampling": "declared deterministic phase sweep, not random hardware shots",
+  "unknown_phase_certified": false,
+  "seed": 52046,
+  "tolerance": 1e-10,
+  "qiskit": "2.5.2",
+  "software_sha256": "ccd2ff19ddaffc358adf03ee35b83ec3da473344b7e37c72add82c3d4f3c91a5",
+  "source_sha256": "e6b70a19511731d84aff7ba3b44b6305b20bb25f87a4fd53d7cfb4aa62fd92e1",
+  "resources": {
+    "v1_real_channels": 4,
+    "truth_table_entries_for_oracle_setup": 2,
+    "oracle_register_applications_per_execution": 1
+  },
+  "results": [
+    {
+      "function": "constant_0",
+      "table": [
+        0,
+        0
+      ],
+      "expected": 0,
+      "q1_probabilities": [
+        0.9999999999999996,
+        1.0573994819069698e-33
+      ],
+      "v1_counts": [
+        1000,
+        0
+      ],
+      "v1_frequencies": [
+        1.0,
+        0.0
+      ],
+      "max_error": 4.440892098500626e-16,
+      "passed": true
+    },
+    {
+      "function": "constant_1",
+      "table": [
+        1,
+        1
+      ],
+      "expected": 0,
+      "q1_probabilities": [
+        0.9999999999999996,
+        1.0573994819069698e-33
+      ],
+      "v1_counts": [
+        1000,
+        0
+      ],
+      "v1_frequencies": [
+        1.0,
+        0.0
+      ],
+      "max_error": 4.440892098500626e-16,
+      "passed": true
+    },
+    {
+      "function": "identity",
+      "table": [
+        0,
+        1
+      ],
+      "expected": 1,
+      "q1_probabilities": [
+        1.0573994819069698e-33,
+        0.9999999999999996
+      ],
+      "v1_counts": [
+        0,
+        1000
+      ],
+      "v1_frequencies": [
+        0.0,
+        1.0
+      ],
+      "max_error": 4.440892098500626e-16,
+      "passed": true
+    },
+    {
+      "function": "inverter",
+      "table": [
+        1,
+        0
+      ],
+      "expected": 1,
+      "q1_probabilities": [
+        1.0573994819069698e-33,
+        0.9999999999999996
+      ],
+      "v1_counts": [
+        0,
+        1000
+      ],
+      "v1_frequencies": [
+        0.0,
+        1.0
+      ],
+      "max_error": 4.440892098500626e-16,
+      "passed": true
+    }
+  ],
+  "passed": true
+}

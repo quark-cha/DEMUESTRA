@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DEMUESTRA - Complete Installation and Usage Guide</title>
+<style>
+body {
+    font-family: Georgia, serif;
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 20px;
+    line-height: 1.6;
+    background: #fcfcfc;
+    color: #222;
+}
+h1, h2, h3, h4 {
+    color: #1a1a1a;
+}
+table {
+    border-collapse: collapse;
+    width:100%;
+    margin:20px 0;
+}
+th, td {
+    border:1px solid #ccc;
+    padding:8px 12px;
+}
+th {
+    background:#f0f0f0;
+}
+blockquote {
+    border-left:4px solid #0077cc;
+    padding-left:16px;
+}
+code {
+    background:#eee;
+    padding:2px 6px;
+}
+pre {
+    background:#f4f4f4;
+    padding:12px;
+    overflow-x:auto;
+}
+img {
+    max-width:100%;
+    height:auto;
+}
+math {
+    font-size:1.1em;
+}
+</style>
+</head>
+<body>
+<h1>DEMUESTRA - Complete Installation and Usage Guide</h1>
+<p>The complete <strong>DEMUESTRA</strong> project can be downloaded from GitHub or consulted there in full under user <strong>quark-cha</strong>, repository <strong>DEMUESTRA</strong>: <a href="https://github.com/quark-cha/DEMUESTRA">https://github.com/quark-cha/DEMUESTRA</a>.</p>
+<h2>1. What DEMUESTRA is</h2>
+<p><strong>DEMUESTRA</strong> is an environment for submitting a mathematical proof to a process of structural analysis and formal verification through <strong>Lean 4</strong>.</p>
+<p>The researcher starts from their own proof written in a Markdown <code>.md</code> file.</p>
+<p>During the process, a <strong>free AI may be used as an auxiliary tool</strong> for tasks such as:</p>
+<ul>
+<li>writing formulas correctly in LaTeX;</li>
+<li>transforming the proof into JSON;</li>
+<li>transforming mathematical propositions into Lean;</li>
+<li>locating errors;</li>
+<li>linking an error to the corresponding point in the proof;</li>
+<li>helping to correct syntax or formalization problems.</li>
+</ul>
+<p>The AI <strong>does not take part in the creative process of the proof</strong>.</p>
+<p>The AI does not provide the mathematical idea and does not replace the researcher's reasoning: it only acts as a tool to adjust the proof formally, organize it, translate formats, and help express precisely a proof that already belongs to the author.</p>
+<p>The proposal, its hypotheses, definitions, reasoning, and conclusions belong to the author.</p>
+<p>DEMUESTRA also does not aim to decide, by means of a simple score, whether a scientific theory is true or false.</p>
+<p>Its objective is much more specific:</p>
+<p><strong>to make the deductive chain explicit and to formally verify that the mathematical steps that have been brought into Lean are correctly built from their premises.</strong></p>
+<hr />
+<h2>2. Authorship, License, and Ethical Use</h2>
+<p>This project is part of the development work of <strong>Victor Estrada Diaz</strong>.</p>
+<p>You are free to use these utilities in your own project as long as you respect my authorship and do not use them for commercial purposes.</p>
+<p>You are also free to distribute and share them as long as you clearly state the part for which I am the author.</p>
+<p>The applicable license is:</p>
+<pre><code class="language-text">CC BY-SA-NC
+</code></pre>
+<p>The use of any part of this development is prohibited in unethical environments, including:</p>
+<ul>
+<li>wars;</li>
+<li>uses that do not comply with Human Rights;</li>
+<li>exploitation or abuse of people or animals;</li>
+<li>uses intended to humiliate or undervalue other people.</li>
+</ul>
+<p>Any such use violates my license.</p>
+<hr />
+<h2>3. Updated Repository</h2>
+<p>The <strong>DEMUESTRA</strong> project has a public repository from which you can download the updated version and access all its files.</p>
+<p>GitHub user:</p>
+<pre><code class="language-text">quark-cha
+</code></pre>
+<p>Repository:</p>
+<pre><code class="language-text">DEMUESTRA
+</code></pre>
+<hr />
+<h1>PART I - INSTALLATION</h1>
+<h2>4. What you need to install</h2>
+<p>Before using DEMUESTRA, you need to prepare the computer.</p>
+<h3>Required</h3>
+<p>Install:</p>
+<ol>
+<li><strong>Python</strong></li>
+<li><strong>Lean 4</strong></li>
+<li>the <strong>DEMUESTRA</strong> repository</li>
+</ol>
+<h3>Recommended</h3>
+<p>We also recommend:</p>
+<ol start="4">
+<li><strong>Anaconda</strong></li>
+<li><strong>Visual Studio Code</strong></li>
+</ol>
+<p>Visual Studio Code is not essential, but it makes editing <code>.md</code>, <code>.json</code>, and <code>.lean</code> files much easier.</p>
+<hr />
+<h2>5. Download DEMUESTRA</h2>
+<p>Download or clone the <strong>DEMUESTRA</strong> repository into your usual development folder.</p>
+<p>For example, you may have a general structure similar to:</p>
+<pre><code class="language-text">MIS_PROYECTOS/
+|
+├── PROYECTO_A/
+├── PROYECTO_B/
+├── PUBLICAR/
+└── DEMUESTRA/
+</code></pre>
+<p>Your projects, <strong>PUBLICAR</strong> if you use it, and <strong>DEMUESTRA</strong> are therefore at the same level.</p>
+<p>DEMUESTRA does not need to directly modify your original projects.</p>
+<p><strong>PUBLICAR is optional.</strong> You do not need to install PUBLICAR to use DEMUESTRA. PUBLICAR is only useful if you also want to use that other PDF generation and publication system.</p>
+<hr />
+<h1>PART II - PREPARING A PROOF</h1>
+<h2>6. The original document</h2>
+<p>Suppose you have a project called:</p>
+<pre><code class="language-text">MI_TEORIA/
+</code></pre>
+<p>and inside it you have written a proof:</p>
+<pre><code class="language-text">MI_TEORIA/
+└── demostracion.md
+</code></pre>
+<p>This <code>.md</code> is your original document.</p>
+<p>We are not going to use that file directly during the tests.</p>
+<p>First, we make a copy so that we can work with it inside DEMUESTRA.</p>
+<hr />
+<h2>7. Copy the Markdown file into DEMUESTRA</h2>
+<p>Copy the <code>.md</code> file that you want to prove into DEMUESTRA's project area.</p>
+<p>Conceptually:</p>
+<pre><code class="language-text">MI_TEORIA/
+└── demostracion.md
+          |
+          | COPY
+          v
+DEMUESTRA/
+└── proyectos/
+    └── MI_TEORIA/
+        └── demostracion.md
+</code></pre>
+<p>From this moment on, two documents must be clearly distinguished:</p>
+<pre><code class="language-text">MI_TEORIA/demostracion.md
+</code></pre>
+<p>is the document that remains in your original project.</p>
+<p>Whereas:</p>
+<pre><code class="language-text">DEMUESTRA/proyectos/MI_TEORIA/demostracion.md
+</code></pre>
+<p>is the <strong>working copy</strong>.</p>
+<h2>Important rule</h2>
+<p>Throughout the entire verification process:</p>
+<p><strong>work and make corrections on the <code>.md</code> file located inside DEMUESTRA.</strong></p>
+<p>You do not need to continuously modify the original project.</p>
+<p>Once the whole process has been completed satisfactorily, you can copy the corrected <code>.md</code> file from DEMUESTRA back to your original project.</p>
+<hr />
+<h1>PART III - HOW TO WRITE THE MARKDOWN</h1>
+<h2>8. The <code>.md</code> file</h2>
+<p>Markdown is simply a plain text format.</p>
+<p>You can write it with any text editor, although Visual Studio Code makes the work easier.</p>
+<p>Mathematical formulas are written using LaTeX.</p>
+<h3>Inline formulas</h3>
+<p>In your actual Markdown file, an inline formula is delimited with the $ character at the beginning and another $ character at the end.</p>
+<p>It must be written like this, as text:</p>
+<p>$formula$</p>
+<p>For example:</p>
+<p>Energy is given by $E=mc^2$.</p>
+<h3>Display formulas</h3>
+<p>In your actual Markdown file, a display formula in its own paragraph is delimited with two $$ characters at the beginning and two $$ characters at the end.</p>
+<p>It must be written like this, as text:</p>
+<p>$$formula$$</p>
+<p>For example:</p>
+<p>$$E=mc^2$$</p>
+<p>You can ask an AI to review the document and place the formulas and their delimiters correctly.</p>
+<hr />
+<h1>PART IV - THE PDF</h1>
+<h2>9. Do I need to generate a PDF?</h2>
+<p><strong>No.</strong></p>
+<p>The PDF is not necessary to carry out the proof.</p>
+<p>The fundamental working document is the <code>.md</code> file.</p>
+<p>To start working, you only need that <code>.md</code> file.</p>
+<p>With the <code>.md</code> file and the help of an AI, you can extract the arithmetic and deductive derivations that will later be brought into the Lean file.</p>
+<p>You can generate a PDF if you want a version intended for reading, distribution, or publication.</p>
+<p>You can do it with an AI or with any specific conversion tool.</p>
+<p>In my case, I use another project called <strong>PUBLICAR</strong>.</p>
+<p>PUBLICAR converts my projects to PDF and automates their publication in Zenodo and on my website.</p>
+<p>However, PUBLICAR uses my own project structure.</p>
+<p>Therefore:</p>
+<p><strong>PUBLICAR is optional and is not necessary to use DEMUESTRA.</strong></p>
+<p>You should not install PUBLICAR if you only want to verify a proof with DEMUESTRA.</p>
+<hr />
+<h1>PART V - STRUCTURAL ANALYSIS</h1>
+<h2>10. Convert the Markdown to JSON</h2>
+<p>A proof may seem evident to the person who developed it and yet contain concepts that have not been explicitly defined or relationships that have been assumed.</p>
+<p>That is why we first perform a structural analysis.</p>
+<p>You can ask a free AI to transform your Markdown proof into the JSON structure required by <strong>Gianluca R. Pisano</strong>'s analyzer.</p>
+<p>The process is:</p>
+<pre><code class="language-text">demostracion.md
+       |
+       v
+      AI
+       |
+       v
+demostracion.json
+</code></pre>
+<p>Here, the AI is performing a <strong>translation of format and structure</strong>.</p>
+<p>It must not invent new premises or modify your proof in order to make it pass the analysis.</p>
+<hr />
+<h2>11. Run the JSON through the analyzer</h2>
+<p>Enter the obtained JSON into Gianluca R. Pisano's analyzer.</p>
+<p>The analyzer may detect problems such as:</p>
+<ul>
+<li>symbols that appear without having been defined;</li>
+<li>insufficiently specified concepts;</li>
+<li>dependencies that are not clear;</li>
+<li>propositions that use previous results without identifying them;</li>
+<li>gaps in the deductive chain;</li>
+<li>hypotheses that need to be made explicit;</li>
+<li>problems of formal structure.</li>
+</ul>
+<hr />
+<h2>12. An analyzer error does not necessarily mean that you are wrong</h2>
+<p>This point is fundamental.</p>
+<p>If the analyzer detects a problem, <strong>it does not automatically mean that the mathematical claim is false</strong>.</p>
+<p>It may mean, for example, that you know perfectly well why a result follows from the previous one, but you have not written it explicitly.</p>
+<p>In that case, the problem is in the formal exposition of the proof.</p>
+<p>But we must not ignore the error either.</p>
+<p>We must find out exactly what it is pointing to.</p>
+<hr />
+<h1>PART VI - CORRECTING THE PROOF</h1>
+<h2>13. Always return to the Markdown</h2>
+<p>The document that must be corrected is:</p>
+<pre><code class="language-text">DEMUESTRA/proyectos/MI_TEORIA/demostracion.md
+</code></pre>
+<p>We must not turn the JSON into our main document.</p>
+<p>The origin of the proof always remains the Markdown file located inside DEMUESTRA.</p>
+<p>You can use an AI to ask:</p>
+<blockquote>
+<p>Which part of my Markdown file corresponds to this error detected by the analyzer?</p>
+</blockquote>
+<p>Then you study the problem and decide what needs to be corrected.</p>
+<hr />
+<h2>14. Generate the JSON again</h2>
+<p>After modifying the Markdown:</p>
+<pre><code class="language-text">Corrected Markdown
+        |
+        v
+new JSON
+        |
+        v
+analyzer
+</code></pre>
+<p>If new problems appear:</p>
+<pre><code class="language-text">analyzer
+     |
+     v
+locate problem
+     |
+     v
+correct .md
+     |
+     v
+generate JSON
+     |
+     v
+analyze again
+</code></pre>
+<p>This cycle may be repeated as many times as necessary.</p>
+<p>The principle is:</p>
+<p><strong>do not modify the proof simply to satisfy the analyzer; first understand what it is pointing to and correct what genuinely needs to be made explicit or corrected.</strong></p>
+<hr />
+<h1>PART VII - ENTERING DEMUESTRA</h1>
+<h2>15. When to use Lean</h2>
+<p>When the mathematical chain is sufficiently defined and structured, we move on to formal verification through Lean 4.</p>
+<p>Now we need to create a file:</p>
+<pre><code class="language-text">.lean
+</code></pre>
+<p>corresponding to our proof.</p>
+<hr />
+<h2>16. Create the Lean file</h2>
+<p>You can use a free AI to produce a first translation of the mathematical propositions from the Markdown into the Lean language.</p>
+<p>You should ask it to bring into the Lean file:</p>
+<ul>
+<li>definitions;</li>
+<li>variables;</li>
+<li>domains;</li>
+<li>hypotheses;</li>
+<li>propositions;</li>
+<li>lemmas;</li>
+<li>theorems;</li>
+<li>dependencies between results.</li>
+</ul>
+<p>The objective is not for the AI to invent a different proof.</p>
+<p>The objective is <strong>to formalize the proof that already exists in the Markdown</strong>.</p>
+<p>For the final mathematical proof of the deductions, DEMUESTRA only needs the <code>.lean</code> file.</p>
+<p>The relationship must be traceable:</p>
+<pre><code class="language-text">Markdown
+   |
+   ├── definition
+   ├── proposition 1
+   ├── proposition 2
+   ├── lemma
+   └── theorem
+          |
+          v
+        Lean
+          |
+   ├── definition
+   ├── proposition 1
+   ├── proposition 2
+   ├── lemma
+   └── theorem
+</code></pre>
+<p>In this way, if Lean finds a problem, we can return to the corresponding point in the Markdown.</p>
+<hr />
+<h1>PART VIII - RUNNING DEMUESTRA</h1>
+<h2>17. Run the program</h2>
+<p>Open a console or terminal.</p>
+<p>Move to the corresponding root folder and run:</p>
+<pre><code class="language-text">python PckDemuestra\demuestra.py
+</code></pre>
+<p>DEMUESTRA will search for the projects placed in its working folder:</p>
+<pre><code class="language-text">DEMUESTRA/proyectos/
+</code></pre>
+<p>and will process the projects it finds there.</p>
+<p>That is why it does not work directly on your original projects.</p>
+<p><strong>It works on the copies that you have decided to place inside <code>DEMUESTRA/proyectos</code>.</strong></p>
+<hr />
+<h2>18. What DEMUESTRA does</h2>
+<p>DEMUESTRA uses Lean 4 to verify the Lean files associated with the projects located in its working area.</p>
+<p>The program will report which ones compile correctly and which ones contain errors.</p>
+<p>A successful compilation means that Lean has been able to verify the provided formal construction.</p>
+<p>An unsuccessful compilation means that there is something to study.</p>
+<hr />
+<h1>PART IX - WHEN LEAN FINDS AN ERROR</h1>
+<h2>19. Do not correct blindly</h2>
+<p>If Lean produces an error, we should not simply ask an AI:</p>
+<blockquote>
+<p>Make it compile.</p>
+</blockquote>
+<p>That could hide precisely the problem we are trying to discover.</p>
+<p>We must locate:</p>
+<pre><code class="language-text">Lean error
+     |
+     v
+affected Lean proposition
+     |
+     v
+corresponding Markdown proposition
+     |
+     v
+mathematical reasoning
+</code></pre>
+<p>You can use an AI to help you locate that correspondence.</p>
+<hr />
+<h2>20. Two fundamental kinds of problems</h2>
+<p>An error may be due simply to the formalization.</p>
+<p>For example:</p>
+<ul>
+<li>incorrect Lean syntax;</li>
+<li>undeclared variable;</li>
+<li>incorrect type;</li>
+<li>a hypothesis that has not been transferred;</li>
+<li>incomplete definition.</li>
+</ul>
+<p>In that case, we correct the <code>.lean</code> file.</p>
+<p>But Lean may also reveal that a certain result <strong>cannot be obtained from the premises that we have formalized</strong>.</p>
+<p>Then we must return to the <code>.md</code> file and study that step.</p>
+<p>A justification may be missing.</p>
+<p>A hypothesis may be missing.</p>
+<p>Or there may truly be a mathematical error.</p>
+<p>DEMUESTRA is useful precisely because it forces us to distinguish these situations.</p>
+<hr />
+<h1>PART X - REPEATING THE PROCESS</h1>
+<h2>21. Verification cycle</h2>
+<p>The complete procedure can be represented as follows:</p>
+<pre><code class="language-text">ORIGINAL PROJECT
+      |
+      | copy .md
+      v
+DEMUESTRA/proyectos
+      |
+      v
+Working Markdown
+      |
+      v
+JSON
+      |
+      v
+Gianluca R. Pisano's analyzer
+      |
+      v
+Corrections
+      |
+      v
+Corrected Markdown
+      |
+      v
+Lean
+      |
+      v
+DEMUESTRA
+      |
+      v
+Lean 4
+      |
+      ├── ERROR
+      |      |
+      |      └── study and correct
+      |               |
+      |               └──────&gt; repeat
+      |
+      └── CORRECT
+              |
+              v
+       evaluated project
+</code></pre>
+<hr />
+<h1>PART XI - ALREADY EVALUATED PROJECTS</h1>
+<h2>22. Avoid reprocessing a project</h2>
+<p>Once the process has finished, DEMUESTRA can move the project, <strong>if you wish</strong>, from the pending projects area to the area intended for already evaluated projects.</p>
+<p>This prevents it from being processed unnecessarily again on the next run.</p>
+<p>The logic is:</p>
+<pre><code class="language-text">DEMUESTRA/
+|
+├── proyectos/
+|   ├── pending project
+|   └── project under evaluation
+|
+└── evaluados/
+    └── already evaluated project
+</code></pre>
+<p>Thus:</p>
+<pre><code class="language-text">proyectos
+</code></pre>
+<p>contains pending or active work.</p>
+<p>And:</p>
+<pre><code class="language-text">evaluados
+</code></pre>
+<p>contains the projects that have already completed the process.</p>
+<hr />
+<h1>PART XII - RETURNING THE RESULT TO THE ORIGINAL PROJECT</h1>
+<h2>23. The final Markdown</h2>
+<p>Throughout this whole process, we have worked on the copy that exists inside DEMUESTRA.</p>
+<p>Our original project remains separate.</p>
+<p>When we are satisfied with the result, we recover the corrected Markdown:</p>
+<pre><code class="language-text">DEMUESTRA/proyectos/MI_TEORIA/demostracion.md
+</code></pre>
+<p>or the corresponding file kept by DEMUESTRA after the evaluation.</p>
+<p>We copy it back to:</p>
+<pre><code class="language-text">MI_TEORIA/demostracion.md
+</code></pre>
+<p>Now our original project includes all the corrections that arose during the analysis and formalization process.</p>
+<hr />
+<h1>PART XIII - WHAT LEAN PROVES AND WHAT IT DOES NOT PROVE</h1>
+<h2>24. What it means for Lean to compile</h2>
+<p>This point must be understood correctly.</p>
+<p>If Lean accepts the formalization, we have a mechanical verification that the formalized results are correctly derived from the definitions, axioms, hypotheses, and theorems used inside that formalization.</p>
+<p>This is much stronger than a simple style review or an AI opinion.</p>
+<p>Lean acts as a <strong>formal verifier</strong>.</p>
+<hr />
+<h2>25. What it does not mean</h2>
+<p>The fact that a Lean file compiles does not automatically prove that all the premises used correctly describe nature.</p>
+<p>For example, a physical theory may have an internally correct mathematical chain and contain a physical hypothesis that must later be tested experimentally.</p>
+<p>Nor does it mean that an incomplete formalization validates what has not been formalized.</p>
+<p>That is why it is essential for the Lean file to truly represent all the necessary propositions of the proof.</p>
+<hr />
+<h1>PART XIV - DEMUESTRA'S PHILOSOPHY</h1>
+<h2>26. The objective</h2>
+<p>DEMUESTRA does not aim to replace the researcher.</p>
+<p>Nor does it aim to replace scientific review or experimental verification when that is necessary.</p>
+<p>Its purpose is to provide something different:</p>
+<p><strong>an explicit, reproducible mathematical chain that can be formally verified.</strong></p>
+<p>The AI can help us translate.</p>
+<p>The analyzer can help us discover deficiencies in the exposition.</p>
+<p>Lean can verify the formalized mathematical relationships.</p>
+<p>But the idea, the hypotheses, and the responsibility for the proof continue to belong to the researcher.</p>
+<p>The working principle can be summarized as follows:</p>
+<pre><code class="language-text">HUMAN IDEA
+     v
+HUMAN PROOF
+     v
+MARKDOWN
+     v
+STRUCTURAL ANALYSIS
+     v
+CORRECTION
+     v
+LEAN FORMALIZATION
+     v
+LEAN 4 VERIFICATION
+     v
+REPRODUCIBLE RESULT
+</code></pre>
+<p><strong>DEMUESTRA does not ask for a proof to be believed.</strong></p>
+<p><strong>It allows it to be examined step by step.</strong></p>
+
+</body>
+</html>

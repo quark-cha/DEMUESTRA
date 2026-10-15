@@ -234,6 +234,22 @@ class WebPublisher:
                 + " | ".join(details)
             )
 
+    def _verify_uploaded_file(self, remote_path: str, expected_hash: str) -> None:
+        tmp_handle = tempfile.NamedTemporaryFile(
+            prefix="publicar_verify_", suffix=".bin", delete=False,
+        )
+        tmp = Path(tmp_handle.name)
+        tmp_handle.close()
+        try:
+            self.ftp.download(remote_path, tmp)
+            actual_hash = hashlib.md5(tmp.read_bytes()).hexdigest()
+            if actual_hash != expected_hash:
+                raise RuntimeError(
+                    f"El archivo remoto no coincide con el local: {remote_path}"
+                )
+        finally:
+            tmp.unlink(missing_ok=True)
+
     def sync(self):
         trace = self._new_trace()
         trace.start_destination()
@@ -288,7 +304,9 @@ class WebPublisher:
                     local_path = self.local_dir / name
                     progress.update(progress.current, f"subiendo {name}")
                     try:
-                        self.ftp.upload(local_path, f"{self.remote_dir}/{name}")
+                        remote_path = f"{self.remote_dir}/{name}"
+                        self.ftp.upload(local_path, remote_path)
+                        self._verify_uploaded_file(remote_path, local_hashes[name])
                     except Exception as exc:
                         progress.finish("fallo")
                         trace.failure("upload", error=exc, item=name)
@@ -332,7 +350,7 @@ class WebPublisher:
                 trace.result.files_uploaded or trace.result.files_deleted
             ) else "FAILED"
             trace.finish_destination(status)
-            return trace.result.as_dict()
+            raise
 
         trace.finish_destination("OK")
         return trace.result.as_dict()

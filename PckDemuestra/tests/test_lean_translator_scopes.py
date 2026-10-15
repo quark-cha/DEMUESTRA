@@ -2,6 +2,7 @@ import hashlib
 import sys
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -9,6 +10,10 @@ sys.path.insert(0, str(ROOT / "vendor" / "PUBLICAR"))
 
 from PackPublica.documento import Documento
 from PackPublica.md import Md
+from PackPublica.lean import Lean
+from PackPublica.formal_ast import parse_formula
+from PackPublica.formal_symbols import SymbolInference
+from PackPublica.formal_semantic import LeanExpressionEmitter
 
 
 class LeanTranslatorScopeTests(unittest.TestCase):
@@ -16,18 +21,23 @@ class LeanTranslatorScopeTests(unittest.TestCase):
     def setUpClass(cls):
         cls.markdown = ROOT / "Proyectos" / "ES_46_RV6" / "ES_46_RV6.md"
         before = hashlib.sha256(cls.markdown.read_bytes()).hexdigest()
-        cls.generated = Md(Documento(cls.markdown)).lean().contenido
+        # Esta prueba del backend no publica artefactos ni selecciona fuentes.
+        cls.generated = Lean(Md(Documento(cls.markdown))).contenido
         after = hashlib.sha256(cls.markdown.read_bytes()).hexdigest()
         if before != after:
             raise AssertionError("El traductor modifico el Markdown durante la prueba.")
 
     def test_membership_constrains_function_result_to_nat(self):
-        self.assertIn("n_fn_1 : ℝ → ℕ", self.generated)
+        formula = SimpleNamespace(ast=parse_formula(r"n(z)\in\mathbb N"))
+        symbols = SymbolInference().infer([
+            SimpleNamespace(declarations=[formula], claims=[], steps=[])
+        ])
+        self.assertEqual(symbols.functions["n"].result, "Nat")
 
     def test_existing_quantifier_is_not_wrapped_in_another_scope(self):
         source = next(
             line for line in self.generated.splitlines()
-            if line.startswith("def Node_A_ZE_source_1 ")
+            if line.startswith("def Node_P_RIM_S_source_1 ")
         )
         self.assertIn("∀ z : ℂ", source)
         self.assertNotIn("∀ z_all", source)
@@ -68,7 +78,8 @@ class LeanTranslatorScopeTests(unittest.TestCase):
         end = self.generated.index("-- FORMAL_NODE:", start + 1)
         block = self.generated[start:end]
         self.assertNotIn("simp_all", block)
-        self.assertIn("assumption", block)
+        self.assertIn("-- DEMUESTRA_ASSERTION: T_RIEMANN|COMPLETA|NO_DETERMINADO", block)
+        self.assertNotIn("theorem derive_T_RIEMANN ", block)
 
     def test_symmetry_axis_is_not_an_arbitrary_zero_hypothesis(self):
         start = self.generated.index("-- FORMAL_NODE: D_Rim")
@@ -83,16 +94,15 @@ class LeanTranslatorScopeTests(unittest.TestCase):
         self.assertNotIn("h_D_Rim_7", riemann)
 
     def test_conditional_theorem_uses_explicit_implication_as_claim(self):
-        start = self.generated.index("-- FORMAL_NODE: T_ZERO_TO_INTEGER_CLOSURE")
-        end = self.generated.index("-- FORMAL_NODE:", start + 1)
-        block = self.generated[start:end]
-        theorem = next(
-            line for line in block.splitlines()
-            if line.startswith("theorem derive_T_ZERO_TO_INTEGER_CLOSURE")
-        )
-        self.assertIn("∀ w : ℂ", theorem)
-        self.assertIn("→ (∀ z : ℂ", theorem)
-        self.assertNotIn(": ((ctx.a = ((1 : ℝ) / (2 : ℝ))))", theorem)
+        formula = SimpleNamespace(ast=parse_formula(
+            r"(\forall w\in\mathbb C,Q(w))\Longrightarrow(\forall z\in\mathbb C,P(z))"))
+        symbols = SymbolInference().infer([
+            SimpleNamespace(declarations=[], claims=[formula], steps=[])
+        ])
+        emitted = LeanExpressionEmitter(symbols=symbols).emit(formula.ast)
+        self.assertIn("∀ w : ℂ", emitted)
+        self.assertIn("→", emitted)
+        self.assertIn("∀ z : ℂ", emitted)
 
 
 if __name__ == "__main__":

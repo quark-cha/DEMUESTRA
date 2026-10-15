@@ -2,6 +2,8 @@ import json as json_lib
 import re
 
 from .base import Publicacion
+from .autoria import resolve_authors
+from .adec_contract import validate_artifact
 
 
 class Json(Publicacion):
@@ -45,11 +47,11 @@ class Json(Publicacion):
     AUTHOR_RE = re.compile(r"\*\*(?:autor|author)\s*:\*\*\s*(?P<author>.+?)(?:\s{2,}|\n|$)", re.IGNORECASE)
     FRAMEWORK_RE = re.compile(r"\*\*(?:marco|framework)\s*:\*\*\s*(?P<framework>.+?)(?:\s{2,}|\n|$)", re.IGNORECASE)
     MARKER_PATTERN = (
-        r"[DAPT]_(?:\{\\rm\s+[^}]+\}|\{[^}]+\}|\\[A-Za-z]+|[A-Za-z][A-Za-z0-9']*)"
+        r"[DAPT]_(?:\{(?:[^{}]|\{[^{}]*\})+\}|\\[A-Za-z]+|[A-Za-z0-9][A-Za-z0-9']*)"
         r"(?:\([^)]*\))?"
     )
-    DOLLAR_DECL_RE = re.compile(r"\$(?P<marker>" + MARKER_PATTERN + r")\$\s*(?:[—\-:])")
-    BARE_DECL_RE = re.compile(r"(?<![A-Za-z\\])(?P<marker>" + MARKER_PATTERN + r")\s*:")
+    DOLLAR_DECL_RE = re.compile(r"(?m)^[ \t]*\$(?P<marker>" + MARKER_PATTERN + r")\$\s*(?:[—\-:])")
+    BARE_DECL_RE = re.compile(r"(?m)^[ \t]*(?P<marker>" + MARKER_PATTERN + r")\s*:")
     MARKER_RE = re.compile(r"\$?(?P<marker>" + MARKER_PATTERN + r")\$?")
 
     def __init__(self, md_obj):
@@ -81,8 +83,8 @@ class Json(Publicacion):
         raw = raw.strip()
         if raw.startswith("{") and raw.endswith("}"):
             raw = raw[1:-1].strip()
-        raw = raw.replace("\\mathrm", "").replace("{", "").replace("}", "")
-        raw = re.sub(r"^\\rm\s+", "", raw).strip()
+        raw = raw.replace("{", "").replace("}", "")
+        raw = re.sub(r"\\(?:rm|mathrm)\s*", "", raw).strip()
         raw = raw.replace("'", "_prime")
         raw = re.sub(r"\\([A-Za-z]+)", r"\1", raw)
         raw = re.sub(r"[^A-Za-z0-9]+", "_", raw).strip("_")
@@ -121,15 +123,15 @@ class Json(Publicacion):
                 )
 
         declarations.sort(key=lambda item: item["start"])
-        unique = []
-        used_ids = set()
+        occurrences = {}
         for item in declarations:
             base_id = item["id"]
-            item["duplicate"] = base_id in used_ids
-            item["id"] = base_id
-            used_ids.add(base_id)
-            unique.append(item)
-        return unique
+            occurrence = occurrences.get(base_id, 0) + 1
+            occurrences[base_id] = occurrence
+            item["base_id"] = base_id
+            if occurrence > 1:
+                item["id"] = f"{base_id}_{occurrence}"
+        return declarations
 
     def _explicit_deps(self, body):
         deps = []
@@ -184,13 +186,14 @@ class Json(Publicacion):
 
     def _proof_steps(self, body):
         parts = []
-        for chunk in re.split(r"\n\s*\n|(?<=[.!?])\s+(?=[A-ZÁÉÍÓÚÑ])", body):
-            chunk = self._clean_inline(chunk)
-            if not chunk or chunk in {"---", "$$", "\\boxed{"}:
-                continue
-            parts.append(chunk)
-            if len(parts) >= 8:
-                break
+        # Blank lines inside a display formula or code fence are not proof boundaries.
+        blocks = re.split(r"(\$\$[\s\S]*?\$\$|```[\s\S]*?```)", body)
+        for block in blocks:
+            chunks = [block] if block.startswith(("$$", "```")) else re.split(r"\n[ \t]*\n", block)
+            for chunk in chunks:
+                chunk = chunk.strip()
+                if chunk and chunk not in {"---", "$$", "\\boxed{"}:
+                    parts.append(chunk)
         return parts
 
     def _proof_from_body(self, body):
@@ -202,6 +205,8 @@ class Json(Publicacion):
             "method": "derivation",
             "status": "declared",
             "steps": steps,
+            "source_text": body,
+            "extraction": "complete_source_blocks",
         }
 
         return proof
@@ -253,43 +258,41 @@ class Json(Publicacion):
         return nodes
 
     def _authors(self, text):
-        match = self.AUTHOR_RE.search(text)
-        if not match:
-            return []
-
-        author = self._clean_inline(match.group("author")).rstrip(".")
-        if not author:
-            return []
-
-        item = {
-            "name": author,
-            "conflict_of_interest": "none",
-        }
-
-        framework_match = self.FRAMEWORK_RE.search(text)
-        if framework_match:
-            item["affiliation"] = self._clean_inline(framework_match.group("framework"))
-        return [item]
+        return resolve_authors(text)
 
     def _nodes_from_logical_markers(self, text):
         declarations = self._find_declarations(text)
         if not declarations:
             return []
 
+        headings = list(self.HEADING_RE.finditer(text))
+        for index, item in enumerate(declarations):
+            item["body_start"] = item["start"]
+            if index == 0:
+                continue
+            previous = declarations[index - 1]
+            intervening = [heading for heading in headings
+                           if previous["end"] <= heading.start() < item["start"]]
+            if intervening:
+                item["body_start"] = intervening[-1].start()
+            if item["body_start"] == item["start"]:
+                display_open = text.rfind("$$", 0, item["start"])
+                if display_open >= 0 and text.count("$$", 0, item["start"]) % 2 == 1:
+                    item["body_start"] = display_open
+
         nodes = []
         for index, item in enumerate(declarations):
-            next_start = declarations[index + 1]["start"] if index + 1 < len(declarations) else len(text)
-            # Repeated logical markers are restatements or references. They
-            # delimit the surrounding text but do not create new theorems.
-            if item.get("duplicate"):
-                continue
-            raw_body = text[item["end"]:next_start].strip()
+            next_start = declarations[index + 1]["body_start"] if index + 1 < len(declarations) else len(text)
+            raw_body = text[item["body_start"]:next_start].strip()
             explicit_deps, body = self._explicit_deps(raw_body)
             kind = self.PREFIX_KIND.get(item["prefix"], "concept")
             name, description = self._description_name(item["id"], item.get("heading"), body)
 
             valid_previous_ids = {node["id"] for node in nodes}
             deps = []
+            base_id = item["base_id"]
+            if item["id"] != base_id and base_id in valid_previous_ids:
+                deps.append(base_id)
             for dep in explicit_deps:
                 normalized = self._marker_id(dep) if re.match(r"^[DAPT]_", dep) else dep
                 if normalized in valid_previous_ids and normalized not in deps:
@@ -313,6 +316,9 @@ class Json(Publicacion):
                     "start_line": text.count("\n", 0, item["start"]) + 1,
                 },
             }
+
+            if item["id"] != base_id:
+                node["source"]["restatement_of"] = base_id
 
             relationship = self._measurement_relationship(deps)
             if relationship:
@@ -379,4 +385,5 @@ class Json(Publicacion):
             "authors": self._authors(text),
             "nodes": nodes,
         }
+        validate_artifact(data)
         return json_lib.dumps(data, ensure_ascii=False, indent=2)

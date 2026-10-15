@@ -1,0 +1,83 @@
+{
+  "project": "ES_52_Maquina_V_UNIHOLOG",
+  "source_sha256": "a267c6d2a16442dca06a2609049fe7ac5ef0ebabaee74a80ecc1d81401b448f7",
+  "diagnostic_scope": "TRANSLATOR_ONLY",
+  "document_verdict": "NO_EMITIDO",
+  "kernel_executed": false,
+  "generated_on": "2026-10-08T11:07:41+00:00",
+  "semantic_diagnostics": [
+    {
+      "location": "ES_52_Maquina_V_UNIHOLOG.md:1886:D_SIMETRIA:formula-3",
+      "source": "R(N)R(M)=R(NM).",
+      "detail": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1886:D_SIMETRIA:formula-3: argumento de R: se esperaba Real, se obtuvo Set[Nat]."
+    },
+    {
+      "location": "ES_52_Maquina_V_UNIHOLOG.md:2400:D_REGISTROBINARIO:formula-4",
+      "source": "\\boxed{\\text{n valores desconocidos}\\neq\\text{una representación física de }2^n\\text{ estados}.}",
+      "detail": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:2400:D_REGISTROBINARIO:formula-4: MUL requiere operandos numericos; obtuvo Prop y Real."
+    },
+    {
+      "location": "ES_52_Maquina_V_UNIHOLOG.md:1344:D_CORRELACIONES:formula-2",
+      "source": "P_V(a,b, x,y)\n=\\int d\\mu(\\lambda)\\,\nP_A(a\\mid x,\\lambda)P_B(b\\mid y,\\lambda).",
+      "detail": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1344:D_CORRELACIONES:formula-2: LIMITACION_DEL_TRADUCTOR: falta el modelo tipado de probabilidad condicionada; no es una multiplicacion."
+    },
+    {
+      "location": "ES_52_Maquina_V_UNIHOLOG.md:1470:D_REGISTROREF:formula-6",
+      "source": "\\sum_{a\\in\\mathcal A}\\sum_{\\nu\\in\\mathcal N_a}\nK_{a,\\nu}^{\\dagger}K_{a,\\nu}=I_D.",
+      "detail": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1470:D_REGISTROREF:formula-6: la variable de sumatoria debe ser un identificador."
+    },
+    {
+      "location": "ES_52_Maquina_V_UNIHOLOG.md:1470:D_REGISTROREF:formula-7",
+      "source": "p_a=\\operatorname{tr}\\left(\n\\sum_{\\nu\\in\\mathcal N_a}K_{a,\\nu}\\rho K_{a,\\nu}^{\\dagger}\n\\right).",
+      "detail": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1470:D_REGISTROREF:formula-7: la variable de sumatoria debe ser un identificador."
+    },
+    {
+      "location": "ES_52_Maquina_V_UNIHOLOG.md:1470:D_REGISTROREF:formula-8",
+      "source": "\\rho_{a,\\mathrm{post}}=\n\\frac{\\sum_{\\nu\\in\\mathcal N_a}K_{a,\\nu}\\rho K_{a,\\nu}^{\\dagger}}\n{p_a},\\qquad p_a>0.",
+      "detail": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1470:D_REGISTROREF:formula-8: la variable de sumatoria debe ser un identificador."
+    },
+    {
+      "location": "ES_52_Maquina_V_UNIHOLOG.md:2488:D_EQUIVALENCIA:formula-6",
+      "source": "\\boxed{\n\\text{componentes convencionales}\n+\\text{valores desconocidos}\n+\\text{relaciones conocidas}\n+\\text{propagación}\n+\\text{medida}\n}",
+      "detail": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:2488:D_EQUIVALENCIA:formula-6: PLUS requiere operandos numericos; obtuvo Prop y Prop."
+    },
+    {
+      "location": "ES_52_Maquina_V_UNIHOLOG.md:1375:P_CHSHLOCAL:formula-10",
+      "source": "\\forall i,\\quad K(V_i)=\\xi.",
+      "detail": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1375:P_CHSHLOCAL:formula-10: el cuantificador de i necesita un dominio tipado."
+    },
+    {
+      "location": "ES_52_Maquina_V_UNIHOLOG.md:971:D_CONDICIONREFERENCIA:formula-1",
+      "source": "r(t_0)\\mid C_\\phi\\sim\\operatorname{Uniforme}(0,1).",
+      "detail": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:971:D_CONDICIONREFERENCIA:formula-1: LIMITACION_DEL_TRADUCTOR: falta el modelo tipado de probabilidad condicionada; no es una multiplicacion."
+    },
+    {
+      "location": "ES_52_Maquina_V_UNIHOLOG.md:998:P_LECTURAUNIFORME:formula-1",
+      "source": "P_V(v=0, C_\\phi)\n=P(r(t_0)<w\\mid C_\\phi)\n=\\int_0^w dr=w.",
+      "detail": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:998:P_LECTURAUNIFORME:formula-1: LIMITACION_DEL_TRADUCTOR: falta el modelo tipado de probabilidad condicionada; no es una multiplicacion."
+    },
+    {
+      "location": "ES_52_Maquina_V_UNIHOLOG.md:1052:D_ACTUALIZACION:formula-6",
+      "source": "r_k\\mid(h_{k-1},C)\\sim\\operatorname{Uniforme}(0,1).",
+      "detail": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1052:D_ACTUALIZACION:formula-6: LIMITACION_DEL_TRADUCTOR: falta el modelo tipado de probabilidad condicionada; no es una multiplicacion."
+    },
+    {
+      "location": "ES_52_Maquina_V_UNIHOLOG.md:1156:T_SECUENCIACOND:formula-1",
+      "source": "P_V(a_1,\\ldots,a_m\\mid c_{\\mathrm{protocolo}})\n=\\prod_{k=1}^m P_V(a_k\\mid a_1,\\ldots,a_{k-1},c_{\\mathrm{protocolo}})\n=P_Q(a_1,\\ldots,a_m\\mid c_{\\mathrm{protocolo}}).",
+      "detail": "Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1156:T_SECUENCIACOND:formula-1: LIMITACION_DEL_TRADUCTOR: falta el modelo tipado de probabilidad condicionada; no es una multiplicacion."
+    }
+  ],
+  "emission_blockers": [
+    "- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1886:D_SIMETRIA:formula-3: argumento de R: se esperaba Real, se obtuvo Set[Nat].",
+    "- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1344:D_CORRELACIONES:formula-2: LIMITACION_DEL_TRADUCTOR: falta el modelo tipado de probabilidad condicionada; no es una multiplicacion.",
+    "- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1470:D_REGISTROREF:formula-6: la variable de sumatoria debe ser un identificador.",
+    "- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1470:D_REGISTROREF:formula-7: la variable de sumatoria debe ser un identificador.",
+    "- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1470:D_REGISTROREF:formula-8: la variable de sumatoria debe ser un identificador.",
+    "- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:971:D_CONDICIONREFERENCIA:formula-1: LIMITACION_DEL_TRADUCTOR: falta el modelo tipado de probabilidad condicionada; no es una multiplicacion.",
+    "- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:998:P_LECTURAUNIFORME:formula-1: LIMITACION_DEL_TRADUCTOR: falta el modelo tipado de probabilidad condicionada; no es una multiplicacion.",
+    "- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1156:T_SECUENCIACOND:formula-1: LIMITACION_DEL_TRADUCTOR: falta el modelo tipado de probabilidad condicionada; no es una multiplicacion."
+  ],
+  "formula_count": 229,
+  "status": "TRADUCCION_PENDIENTE",
+  "detail": "No se pueden emitir formulas sin tipo:\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1886:D_SIMETRIA:formula-3: argumento de R: se esperaba Real, se obtuvo Set[Nat].\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1344:D_CORRELACIONES:formula-2: LIMITACION_DEL_TRADUCTOR: falta el modelo tipado de probabilidad condicionada; no es una multiplicacion.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1470:D_REGISTROREF:formula-6: la variable de sumatoria debe ser un identificador.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1470:D_REGISTROREF:formula-7: la variable de sumatoria debe ser un identificador.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1470:D_REGISTROREF:formula-8: la variable de sumatoria debe ser un identificador.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:971:D_CONDICIONREFERENCIA:formula-1: LIMITACION_DEL_TRADUCTOR: falta el modelo tipado de probabilidad condicionada; no es una multiplicacion.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:998:P_LECTURAUNIFORME:formula-1: LIMITACION_DEL_TRADUCTOR: falta el modelo tipado de probabilidad condicionada; no es una multiplicacion.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1156:T_SECUENCIACOND:formula-1: LIMITACION_DEL_TRADUCTOR: falta el modelo tipado de probabilidad condicionada; no es una multiplicacion."
+}

@@ -4,6 +4,7 @@ import tempfile
 import re
 from .base import Publicacion
 from .odt import Odt
+from .artifact_metadata import office_authors
 
 class Docx(Publicacion):
     carpeta_salida = "docxs"
@@ -58,6 +59,7 @@ class Docx(Publicacion):
                 capture_output=True,
                 timeout=300,
             )
+            office_authors(fichero, self.documento)
             print(f"  ✅ DOCX generado con Pandoc: {fichero.resolve()}")
         except subprocess.CalledProcessError as e:
             raise RuntimeError(f"Error al generar DOCX:\n{e.stderr.decode()}")
@@ -65,22 +67,24 @@ class Docx(Publicacion):
             raise TimeoutError(
                 f"Pandoc superó el tiempo máximo al generar DOCX: {fichero}"
             ) from e
+        except FileNotFoundError as e:
+            if e.filename != "pandoc":
+                raise
+            raise RuntimeError(
+                "PUBLICAR no encuentra Pandoc para generar el DOCX.\n"
+                "Windows: winget install --id JohnMacFarlane.Pandoc --exact\n"
+                "Debian/Ubuntu: sudo apt install pandoc\n"
+                "macOS: brew install pandoc\n"
+                "Reabra la terminal y compruebe: pandoc --version"
+            ) from e
         finally:
             if temp_html.exists():
                 temp_html.unlink()
 
     def save(self, fichero=None):
         # ... (tu código original, sin cambios) ...
-        super().save(fichero)
-        base_name = "documento"
-        if self.documento and hasattr(self.documento, 'md') and hasattr(self.documento.md, 'stem'):
-            base_name = self.documento.md.stem
-        elif self.origen and hasattr(self.origen, 'fichero') and hasattr(self.origen.fichero, 'stem'):
-            base_name = self.origen.fichero.stem
-        else:
-            self.logger.warning("No se pudo determinar el nombre base para ODT. Usando 'documento'.")
-
-        docx_folder = Path(self.carpeta_salida)
+        docx_file = Path(super().save(fichero))
+        docx_folder = docx_file.parent
         parts = list(docx_folder.parts)
         for i, part in enumerate(parts):
             if part == "docxs":
@@ -89,19 +93,12 @@ class Docx(Publicacion):
         odt_folder = Path(*parts) if parts else Path("odts")
         odt_folder.mkdir(parents=True, exist_ok=True)
 
-        docx_file = docx_folder / f"{base_name}.docx"
-        if not docx_file.exists():
-            posibles = list(docx_folder.glob(f"{base_name}*.docx"))
-            if posibles:
-                docx_file = posibles[0]
-            else:
-                raise FileNotFoundError(f"No se encontró el DOCX en {docx_file}")
-
         print(f"  🔍 DOCX encontrado: {docx_file.resolve()}")
 
         odt_obj = Odt(docx_path=docx_file, documento=self.documento)
         odt_obj.carpeta_salida = str(odt_folder)
-        odt_file = odt_folder / f"{base_name}.odt"
+        odt_file = odt_folder / f"{docx_file.stem}.odt"
         odt_obj.save(odt_file)
         print(f"  ✅ ODT generado automáticamente desde DOCX: {odt_file.resolve()}")
+        return docx_file
 

@@ -8,7 +8,7 @@ Codigo de salida: `0`
 
 ## Diagnostico
 
-Prolog cerro independientemente el arbol declarado. La auditoria estatica del archivo Lean certifico su estructura y sus conteos, sin ejecutar el kernel de Lean en esta ruta.
+Prolog cerro el arbol declarado y comprobo la cobertura de formulas extraidas.
 
 ## Enlaces ausentes
 
@@ -16,7 +16,7 @@ Ninguno detectado.
 
 ## Accion
 
-Consultar por separado el informe del evaluador Lean para conocer el estado de compilacion y prueba.
+No se requiere ninguna accion.
 
 ## Alcance
 

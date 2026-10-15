@@ -4,14 +4,17 @@
 
 **TEOREMA DERIVADO DESDE PREMISAS DECLARADAS**
 
+Certificados estructurales: 7/7. Refutaciones: 0.
+Alcance: cierre de dependencias bajo premisas declaradas; no certificacion matematica global.
+
 Entrada unica: `ES_46_RV6.md`
-Nodos extraidos: `38`
+Nodos extraidos: `39`
 Reglas Deps extraidas: `7`
-Premisas declaradas: `31`
-Lineas matematicas extraidas: `730`
+Premisas declaradas: `32`
+Lineas matematicas extraidas: `845`
 Dependencias recuperadas del texto de prueba: `5`
-SHA-256 del Markdown: `90cf88725aede8ecb78ee7ee7c5acc0f8e0ddc3c83ef5a69f2619fe37d9c71dd`
-SHA-256 del auditor: `178211ec6d1327ec19c135b798d24441cf429fdf6e1b7b8e99f8e6421724d91f`
+SHA-256 del Markdown: `1a6347bb2e7f67f2a27d7f20b27cb3b3b2d45af25a58bfc8bdf6bc5c8e817000`
+SHA-256 del auditor: `a9ad83b7361bf9b2bd40247fa7733d2fa85011c8c93cac3a506d1dc1d400b8ed`
 
 ## Teoremas
 
@@ -24,43 +27,43 @@ SHA-256 del auditor: `178211ec6d1327ec19c135b798d24441cf429fdf6e1b7b8e99f8e64217
 
 ## Dependencias recuperadas de la prueba
 
-- `D_LAP` usa `P_F3` en la linea `776`
-- `P_VR_RHO` usa `P_VED_E` en la linea `1290`
-- `P_VR_E` usa `P_VR_RHO` en la linea `1410`
-- `T_RIEMANN` usa `D_RHO_R` en la linea `1502`
-- `T_RIEMANN` usa `P_VR_RHO` en la linea `1502`
+- `D_LAP` usa `P_F3` en la linea `1127`
+- `P_VR_RHO` usa `P_VED_E` en la linea `1641`
+- `P_VR_E` usa `P_VR_RHO` en la linea `1761`
+- `T_RIEMANN` usa `D_RHO_R` en la linea `1853`
+- `T_RIEMANN` usa `P_VR_RHO` en la linea `1853`
 
 ## Premisas usadas por el objetivo
 
-- `D_F` declarada en la linea `1072`
-- `D_FINV` declarada en la linea `1100`
-- `P_Z` declarada en la linea `1454`
-- `D_RHO_R` declarada en la linea `1003`
-- `P_VED_E` declarada en la linea `394`
+- `D_F` declarada en la linea `1423`
+- `D_FINV` declarada en la linea `1451`
+- `P_Z` declarada en la linea `1805`
+- `D_RHO_R` declarada en la linea `1354`
+- `P_VED_E` declarada en la linea `417`
 
 ## Arbol de prueba
 
 ```text
-    TEOREMA t_riemann por Deps (linea 1474)
-      TEOREMA t_iso por Deps (linea 1128)
-        PREMISA_MD d_f (linea 1072)
-        PREMISA_MD d_finv (linea 1100)
-      TEOREMA p_rho_iso por Deps (linea 1144)
-        TEOREMA t_iso por Deps (linea 1128)
-          PREMISA_MD d_f (linea 1072)
-          PREMISA_MD d_finv (linea 1100)
-      TEOREMA p_rim_s por Deps (linea 1195)
-        TEOREMA t_iso por Deps (linea 1128)
-          PREMISA_MD d_f (linea 1072)
-          PREMISA_MD d_finv (linea 1100)
-        TEOREMA p_rho_iso por Deps (linea 1144)
-          TEOREMA t_iso por Deps (linea 1128)
-            PREMISA_MD d_f (linea 1072)
-            PREMISA_MD d_finv (linea 1100)
-      PREMISA_MD p_z (linea 1454)
-      PREMISA_MD d_rho_r (linea 1003)
-      TEOREMA p_vr_rho por Deps (linea 1290)
-        PREMISA_MD p_ved_e (linea 394)
+    TEOREMA t_riemann por Deps (linea 1825)
+      TEOREMA t_iso por Deps (linea 1479)
+        PREMISA_MD d_f (linea 1423)
+        PREMISA_MD d_finv (linea 1451)
+      TEOREMA p_rho_iso por Deps (linea 1495)
+        TEOREMA t_iso por Deps (linea 1479)
+          PREMISA_MD d_f (linea 1423)
+          PREMISA_MD d_finv (linea 1451)
+      TEOREMA p_rim_s por Deps (linea 1546)
+        TEOREMA t_iso por Deps (linea 1479)
+          PREMISA_MD d_f (linea 1423)
+          PREMISA_MD d_finv (linea 1451)
+        TEOREMA p_rho_iso por Deps (linea 1495)
+          TEOREMA t_iso por Deps (linea 1479)
+            PREMISA_MD d_f (linea 1423)
+            PREMISA_MD d_finv (linea 1451)
+      PREMISA_MD p_z (linea 1805)
+      PREMISA_MD d_rho_r (linea 1354)
+      TEOREMA p_vr_rho por Deps (linea 1641)
+        PREMISA_MD p_ved_e (linea 417)
 ```
 
 ## Alcance

@@ -19,8 +19,10 @@ maximum recursion depth has been reached
         diagnostics = _clasificar_fallos_lean_por_nodo(
             source, log, ["A", "B"]
         )
-        self.assertEqual("NO_DEMOSTRADO", diagnostics[0]["state"])
+        self.assertEqual("VERIFICACION_FORMAL_PENDIENTE", diagnostics[0]["state"])
+        self.assertFalse(diagnostics[0]["source_refuted"])
         self.assertEqual("ERROR_EVALUADOR", diagnostics[1]["state"])
+        self.assertFalse(diagnostics[1]["source_refuted"])
 
 
 if __name__ == "__main__":

@@ -1,0 +1,40 @@
+CORRECCION DEL TRADUCTOR: FAMILIAS INDEXADAS LIGADAS
+
+No se modifican los documentos cientificos ni los certificados.
+
+Defecto corregido:
+Una expresion a_j dentro de una sumatoria sobre j se trataba como un
+simbolo fijo, en lugar de una aplicacion de la familia a al indice j.
+La correccion reconoce el alcance del indice ligado; no captura otros
+indices ni convierte etiquetas ajenas a una sumatoria en funciones.
+
+Comprobaciones:
+- 68 pruebas Python aprobadas.
+- Pruebas nuevas de indices ligados, productos, sumas anidadas y alcance.
+- El codigo ejecutable del 46 coincide con la referencia del traductor
+  anterior a la ampliacion de indices. Se omiten solo los comentarios
+  de metadatos al comparar; no se omite ninguna instruccion Lean.
+- publica.py --diagnosticar-traduccion ES_46_RV6: emision generada,
+  cero bloqueos. Esto no acredita una nueva prueba por el kernel.
+- publica.py --diagnosticar-traduccion ES_52: ocho bloqueos, frente a
+  nueve antes de esta correccion. Se elimina el bloqueo de e_j.
+- La comprobacion Lean de tests/familias_generadas.lean supera el limite
+  de 90 segundos sin resultado; queda INCONCLUSA. No se marca aprobada.
+- lean --version responde correctamente: Lean 4.33.1. El timeout no
+  demuestra un error matematico ni del Markdown.
+
+Pendiente en el 52:
+- Modelo de matrices y resolucion contextual de R(N).
+- Sumatorias sobre dominios simbolicos y operadores de Kraus.
+- Probabilidad condicionada, integrales y productos del protocolo.
+No se reemplazan estas operaciones por multiplicaciones ni escalares
+para conseguir que el archivo compile.
+
+Fuentes intactas, SHA-256:
+46: 90cf88725aede8ecb78ee7ee7c5acc0f8e0ddc3c83ef5a69f2619fe37d9c71dd
+52: a267c6d2a16442dca06a2609049fe7ac5ef0ebabaee74a80ecc1d81401b448f7
+
+El diagnostico integrado en publica.py guarda su informe en
+documentacion/<carpeta-del-proyecto>/DIAGNOSTICO_TRADUCTOR_ACTUAL.json.
+No genera PDF, certificados ni subidas web. Un codigo de salida 1
+indica traduccion pendiente, no refutacion del documento.

@@ -25,15 +25,15 @@ forma parte del veredicto.
 - PASS `prolog_md_directo_aprobado`
 - PASS `obligaciones_semanticas_cerradas`
 - PASS `nodo_lean_coincide`
-- PASS `dependencias_lean_internalizadas`
+- FAIL `dependencias_lean_internalizadas`
 - PASS `sin_pendientes_ya_demostrados`
 - PASS `sin_marcadores_no_certificables`
 
 ## Clasificacion visual y semantica
 
-- **ERROR_EVALUADOR** — `Lean`: Lean comprobo la sintaxis y los tipos de la traduccion generada. La compilacion no demuestra por si sola el teorema.
-- **CERTIFICADO_PARCIAL** — `Lean parcial`: 17 nodos aceptados individualmente por el kernel.
-- **CERTIFICADO_ESTRUCTURAL** — `Prolog estructural`: Prolog cerro independientemente el arbol declarado. La auditoria estatica del archivo Lean certifico su estructura y sus conteos, sin ejecutar el kernel de Lean en esta ruta.
+- **CERTIFICACION_GLOBAL_PENDIENTE** — `Lean`: Lean comprobo la sintaxis y los tipos de la traduccion generada. La compilacion no demuestra por si sola el teorema.
+- **CERTIFICADO_PARCIAL** — `Lean parcial`: 22 nodos aceptados individualmente por el kernel.
+- **CERTIFICADO_ESTRUCTURAL** — `Prolog estructural`: Prolog cerro el arbol declarado y comprobo la cobertura de formulas extraidas.
 - **CERTIFICADO** — `Prolog directo del MD`: Lee exclusivamente el Markdown y comprueba las reglas Deps, las referencias explicitas de la prueba y las premisas declaradas. Certifica la derivacion interna de T_RIEMANN en ese sistema; no convierte automaticamente cada premisa declarada en verdad matematica externa.
 
 ## Prolog directo del Markdown
@@ -49,20 +49,13 @@ forma parte del veredicto.
 
 ## Raices utilizadas
 
-- `A_L`
-- `D_L`
-- `D_U`
 - `D_f`
 - `D_fInv`
-- `D_k`
-- `D_lambda`
-- `D_rho`
 - `D_rho_R`
-- `D_t_prime`
 
 ## Dependencias declaradas como parametros en Lean
 
-- Ninguna
+- `hCompat: HR46_RV6.TransversalCompatibilityForZeros IsZeroRim`
 
 Si una propiedad ya esta demostrada en el proyecto, su presencia aqui indica que
 el generador debe enlazar el teorema correspondiente en vez de volver a pedirla
@@ -77,19 +70,19 @@ antecedentes demostrados antes de poder publicarse como pendiente.
 
 ## Axiomas informados por Lean
 
-No determinados: Lean no completo una verificacion global valida.
+propext, Classical.choice, Quot.sound
 
 ## Recomendacion prioritaria
 
-**Accion:** Repetir la auditoria completa y emitir el certificado final.
+**Accion:** Conservar los resultados positivos y completar el enlace del resultado con una prueba aceptada por el kernel antes de emitir certificado global.
 
-**Impacto esperado:** Confirma que todos los evaluadores independientes permanecen en verde.
+**Impacto esperado:** La ausencia de obligaciones en un informe no elimina los bloqueos de certificacion registrados ni demuestra el resultado global.
 
 **Siguiente objetivo matematico:** No quedan obligaciones semanticas registradas.
 
 ### Conservar
 
-- 17 nodos certificados parcialmente por Lean
+- 22 nodos certificados parcialmente por Lean
 - resultado estructural Prolog
 - informes y hashes ya emitidos
 - independencia entre evaluadores

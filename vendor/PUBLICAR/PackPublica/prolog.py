@@ -1,5 +1,7 @@
 import json
 import re
+from datetime import datetime
+from pathlib import Path
 
 from .base import Publicacion
 from .formal import FormalGraph, FormalGraphError
@@ -173,7 +175,20 @@ class Prolog(Publicacion):
                 f"sobran {sorted(parsed_ids - graph_ids)}."
             )
 
+        generated_on = datetime.now().astimezone().isoformat(timespec="seconds")
+        generator = Path(__file__).resolve()
+        source = self.md.fichero.resolve()
+        output_name = f"{self.md.fichero.stem}.pl"
+
         lines = [
+            f"% GENERADO_POR: {generator} | FECHA_HORA_GENERACION: {generated_on}",
+            f"% FUENTE_MARKDOWN: {source}",
+            "% REQUISITO: SWI-Prolog (https://www.swi-prolog.org/Download.html)",
+            "% INSTALAR_EN_WINDOWS: winget install SWI-Prolog.SWI-Prolog",
+            "% COMPROBAR_INSTALACION: swipl --version",
+            f"% EJECUTAR_EN_ESTA_CARPETA: swipl -q -s {output_name}",
+            "% La ejecucion audita el grafo formal derivado del Markdown; no demuestra por si sola la verdad matematica externa de sus premisas.",
+            "%",
             "% ============================================================",
             "% DEMUESTRA / PUBLICAR",
             "% Auditoria logica Prolog",
@@ -779,4 +794,5 @@ class Prolog(Publicacion):
             ").",
         ])
 
-        return "\n".join(lines)
+        from .autoria import resolve_authors, author_comment
+        return author_comment(resolve_authors(self.md.texto), "%") + "\n".join(lines)

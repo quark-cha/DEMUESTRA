@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Evaluacion del control temporal de V</title>
+<style>
+body {
+    font-family: Georgia, serif;
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 20px;
+    line-height: 1.6;
+    background: #fcfcfc;
+    color: #222;
+}
+h1, h2, h3, h4 {
+    color: #1a1a1a;
+}
+table {
+    border-collapse: collapse;
+    width:100%;
+    margin:20px 0;
+}
+th, td {
+    border:1px solid #ccc;
+    padding:8px 12px;
+}
+th {
+    background:#f0f0f0;
+}
+blockquote {
+    border-left:4px solid #0077cc;
+    padding-left:16px;
+}
+code {
+    background:#eee;
+    padding:2px 6px;
+}
+pre {
+    background:#f4f4f4;
+    padding:12px;
+    overflow-x:auto;
+}
+img {
+    max-width:100%;
+    height:auto;
+}
+math {
+    font-size:1.1em;
+}
+</style>
+</head>
+<body>
+<h1>Evaluacion del control temporal de V</h1>
+<p><strong>Estado: CONTROL_TEMPORAL_VERIFICADO.</strong></p>
+<p>Pruebas ejecutadas y superadas: 44. Pruebas del modelo retirado omitidas: 14.</p>
+<p>En V1, V2 y V3, <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>t</mi><mo>=</mo><msub><mi>t</mi><mn>0</mn></msub></mrow></math> identifica el evento de disparo. No es una
+etiqueta proporcionada a un calculo de salidas. La preparacion configura
+las conexiones sin leer resultados. La medida llama una sola vez a
+<code>disparar(t0)</code> de la realizacion conectada, y registra sus bits.</p>
+<p>El controlador no recorre estados, caminos ni el plan de puertas durante
+el disparo. La validacion y el registro de los bits recibidos no son una
+busqueda de posibles salidas. Las llamadas repetidas devuelven el registro
+existente y no vuelven a disparar.</p>
+<h2>Alcance pendiente</h2>
+<p>Se ha corregido el control temporal, no se ha construido ni verificado
+la dinamica fisica de las tres maquinas. Un detector de prueba no
+demuestra H, fase, Fourier ni los algoritmos completos. El reloj del
+programa registra la llamada; un sensor real requiere su propia calibracion.</p>
+<p>El ensayo por caminos es independiente y no aplicable a V. Sus 74 segundos
+y su resultado <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mn>15</mn><mo>=</mo><mn>3</mn><mo>×</mo><mn>5</mn></mrow></math> no describen el coste o los resultados de V.</p>
+<p>No hay evidencia de mejor orden temporal que la programacion convencional
+ni tiempos de hardware Q. No se altera Lean, Prolog o un certificado.</p>
+<p><a href="TEMPORAL_ES_52_Maquina_V_UNIHOLOG.json">Registro estructurado</a></p>
+
+</body>
+</html>

@@ -26,6 +26,8 @@ from shutil import which
 from typing import Any, Dict, List, Optional
 
 from .proyecto import Proyecto
+from .seleccion_md import aviso_no_demostracion, fuente_principal, proyecto_evaluable
+from .salida_archivos import enlace_archivo, FormatoConArchivos
 
 
 DEFAULT_TIMEOUT = 600
@@ -93,7 +95,7 @@ def _crear_logger(raiz_demuestra: Path) -> logging.Logger:
     logger.addHandler(fh)
 
     ch = logging.StreamHandler()
-    ch.setFormatter(formato)
+    ch.setFormatter(FormatoConArchivos(formato._fmt))
     logger.addHandler(ch)
 
     logger._demuestra_configurado = True
@@ -591,7 +593,7 @@ class Demuestra:
         print(f"Raiz proyecto: {proyecto}")
         print(f"Archivos Lean: {len(archivos)}")
         for archivo in archivos:
-            print(f"  - {archivo}")
+            print(f"  - {enlace_archivo(archivo)}")
 
         return info
 
@@ -683,23 +685,23 @@ class Demuestra:
                         f"{salida}\n{error}",
                     )
                 print(
-                    f"\nDEMOSTRACION PENDIENTE: {archivo.name} compila, "
+                    f"\nDEMOSTRACION PENDIENTE: {enlace_archivo(archivo)} compila, "
                     "pero su resultado principal aun no esta demostrado."
                 )
                 return 0, "DEMOSTRACION PENDIENTE"
-            print(f"\nOK: {archivo.name} compilado y demostrado correctamente.")
+            print(f"\nOK: {enlace_archivo(archivo)} compilado y demostrado correctamente.")
             return 0, "DEMOSTRACION COMPLETA"
 
         if resultado.returncode == 124:
             clase = "INCONCLUSO"
-            print(f"\nINCONCLUSO: {archivo.name} excedio el tiempo permitido.")
+            print(f"\nINCONCLUSO: {enlace_archivo(archivo)} excedio el tiempo permitido.")
             print("Causa: Lean/Lake no termino; esto no demuestra un error formal.")
-            print("Revisar: preparacion de Mathlib, cache, red y logs/demuestra.log.")
+            print(f"Revisar: preparacion de Mathlib, cache, red y {enlace_archivo(self.raiz_demuestra / 'logs/demuestra.log')}.")
             print("Accion: preparar la cache y repetir la evaluacion.")
         elif resultado.returncode == 127:
             clase = "INCONCLUSO"
-            print(f"\nINCONCLUSO: no se pudo iniciar Lean para {archivo.name}.")
-            print("Revisar: instalacion de Elan/Lake, PATH y logs/demuestra.log.")
+            print(f"\nINCONCLUSO: no se pudo iniciar Lean para {enlace_archivo(archivo)}.")
+            print(f"Revisar: instalacion de Elan/Lake, PATH y {enlace_archivo(self.raiz_demuestra / 'logs/demuestra.log')}.")
         else:
             clase = _clasificar_error_lean(
                 f"{salida}\n{error}",
@@ -708,7 +710,7 @@ class Demuestra:
             if clase == "ERROR_EVALUADOR":
                 print(
                     f"\nERROR_EVALUADOR: Lean rechazo el archivo generado "
-                    f"{archivo.name}."
+                    f"{enlace_archivo(archivo)}."
                 )
                 print(
                     "Responsabilidad: el traductor no produjo una construccion "
@@ -721,13 +723,13 @@ class Demuestra:
                         f"{nodos}."
                     )
             else:
-                print(f"\n{clase}: Lean encontro errores en {archivo.name}.")
+                print(f"\n{clase}: Lean encontro errores en {enlace_archivo(archivo)}.")
                 print(
                     "Alcance: se rechaza el intento Lean actual, no la teoria. "
                     "Una refutacion exige contradiccion o contraejemplo demostrados."
                 )
             if detalle_guardado:
-                print(f"Detalle tecnico completo: {detalle_log}")
+                print(f"Detalle tecnico completo: {enlace_archivo(detalle_log)}")
 
         return resultado.returncode, clase
 
@@ -943,6 +945,7 @@ class Demuestra:
         )
         print(
             "Certificacion Lean por nodos emitida: "
+            f"{enlace_archivo(copia_publicable)}; "
             f"{len(certificados)} certificados, {len(fallidos)} errores de "
             f"traduccion y {len(no_determinados)} no determinados."
         )
@@ -1128,6 +1131,7 @@ class Demuestra:
         (archivo.parent / certificado_path.name).write_text(texto, encoding="utf-8")
         print(
             "Certificacion Lean por nodos conservada desde la ejecucion principal: "
+            f"{enlace_archivo(archivo.parent / certificado_path.name)}; "
             f"{len(certificados)} certificados, {len(fallidos)} errores de "
             f"traduccion y {len(no_determinados)} no determinados."
         )
@@ -1301,6 +1305,7 @@ class Demuestra:
         )
         print(
             "Certificacion parcial Lean emitida: "
+            f"{enlace_archivo(copia_publicable)}; "
             f"{', '.join(certificado['certified_nodes'])}."
         )
         return certificado
@@ -1310,6 +1315,11 @@ class Demuestra:
             self.logger.error("No existe el proyecto: %s", proyecto)
             print(f"No existe el proyecto: {proyecto}")
             return 2
+
+        if not proyecto_evaluable(proyecto):
+            print(aviso_no_demostracion(fuente_principal(proyecto) or f"{proyecto.name}.md"))
+            self._estado_ultimo_proyecto = "NO EVALUADO"
+            return 0
 
         archivos = self._archivos_lean(proyecto)
 
@@ -1338,7 +1348,7 @@ class Demuestra:
             )
             print("\nValidacion Lean terminada con errores:")
             for archivo, rc, clase in fallos:
-                print(f"  - {archivo.name}: {clase}, codigo {rc}")
+                print(f"  - {enlace_archivo(archivo)}: {clase}, codigo {rc}")
             self._estado_ultimo_proyecto = fallos[0][2]
             return fallos[0][1] or 1
 
@@ -1381,6 +1391,17 @@ class Demuestra:
 
         if not proyectos:
             print("No hay proyectos para validar.")
+            return 0
+
+        seleccionados = []
+        for proyecto in proyectos:
+            if not proyecto.exists() or proyecto_evaluable(proyecto):
+                seleccionados.append(proyecto)
+            else:
+                print(aviso_no_demostracion(fuente_principal(proyecto) or f"{proyecto.name}.md"))
+        proyectos = seleccionados
+        if not proyectos:
+            print("No hay fuentes Markdown evaluables. No se ejecuta Lean.")
             return 0
 
         hay_lean = any(

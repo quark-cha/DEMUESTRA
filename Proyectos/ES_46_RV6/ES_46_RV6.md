@@ -1,9 +1,9 @@
-# DOCUMENTO 46 — REVISIÓN 6
-## Teorema geométrico-topológico de estabilidad, espacios de soluciones y conexión con la Hipótesis de Riemann
+# ES_46: DOCUMENTO 46 — REVISIÓN 6
+## Demostración de la Hipótesis de Riemann mediante el teorema geométrico-topológico de estabilidad y los espacios de soluciones
 
 **Marco:** Einstein–VED · UNIHOLOG  
 **Autor:** Víctor Estrada Díaz  
-**Carácter del documento:** versión final autocontenida del desarrollo deductivo.  
+**Carácter del documento:** versión final autocontenida del desarrollo deductivo que presenta la demostración de la Hipótesis de Riemann para establecerla como teorema.  
 **Principio metodológico:** una definición se introduce una vez; una proposición demostrada queda asentada y puede utilizarse posteriormente sin reabrir su demostración. Si una conclusión se sigue de las proposiciones asentadas, se afirma con la fuerza lógica que corresponde.
 
 ---
@@ -201,6 +201,11 @@ $$
 
 $D_L$ — Sea $L$ la longitud total del contorno espacial recorrido por una onda confinada; es el perímetro de cierre de la onda.
 
+Aquí $\lambda$ es la longitud de onda Compton de la materia considerada,
+estrictamente positiva, y $n=L/\lambda$ es el número exacto de ciclos
+contenido en el contorno: no es una aproximación ni un redondeo. El cierre
+exacto en fase exige que ese número sea un entero positivo.
+
 Definimos
 
 $$
@@ -214,6 +219,8 @@ Para un cierre finito,
 $$
 n\in\mathbb R^+.
 $$
+
+**La longitud del contorno de una onda cerrada es siempre estrictamente positiva: $L>0$.** Tanto el número de longitudes de onda contenido en el contorno como la longitud de onda Compton son positivos. Por la relación anterior, su producto es positivo; un contorno de longitud cero no representa una onda material cerrada de este marco.
 
 ## 4.3. Construcción de $U_{\rm VED}$
 
@@ -323,6 +330,8 @@ $$
 }
 $$
 
+Aquí $\rho$ es la **distancia mínima de $n$ al entero positivo más próximo $k$**, no la distancia a un entero elegido arbitrariamente. Por tanto, $\rho=|n-k|$. Esta distancia mide cuánto se aparta el número de ciclos del cierre entero y exacto en fase.
+
 Por definición de distancia al entero más próximo,
 
 $$
@@ -365,7 +374,21 @@ R_{\rm VED}(k,\rho)
 }
 $$
 
-## 6.2. Estabilidad
+## 6.2. Concepto primordial: estabilidad de la materia como onda cerrada
+
+**Regla básica de $U_{\rm VED}$: el único valor estable es $\rho=0$. Todo valor de $\rho$ en el intervalo $(0,1/2]$ corresponde a un cierre no estable.**
+
+La materia se representa en este marco como una onda de longitud de onda Compton positiva $\lambda$, cerrada en un contorno de longitud $L=n\lambda$. El número $n$ cuenta cuántas longitudes de onda contiene ese contorno. Escribir $L=n\lambda$ describe su longitud, pero no basta por sí solo para afirmar su estabilidad.
+
+**La estabilidad exige un número entero positivo de ciclos.** Cuando $n=k\in\mathbb N^+$, el recorrido completo contiene exactamente un número entero de longitudes de onda: la onda retorna al mismo punto en la misma fase, el contorno es $L=k\lambda$ y la distancia al entero más próximo es cero. Este es el cierre estable.
+
+Si $n$ es real no entero, el recorrido no contiene un número entero de ciclos. La onda no retorna exactamente en fase y queda un desfase respecto del cierre entero. En la clasificación de este marco, ese desfase es el origen de la inestabilidad y de la evolución destructiva en el tiempo del cierre no entero. Su distancia mínima al entero más próximo es positiva y pertenece al intervalo $(0,1/2]$ de la clasificación.
+
+**Entre dos enteros positivos consecutivos, todo cierre es no estable.** Si $j$ designa el entero inferior del intervalo, cualquier número de ciclos que cumpla $j<n<j+1$ está estrictamente entre los cierres enteros de sus extremos: no cierra exactamente en fase y su distancia mínima al entero más próximo es positiva. En el intervalo abierto entre esos enteros no hay ningún valor estable. Los extremos enteros sí tienen distancia cero y corresponden a cierres estables.
+
+El intervalo abierto describe los valores de $n$, no los valores de $\rho$. La letra $j$ designa aquí el extremo inferior; $k$ conserva su significado de entero positivo más próximo a $n$. Al recorrer el intervalo, $k$ puede ser uno u otro extremo, pero la regla no cambia: distancia cero al entero significa estabilidad; distancia positiva significa no estabilidad.
+
+**Esta distinción es la base de la estabilidad y la inestabilidad en $U_{\rm VED}$.** Se establece en el universo de la onda antes de cualquier correspondencia con otros espacios; no es una condición añadida posteriormente ni una definición obtenida desde Riemann. Las correspondencias posteriores deben conservar esta clasificación de origen.
 
 Si
 
@@ -459,6 +482,14 @@ $$
 
 Por tanto no existe un cierre finito fuera de esta clasificación.
 
+$D_{\mathcal E_{\rm VED}}$ — El conjunto de parámetros de cierre estable
+se define a partir del dominio declarado y del criterio de desfase nulo:
+
+$$
+\mathcal E_{\rm VED}
+=\{(k,\rho):k\in\mathbb N^+,\rho\in[0,1/2],\rho=0\}.
+$$
+
 $P_{\rm VED}(K_E)$ — Para $\rho=0$,
 
 $$
@@ -476,6 +507,57 @@ k=1,2,3,\ldots
 $$
 
 enumeran todos los casos de estabilidad sin dejar ninguno fuera.
+
+Para cada longitud de onda Compton positiva $\lambda$, el conjunto completo
+de valores estables corresponde a todos los $k\in\mathbb N^+$, con
+$n=k$ y $L=k\lambda$. Cada par $(k,0)$ representa un cierre material
+posible y estable en la parametrización de $U_{\rm VED}$. Recíprocamente,
+todo cierre estable tiene un número exacto de ciclos entero positivo y,
+por ello, queda representado por uno de esos pares. Esta completitud se
+refiere a todos los cierres estables permitidos por el modelo, no a la
+presencia de cada valor de $k$ en la naturaleza.
+
+El caso complementario queda igualmente determinado: si el número exacto
+de ciclos $n>0$ no es entero, su distancia al entero positivo más próximo
+es estrictamente positiva. Existe desfase; el contorno no cierra
+exactamente en fase y, por el criterio de $U_{\rm VED}$, no es estable.
+No se trata de un redondeo de $n$ ni de una elección de clasificación.
+
+Para todo entero positivo $k$, el contorno $L=k\lambda$ contiene un número
+entero de ciclos y cierra exactamente en fase. Por el criterio de
+$U_{\rm VED}$, su desfase es nulo:
+
+$$
+\forall k\in\mathbb N^+,\qquad n=k\Rightarrow\rho=0.
+$$
+
+La enumeración es numerable y completa en sentido matemático: abarca
+todos los valores enteros positivos permitidos por la parametrización.
+No afirma que todos esos valores se realicen en la naturaleza, ni exige
+observar cada uno para establecer el criterio de estabilidad.
+
+Como asignaciones físicas del marco Einstein–VED, el autor indica:
+
+- k=2 define la gravedad universal.
+- k=4 da el cierre de todos los protones.
+- k=137 da el cierre superficial esférico del electrón.
+
+Estas asignaciones se distinguen del resultado de enumeración: son
+interpretaciones físicas del marco, no consecuencias de la sola igualdad
+entre cierre entero y desfase nulo.
+
+$D_{\rm Particion}$ — Los cierres finitos admisibles y su sector no estable
+se expresan mediante el dominio y el criterio ya establecidos:
+
+$$
+U_{\rm VED}^{\rm cerrado}
+=\{(k,\rho):k\in\mathbb N^+,\rho\in[0,1/2]\}.
+$$
+
+$$
+\mathcal I_{\rm VED}
+=\{(k,\rho):k\in\mathbb N^+,\rho\in[0,1/2],\rho>0\}.
+$$
 
 $P_{\rm VED}(K_I)$ — Para $\rho=1/2$, los mismos $k$ enumeran todas las fronteras de máxima desviación.
 
@@ -754,6 +836,275 @@ aparece algebraicamente en la factorización de $F$.
 No procede de Riemann.  
 No se introduce como normalización elegida.  
 No se obtiene suponiendo previamente la recta crítica.
+
+<!-- Desarrollo recuperado de 8ee5d60:SRC-VED/UNIHOLOG/ES_46_Revision3_completa_y_rigurosa.md, secciones 7-11. Encabezados renumerados. Se omite el comentario sobre anulacion del factor por indicacion del autor. -->
+
+## 10.1. Origen geométrico del factor $1/2$
+
+Éste es el paso central.
+
+Partimos de la dinámica exacta
+
+$$
+\boxed{
+\mathcal F
+=
+(ds)^2
++
+\frac{d}{dt}\left[(ds)^2\right].
+}
+$$
+
+La derivada de una función cuadrática satisface
+
+$$
+\boxed{
+\frac{d}{dt}\left[(ds)^2\right]
+=
+2ds\frac{d(ds)}{dt}.
+}
+$$
+
+Así,
+
+$$
+\mathcal F
+=
+(ds)^2
++
+2ds\frac{d(ds)}{dt}.
+$$
+
+Factorizamos $2ds$:
+
+$$
+(ds)^2
+=
+2ds\left(\frac12ds\right).
+$$
+
+Por tanto,
+
+$$
+\boxed{
+\mathcal F
+=
+2ds
+\left[
+\frac{d(ds)}{dt}
++
+\frac12ds
+\right].
+}
+$$
+
+El factor
+
+$$
+\boxed{
+\frac12
+}
+$$
+
+aparece algebraicamente de la naturaleza cuadrática de la diferencial.
+
+No se ha introducido desde Riemann.
+
+No se ha introducido como una normalización elegida para obtener la recta
+crítica.
+
+---
+
+## 10.2. Operador espectral desplazado
+
+La factorización anterior define naturalmente el operador
+
+$$
+\boxed{
+\mathcal D
+=
+\frac{d}{dt}+\frac12.
+}
+$$
+
+Desde este punto, $t$ se entiende como coordenada temporal normalizada de
+$U_{\rm Lap}$.
+
+Sea un modo elemental
+
+$$
+\boxed{
+ds(t)=ds_0e^{\mu t}.
+}
+$$
+
+Entonces
+
+$$
+\frac{d(ds)}{dt}
+=
+\mu ds.
+$$
+
+Aplicando $\mathcal D$,
+
+$$
+\mathcal D[ds]
+=
+\left(\mu+\frac12\right)ds.
+$$
+
+Definimos el autovalor espectral de $\mathcal D$ como
+
+$$
+\boxed{
+s=\mu+\frac12.
+}
+$$
+
+Equivalente:
+
+$$
+\boxed{
+\mu=s-\frac12.
+}
+$$
+
+---
+
+## 10.3. Estabilidad en la coordenada desplazada
+
+La amplitud física de un estado estable no crece ni decrece secularmente.
+
+En la variable modal desplazada $\mu$, esto exige
+
+$$
+\boxed{
+\Re(\mu)=0.
+}
+$$
+
+Por tanto,
+
+$$
+\boxed{
+\mu_\pm(k,\rho)
+=
+\pm i\,b(k,\rho).
+}
+$$
+
+Como
+
+$$
+s=\frac12+\mu,
+$$
+
+se obtiene
+
+$$
+\boxed{
+s_\pm(k,\rho)
+=
+\frac12
+\pm i\,b(k,\rho).
+}
+$$
+
+Por tanto,
+
+$$
+\boxed{
+\Re[s_\pm(k,\rho)]
+=
+\frac12.
+}
+$$
+
+El $1/2$ procede del desplazamiento del operador.
+
+La parte imaginaria procede de la periodicidad del cierre.
+
+---
+
+## 10.4. Familia espectral completa
+
+Sustituyendo la periodicidad,
+
+$$
+b(k,\rho)
+=
+\frac{2\pi}
+{(k\pm\rho)\lambda},
+$$
+
+queda
+
+$$
+\boxed{
+s_\pm(k,\rho)
+=
+\frac12
+\pm
+i\frac{2\pi}
+{(k\pm\rho)\lambda},
+\qquad
+0\leq\rho\leq\frac12.
+}
+$$
+
+Ésta es la familia de soluciones espectrales del sistema regulado dentro de
+la parametrización geométrica adoptada.
+
+---
+
+## 10.5. Todos los estados estables
+
+Los estados estables corresponden a
+
+$$
+\boxed{
+\rho=0.
+}
+$$
+
+Entonces
+
+$$
+T_k=k\lambda
+$$
+
+y
+
+$$
+b_k=
+\frac{2\pi}{k\lambda}.
+$$
+
+Por tanto,
+
+$$
+\boxed{
+s_{Z,\pm}(k)
+=
+\frac12
+\pm
+i\frac{2\pi}{k\lambda},
+\qquad
+k\in\mathbb N^+.
+}
+$$
+
+De aquí,
+
+$$
+\boxed{
+\forall k\in\mathbb N^+,\qquad
+\Re[s_{Z,\pm}(k)]
+=
+\frac12.
+}
+$$
 
 ---
 

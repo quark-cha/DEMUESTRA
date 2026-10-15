@@ -22,9 +22,11 @@ class SymbolTable:
     values: dict[str, str] = field(default_factory=dict)
     functions: dict[str, FunctionType] = field(default_factory=dict)
     domains: dict[str, str] = field(default_factory=dict)
+    indexed_families: set[str] = field(default_factory=set)
 
     def child(self):
-        return SymbolTable(dict(self.values), dict(self.functions), dict(self.domains))
+        return SymbolTable(dict(self.values), dict(self.functions), dict(self.domains),
+                           set(self.indexed_families))
 
     def declare_value(self, name, type_name):
         previous = self.values.get(name)
@@ -48,6 +50,7 @@ class SemanticAnalyzer:
         table = SymbolTable()
         table.functions.update({
             "Re": FunctionType(("Complex",), "Real"),
+            "Im": FunctionType(("Complex",), "Real"),
             "abs": FunctionType(("Real",), "Real"),
         })
         table.domains.update({
@@ -85,14 +88,25 @@ class SemanticAnalyzer:
                 self._fail("la variable de sumatoria debe ser un identificador")
             child = symbols.child()
             # A bound summation index shadows an equally named global symbol.
-            child.values[variable.value] = "Nat"
+            if node.value == "finite_set":
+                domain_type = self._infer(lower, symbols)
+                if not domain_type.startswith("Set["):
+                    self._fail("el dominio de la sumatoria debe ser un conjunto finito explicito")
+                element_type = domain_type[4:-1]
+                declared = symbols.values.get(variable.value, element_type)
+                if declared in self.NUMERIC and element_type in self.NUMERIC:
+                    element_type = self._promote(declared, element_type)
+                child.values[variable.value] = element_type
+            else:
+                child.values[variable.value] = "Nat"
             for name in list(child.values):
                 if name.startswith(f"{variable.value}_") or name.endswith(f"_{variable.value}"):
                     child.values.pop(name, None)
-            lower_type = self._infer(lower, child)
-            self._infer(upper, child)
-            if lower_type not in self.NUMERIC:
-                self._fail(f"el limite inferior de sumatoria debe ser numerico, obtuvo {lower_type}")
+            if node.value != "finite_set":
+                lower_type = self._infer(lower, child)
+                self._infer(upper, child)
+                if lower_type not in self.NUMERIC:
+                    self._fail(f"el limite inferior de sumatoria debe ser numerico, obtuvo {lower_type}")
             body_type = self._infer(body, child)
             if body_type not in self.NUMERIC:
                 self._fail(f"la sumatoria requiere cuerpo numerico, obtuvo {body_type}")
@@ -132,6 +146,8 @@ class SemanticAnalyzer:
             return self._infer(node.children[0], symbols)
         if node.kind == "subscript":
             base = self._symbol_name(node.children[0])
+            if base in symbols.indexed_families:
+                return self._infer_call(base, (node.children[1],), symbols)
             subscript = self._symbol_name(node.children[1])
             name = f"{base}_{subscript}"
             if name not in symbols.values:
@@ -260,6 +276,22 @@ class SemanticAnalyzer:
         self._fail(f"nodo AST no soportado: {node.kind}")
 
     def _infer_call(self, name, arguments, symbols):
+        if name == "dist":
+            if len(arguments) != 2:
+                self._fail("dist requiere un punto y un punto o conjunto")
+            point = self._infer(arguments[0], symbols)
+            target = self._infer(arguments[1], symbols)
+            element = target[4:-1] if target.startswith("Set[") else target
+            if point not in self.NUMERIC or element not in self.NUMERIC:
+                self._fail("dist requiere puntos o conjuntos de escalares numericos")
+            return "Real"
+        if name in {"abs", "norm"}:
+            if len(arguments) != 1:
+                self._fail(f"{name} requiere un argumento")
+            operand = self._infer(arguments[0], symbols)
+            if operand not in self.NUMERIC:
+                self._fail(f"{name} requiere un escalar numerico, obtuvo {operand}")
+            return "Real" if operand == "Complex" or name == "norm" else operand
         signature = symbols.functions.get(name)
         if signature is None:
             self._fail(f"funcion no declarada: {name}")
@@ -273,7 +305,10 @@ class SemanticAnalyzer:
             )
         for child, expected in zip(arguments, signature.arguments):
             actual = self._infer(child, symbols)
-            if actual != expected and not (expected == "Real" and actual in {"Nat", "Int"}):
+            widening = ((expected == "Int" and actual == "Nat") or
+                        (expected == "Real" and actual in {"Nat", "Int"}) or
+                        (expected == "Complex" and actual in {"Nat", "Int", "Real"}))
+            if actual != expected and not widening:
                 self._fail(f"argumento de {name}: se esperaba {expected}, se obtuvo {actual}")
         return signature.result
 
@@ -314,6 +349,8 @@ class SemanticAnalyzer:
 
     def _infer_binary(self, node, symbols):
         operator = node.value
+        if operator == "GIVEN":
+            self._fail("LIMITACION_DEL_TRADUCTOR: falta el modelo tipado de probabilidad condicionada; no es una multiplicacion")
         if operator == "COLON":
             return "Declaration"
         if operator == "CONTEXT":
@@ -370,6 +407,14 @@ class SemanticAnalyzer:
     def _compatible(actual, expected):
         if actual == expected:
             return True
+        if actual.startswith("Set[") and expected.startswith("Set["):
+            return SemanticAnalyzer._compatible(actual[4:-1], expected[4:-1])
+        if actual.startswith("Tuple[") and expected.startswith("Tuple["):
+            left, right = actual[6:-1].split(","), expected[6:-1].split(",")
+            if not any("[" in value or "]" in value for value in left + right):
+                return len(left) == len(right) and all(
+                    SemanticAnalyzer._compatible(a, b) for a, b in zip(left, right)
+                )
         numeric = {"Nat", "Int", "Real", "Complex"}
         return actual in numeric and expected in numeric
 
@@ -444,28 +489,58 @@ class LeanExpressionEmitter:
         if node.kind == "summation":
             variable, lower, upper, body = node.children
             variable_name = variable.value
+            previous_bound = variable_name in self.bound
+            previous_type = self.bound_types.get(variable_name)
+            index_type = "Nat"
+            if node.value == "finite_set":
+                domain_type = self._emit_type(lower)[4:-1]
+                declared = self.symbols.values.get(variable_name, domain_type) if self.symbols else domain_type
+                index_type = SemanticAnalyzer._promote(declared, domain_type)
+                index_lean_type = self.TYPES[index_type]
+                elements = ", ".join(f"({self.emit(element)} : {index_lean_type})"
+                                     for element in lower.children)
+                domain_text = "{" + elements + "}"
             self.bound.add(variable_name)
-            self.bound_types[variable_name] = "Nat"
+            self.bound_types[variable_name] = index_type
             try:
                 body_type = "Complex"
                 if self.symbols:
                     child = self.symbols.child()
-                    child.values[variable_name] = "Nat"
+                    for bound in self.bound:
+                        child.values[bound] = self.bound_types[bound]
                     for name in list(child.values):
                         if name.startswith(f"{variable_name}_") or name.endswith(f"_{variable_name}"):
                             child.values.pop(name, None)
                     body_type = SemanticAnalyzer(self.symbols).analyze(body, symbols=child)
                 lean_type = "ℂ" if body_type == "Complex" else "ℝ"
                 field = "InfiniteSum_Nat_Complex" if body_type == "Complex" else "InfiniteSum_Nat_Real"
-                lower_text = self.emit(lower)
                 body_text = self.emit(body)
+                if node.value == "finite_set":
+                    result_type = self.TYPES[body_type]
+                    return (
+                        f"Finset.sum ({domain_text} : Finset {index_lean_type}) "
+                        f"(fun {self._lean_name(variable_name)} : {index_lean_type} => ({body_text} : {result_type}))"
+                    )
+                lower_text = self.emit(lower)
+                if not (upper.kind == "constant" and upper.value == "INFINITY"):
+                    if self._emit_type(lower) != "Nat" or self._emit_type(upper) != "Nat":
+                        raise FormalSemanticError("La sumatoria finita necesita limites naturales tipados.")
+                    upper_text = self.emit(upper)
+                    result_type = self.TYPES.get(body_type, lean_type)
+                    return (
+                        f"Finset.sum (Finset.Icc ({lower_text} : ℕ) ({upper_text} : ℕ)) "
+                        f"(fun {self._lean_name(variable_name)} : ℕ => ({body_text} : {result_type}))"
+                    )
                 return (
                     f"{self._resolve(field, 2)} ({lower_text}) "
                     f"(fun {self._lean_name(variable_name)} : ℕ => ({body_text} : {lean_type}))"
                 )
             finally:
-                self.bound.discard(variable_name)
-                self.bound_types.pop(variable_name, None)
+                if previous_bound:
+                    self.bound_types[variable_name] = previous_type
+                else:
+                    self.bound.discard(variable_name)
+                    self.bound_types.pop(variable_name, None)
         if node.kind == "enumeration":
             symbol = node.children[0]
             values = node.children[1:]
@@ -495,6 +570,9 @@ class LeanExpressionEmitter:
             name = self._symbolic_name(node)
             return self._resolve(name) if name else self._lean_name(f"{node.value}_{self.emit(node.children[0])}")
         if node.kind == "subscript":
+            base = self._symbolic_name(node.children[0])
+            if self.symbols and base in self.symbols.indexed_families:
+                return f"{self._resolve(base, 1)} ({self.emit(node.children[1])})"
             name = self._symbolic_name(node)
             return self._resolve(name) if name else self._lean_name(f"{self.emit(node.children[0])}_{self.emit(node.children[1])}")
         if node.kind == "power":
@@ -529,6 +607,8 @@ class LeanExpressionEmitter:
             return f"{self._parenthesize(node.children[0])} ^ {self._parenthesize(node.children[1])}"
         if node.kind == "apply":
             symbolic = self._symbolic_name(node.children[0])
+            if symbolic in {"Re", "Im", "abs", "norm", "dist"}:
+                return self.emit(Ast("call", symbolic, node.children[1:]))
             function = self._resolve(symbolic, len(node.children) - 1) if symbolic else self.emit(node.children[0])
             args = " ".join(self._parenthesize(child) for child in node.children[1:])
             return f"{function} {args}"
@@ -536,32 +616,39 @@ class LeanExpressionEmitter:
             return "(" + ", ".join(self.emit(child) for child in node.children) + ")"
         if node.kind == "interval":
             left, right = (self._parenthesize(child) for child in node.children)
-            return f"Set.Icc {left} {right}"
+            constructor = {"Ioc": "Ioc", "Ico": "Ico"}.get(node.value, "Icc")
+            return f"Set.{constructor} {left} {right}"
         if node.kind == "set":
             return "{" + ", ".join(self.emit(child) for child in node.children) + "}"
         if node.kind == "set_builder":
             element = node.children[0]
             condition = node.children[1]
             variable, variable_type = self._builder_variable(condition)
+            variables = [(variable, variable_type)] if variable else []
+            if element.kind == "tuple":
+                variables = self._builder_variables(condition)
+                element_names = {self._symbolic_name(child) for child in element.children}
+                variables = [(name, kind) for name, kind in variables if name in element_names]
             if not variable and element.kind == "identifier":
                 variable = element.value
                 declared = self.symbols.values.get(variable, "Real") if self.symbols else "Real"
                 variable_type = self.TYPES.get(declared, declared)
-            if variable:
-                self.bound.add(variable)
+                variables = [(variable, variable_type)]
+            old_bound, old_types = self.bound.copy(), self.bound_types.copy()
+            for name, kind in variables:
+                self.bound.add(name)
                 reverse_types = {lean: semantic for semantic, lean in self.TYPES.items()}
-                self.bound_types[variable] = reverse_types.get(variable_type, "Real")
+                self.bound_types[name] = reverse_types.get(kind, "Real")
             try:
                 condition_text = self.emit(condition)
                 if element.kind == "identifier" and element.value == variable:
                     return "{" + self.emit(element) + " | " + condition_text + "}"
                 branches = self._arithmetic_branches(element)
                 alternatives = " ∨ ".join(f"x = ({value})" for value in branches)
-                return f"{{x | ∃ {self._lean_name(variable)} : {variable_type}, ({condition_text}) ∧ ({alternatives})}}"
+                binders = ", ∃ ".join(f"{self._lean_name(name)} : {kind}" for name, kind in variables)
+                return f"{{x | ∃ {binders}, ({condition_text}) ∧ ({alternatives})}}"
             finally:
-                if variable:
-                    self.bound.discard(variable)
-                    self.bound_types.pop(variable, None)
+                self.bound, self.bound_types = old_bound, old_types
         if node.kind == "limit":
             source, target = node.children
             if target.kind == "constant" and target.value == "INFINITY":
@@ -592,7 +679,17 @@ class LeanExpressionEmitter:
                 f"Filter.atTop (nhds ({self.emit(result)}))"
             )
         if node.kind == "call":
-            builtins = {"Re": "Complex.re", "abs": "abs"}
+            if node.value == "dist":
+                return self._emit_distance(node)
+            if node.value == "norm":
+                operand = node.children[0]
+                value = self._as_real(operand) if self._emit_type(operand) in {"Nat", "Int"} else self.emit(operand)
+                return f"norm ({value})"
+            if node.value == "abs" and self.symbols:
+                operand_type = self._emit_type(node.children[0])
+                if operand_type == "Complex":
+                    return f"norm {self._parenthesize(node.children[0])}"
+            builtins = {"Re": "Complex.re", "Im": "Complex.im", "abs": "abs"}
             name = builtins.get(node.value, node.value)
             if node.value not in builtins:
                 name = self._resolve(name, len(node.children))
@@ -802,6 +899,17 @@ class LeanExpressionEmitter:
                     return variable, type_name
         return None, None
 
+    def _builder_variables(self, condition):
+        if condition.kind == "binary" and condition.value == "AND":
+            result = []
+            for child in condition.children:
+                for pair in self._builder_variables(child):
+                    if pair[0] not in {name for name, _ in result}:
+                        result.append(pair)
+            return result
+        name, kind = self._builder_variable(condition)
+        return [(name, kind)] if name else []
+
     def _symbolic_name(self, node):
         if node.kind in {"identifier", "number", "sign", "constant"}:
             return str(node.value)
@@ -836,6 +944,28 @@ class LeanExpressionEmitter:
             self._uses_bound(child)
             for child in node.children if isinstance(child, Ast)
         )
+
+    def _emit_distance(self, node):
+        if len(node.children) != 2 or self.symbols is None:
+            raise FormalSemanticError("dist necesita dos argumentos con tipos declarados")
+        point, target = node.children
+        point_type = self._emit_type(point)
+        target_type = self._emit_type(target)
+        element_type = target_type[4:-1] if target_type.startswith("Set[") else target_type
+        numeric = SemanticAnalyzer.NUMERIC
+        if point_type not in numeric or element_type not in numeric:
+            raise FormalSemanticError("dist requiere puntos o conjuntos de escalares numericos")
+        metric_type = "Complex" if "Complex" in {point_type, element_type} else "Real"
+        lean_type = self.TYPES[metric_type]
+        point_text = self._as_complex(point) if metric_type == "Complex" else self._as_real(point)
+        if target_type.startswith("Set["):
+            target_text = self.emit(target)
+            if element_type != metric_type:
+                source_type = self.TYPES[element_type]
+                target_text = f"((fun distance_element : {source_type} => (distance_element : {lean_type})) '' ({target_text}))"
+            return f"Metric.infDist ({point_text}) ({target_text})"
+        target_text = self._as_complex(target) if metric_type == "Complex" else self._as_real(target)
+        return f"dist ({point_text}) ({target_text})"
 
     def _resolve(self, name, arity=None):
         try:

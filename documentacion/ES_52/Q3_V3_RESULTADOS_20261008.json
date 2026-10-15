@@ -1,0 +1,76 @@
+{
+  "status": "LOCAL_MODEL_CHECK",
+  "results": [
+    {
+      "qubits": 4,
+      "gate_count": 61,
+      "circuit_sha256": "77c038f9d68cd805720b9c534e3d7ba025967d1f4048f9fe9ca1aed04458b673",
+      "q3_local_seconds": 0.008959599974332377,
+      "v3_local_seconds": 0.005602999997790903,
+      "v3_latched_bits": "1000",
+      "max_probability_error": 8.326672684688674e-17,
+      "total_variation_distance": 3.5952144039619327e-16,
+      "uniform_control_distance": 0.24625267018160024,
+      "passed": true,
+      "scope": "full ideal probabilities for a local generated instance, not Willow"
+    },
+    {
+      "qubits": 8,
+      "gate_count": 125,
+      "circuit_sha256": "462729f77eb8009b844d979d6ef999b3eedb743ccb13a7f8ea4aeba4aca75825",
+      "q3_local_seconds": 0.01926540001295507,
+      "v3_local_seconds": 0.007754099991871044,
+      "v3_latched_bits": "01100000",
+      "max_probability_error": 5.898059818321144e-17,
+      "total_variation_distance": 8.137809748439383e-16,
+      "uniform_control_distance": 0.43426255386780577,
+      "passed": true,
+      "scope": "full ideal probabilities for a local generated instance, not Willow"
+    },
+    {
+      "qubits": 12,
+      "gate_count": 189,
+      "circuit_sha256": "07d8da17316e9e57a8a94c5ed351005053b74d5bba120b79b9a7283b24056846",
+      "q3_local_seconds": 0.04305200002272613,
+      "v3_local_seconds": 0.021778600028483197,
+      "v3_latched_bits": "010111111010",
+      "max_probability_error": 1.0408340855860843e-17,
+      "total_variation_distance": 9.203730501468526e-16,
+      "uniform_control_distance": 0.46488680747597866,
+      "passed": true,
+      "scope": "full ideal probabilities for a local generated instance, not Willow"
+    },
+    {
+      "qubits": 16,
+      "gate_count": 253,
+      "circuit_sha256": "94e74934d98d622bdc9689b830dc996153c5bad4163592dff545797086f5eaa5",
+      "q3_local_seconds": 0.6708132000057958,
+      "v3_local_seconds": 0.231108400010271,
+      "v3_latched_bits": "0110010101001011",
+      "max_probability_error": 1.3010426069826053e-18,
+      "total_variation_distance": 9.546368507946494e-16,
+      "uniform_control_distance": 0.443450153035868,
+      "passed": true,
+      "scope": "full ideal probabilities for a local generated instance, not Willow"
+    }
+  ],
+  "passed": true,
+  "published_Willow_instance_tested": false,
+  "quantum_advantage_verified": false,
+  "hidden_generator_architecture_implemented": false,
+  "limits": "16 qubits for both local models; V3 stores 16*2**n state bytes before overhead",
+  "published_target": {
+    "source": "https://blog.google/innovation-and-ai/technology/research/google-willow-quantum-chip/",
+    "q_runtime": "under five minutes, reported by Google",
+    "classical_runtime": "Google estimate, not measured in this program"
+  },
+  "utc": "2026-10-08T02:26:34.376952+00:00",
+  "sha256": {
+    "comparar_q3_v3.py": "ae7a9859996c13ecf9f4e2afab8442521111bc0156e0536bc186ca7adb2d14a5",
+    "q3.py": "dbb07409478c4f6b256ba70ab95de6e46bd93250b8b6104f275675ee5f24d9c7",
+    "v3.py": "b167294ebd6afe06cd942955b011a3a6d9b17f0fb5237b2985dc978f1b86d098",
+    "protocolo_q3.py": "1459edec2be68c2739a41875c4c34671a14175abdfc6ff186d6559f06b4214bf",
+    "q1_v1.py": "ccd2ff19ddaffc358adf03ee35b83ec3da473344b7e37c72add82c3d4f3c91a5",
+    "ES_52_Maquina_V_UNIHOLOG.md": "a267c6d2a16442dca06a2609049fe7ac5ef0ebabaee74a80ecc1d81401b448f7"
+  }
+}

@@ -4,6 +4,7 @@ import subprocess
 import shutil
 import tempfile
 from .base import Publicacion
+from .artifact_metadata import office_authors
 
 class Odt(Publicacion):
     carpeta_salida = "odts"
@@ -103,6 +104,7 @@ class Odt(Publicacion):
             if odt_generado.exists():
                 if odt_generado != fichero:
                     shutil.move(str(odt_generado), str(fichero))
+                office_authors(fichero, self.documento)
                 print(f"  ✅ ODT generado desde DOCX con soffice: {fichero.resolve()}")
             else:
                 # Buscar cualquier .odt en la carpeta de salida (por si el nombre cambió)

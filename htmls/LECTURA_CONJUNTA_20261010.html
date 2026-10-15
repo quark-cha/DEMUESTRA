@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Construccion de V1, V2 y V3: lectura conjunta</title>
+<style>
+body {
+    font-family: Georgia, serif;
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 20px;
+    line-height: 1.6;
+    background: #fcfcfc;
+    color: #222;
+}
+h1, h2, h3, h4 {
+    color: #1a1a1a;
+}
+table {
+    border-collapse: collapse;
+    width:100%;
+    margin:20px 0;
+}
+th, td {
+    border:1px solid #ccc;
+    padding:8px 12px;
+}
+th {
+    background:#f0f0f0;
+}
+blockquote {
+    border-left:4px solid #0077cc;
+    padding-left:16px;
+}
+code {
+    background:#eee;
+    padding:2px 6px;
+}
+pre {
+    background:#f4f4f4;
+    padding:12px;
+    overflow-x:auto;
+}
+img {
+    max-width:100%;
+    height:auto;
+}
+math {
+    font-size:1.1em;
+}
+</style>
+</head>
+<body>
+<h1>Construccion de V1, V2 y V3: lectura conjunta</h1>
+<p>Fecha: 10 de octubre de 2026.</p>
+<h2>Cambios ejecutables</h2>
+<ul>
+<li>V1 declara la preparacion <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mo stretchy="false">(</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></math> y conserva H, H, oraculo y H en su orden.</li>
+<li>V2 declara el registro de trabajo en <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mn>1</mn></mrow></math> y los controles en <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mn>0</mn></mrow></math>.
+Conserva las potencias modulares y Fourier inversa; extrae el valor
+de control solo de los bits registrados tras la medida.</li>
+<li>V3 declara la preparacion cero y conserva el circuito recibido.</li>
+<li>Toffoli ya tiene una conexion binaria ejecutable. OR reversible se
+construye con dos CNOT y una Toffoli, sin borrar los controles.</li>
+<li>Las tres admiten la misma conexion de realizacion y una unica medida
+conjunta en <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>t</mi><mo>=</mo><msub><mi>t</mi><mn>0</mn></msub></mrow></math>. Antes de esa medida, la interfaz sigue mostrando <code>@</code>.</li>
+<li>Se retiraron de los comparadores activos las llamadas al banco anterior,
+las fases de prueba impuestas y las afirmaciones de que V almacena
+un registro exponencial. Los vectores de Qiskit pertenecen exclusivamente
+a las referencias Q simuladas, no a V.</li>
+</ul>
+<p>La descripcion de conexiones no contiene valores internos medidos ni
+tablas de amplitudes. La preparacion conocida no es una lectura intermedia.
+Un resultado registrado se conserva; no se repite la medida de la misma
+preparacion, tampoco cuando el detector falla.</p>
+<h2>Conexion de una realizacion</h2>
+<p>Una realizacion implementa dos operaciones:</p>
+<pre><code class="language-python">def preparar(plan):
+    # Configurar preparacion y conexiones; no medir ni devolver resultados.
+    ...
+
+def disparar(t0):
+    # Una lectura conjunta: un bit por unidad, con q0 primero.
+    ...
+</code></pre>
+<p>El plan incluye numero de unidades, preparacion declarada y orden completo
+de operaciones. No incluye la respuesta de Q, factores, periodos, una
+clasificacion del oraculo ni una distribucion de salida prefabricada.</p>
+<p>El instante recibido es la coordenada de medida del protocolo. Esta interfaz
+no es un temporizador fisico: la realizacion debe definir su relacion con
+el reloj y efectuar la lectura correspondiente. El tiempo registrado por
+el programa mide la duracion de las llamadas, no acredita esa calibracion.</p>
+<p>La conexion permite usar una realizacion propia en Python o controlar un
+circuito electronico. No proporciona por si misma la dinamica del dispositivo.
+Una realizacion externa tiene que documentar sus recursos; la interfaz no
+puede garantizar que su codigo respete las restricciones de memoria.</p>
+<h2>Que falta exactamente</h2>
+<p>No se ha implementado una realizacion compacta que ejecute conjuntamente
+H, fases, rotaciones, controles y bloques modulares sobre las relaciones
+de V y entregue sus bits finales. Las formulas de dos caminos estan
+implementadas, pero no basta aplicarlas por separado despues de medir
+generadores binarios: eso cambiaria el orden y las relaciones del circuito.</p>
+<p>El MD principal, seccion 20.1, describe una lectura conjunta para V_ref
+mediante amplitudes conjuntas y umbrales acumulados. Ese procedimiento
+requiere el registro exponencial que se ha excluido de esta construccion.
+No se ha incorporado a V. La subseccion &quot;Obligacion central de la
+arquitectura basada en relaciones&quot; distingue expresamente la arquitectura
+compacta de ese procedimiento de referencia.</p>
+<p>Por tanto, lo pendiente no es volver a definir <code>@</code> ni repetir la premisa
+de desconocimiento hasta <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>t</mi><mo>=</mo><msub><mi>t</mi><mn>0</mn></msub></mrow></math>. Es la realizacion ejecutable de las
+transformaciones conjuntas y de su detector final sin ese registro.
+No se considera una refutacion de la propuesta ni se declara terminada
+la construccion de las tres maquinas.</p>
+<h2>Comprobaciones</h2>
+<p>Pasan 44 pruebas; otras 14 del ensayo retirado se omiten. Comprueban conexiones, preparaciones, medida unica,
+errores del detector, orden de bits y procesamiento de una lectura dada.
+Los detectores de prueba devuelven datos de ensayo; no son realizaciones
+de H, entrelazamiento, Fourier ni de los algoritmos completos.</p>
+<p>El informe <code>VERIFICACION_TRES_MAQUINAS_20261010.json</code> registra la ejecucion
+actual de los tres comparadores. Sin una realizacion conectada, el estado
+es <code>PENDIENTE_REALIZACION</code>, no &quot;demostrado&quot;, &quot;refutado&quot; ni &quot;medido&quot;.
+No se inventan resultados o tiempos de una captura que no se ha realizado.</p>
+<p>Los tiempos de una distribucion Q simulada y de una lectura individual V
+son trabajos distintos. No se utilizan para afirmar igualdad de orden
+temporal o ventaja computacional. El contraste de ese objetivo requiere
+ejecuciones correspondientes completas.</p>
+<p>No se cambia el MD de autor, no se publica y no se certifica.</p>
+<h2>Propuesta posterior autorizada</h2>
+<p>Se desarrolla un modelo numerico independiente en
+<a href="PROPUESTA_LECTURA_POR_CAMINOS_20261010.md">PROPUESTA_LECTURA_POR_CAMINOS_20261010.md</a>.
+Permite probar una regla de lectura sin almacenar la tabla conjunta,
+pero su tiempo puede ser exponencial. No completa la realizacion fisica
+pendiente ni sustituye por defecto la arquitectura de V.</p>
+<p>El autor aclara posteriormente que la medida solo debe desencadenarse,
+sin recorrer caminos ni salidas. Por ello se retira esa propuesta como
+candidata de V y se conserva como ensayo separado no aplicable a su
+premisa. La interfaz actual hace una unica llamada a <code>disparar(t0)</code>;
+sigue pendiente conectar esa llamada con la realizacion propia de V.</p>
+<h2>Correccion del instante constitutivo</h2>
+<p>V1, V2 y V3 requieren ahora <code>preparar(plan)</code> y <code>disparar(t0)</code> de su
+realizacion. Su <code>capture_t0()</code> registra el reloj del disparo y ya no
+acepta un numero inventado como etiqueta. No utiliza el evaluador binario
+del banco ni calcula caminos o probabilidades. El modelo retirado no
+implementa ese contrato y no se acepta como realizacion V.</p>
+<p>La evaluacion de este control se registra por separado en
+<code>Proyectos/ES_52/evaluaciones/TEMPORAL_ES_52_Maquina_V_UNIHOLOG.md</code>.
+Se verifica el control temporal, no la dinamica fisica pendiente.</p>
+<h2>Enlace concreto entre las formulas y la construccion</h2>
+<p>La seccion 12.1 del MD principal explicita dos caminos coherentes,
+recombinacion y fase relativa. Las formulas de H y fase no estan ausentes:</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>H</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mn>0</mn></msub><mo>,</mo><msub><mi>s</mi><mn>1</mn></msub><mo stretchy="false">)</mo><mo>=</mo><mrow><mo stretchy="true" fence="true" form="prefix">(</mo><mfrac><mrow><msub><mi>s</mi><mn>0</mn></msub><mo>+</mo><msub><mi>s</mi><mn>1</mn></msub></mrow><mrow><msqrt><mrow><mn>2</mn></mrow></msqrt></mrow></mfrac><mo>,</mo><mfrac><mrow><msub><mi>s</mi><mn>0</mn></msub><mo>−</mo><msub><mi>s</mi><mn>1</mn></msub></mrow><mrow><msqrt><mrow><mn>2</mn></mrow></msqrt></mrow></mfrac><mo stretchy="true" fence="true" form="postfix">)</mo></mrow><mo>,</mo><mspace width="2em" /><msub><mi>U</mi><mi>ϕ</mi></msub><mo stretchy="false">(</mo><msub><mi>s</mi><mn>0</mn></msub><mo>,</mo><msub><mi>s</mi><mn>1</mn></msub><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">(</mo><msub><mi>s</mi><mn>0</mn></msub><mo>,</mo><msup><mi>e</mi><mrow><mi>i</mi><mi>ϕ</mi></mrow></msup><msub><mi>s</mi><mn>1</mn></msub><mo stretchy="false">)</mo><mo>.</mo></mrow></math></p>
+<p><code>operaciones_senales.Bloque.transformar_par</code> implementa estas expresiones.
+Sin embargo, <code>MaquinaRelacional.execute</code> solo compila las conexiones y
+entrega el plan a <code>realizacion.preparar</code>. No llama a <code>transformar_par</code>
+para realizar la evolucion de V. <code>disparar</code> tampoco debe hacerlo:
+la medida no debe convertirse en una evaluacion del circuito.</p>
+<p>El paso de construccion pendiente es conectar esos bloques a senales
+que evolucionen antes del disparo, sin observar las salidas binarias.
+No se identifica desconocimiento de una salida con inexistencia de la
+dinamica interna. Tampoco se introduce por ello una tabla conjunta de
+amplitudes ni se autoriza el modelo retirado de recorridos.</p>
+<p>Para una realizacion Python queda por aclarar si las dos senales pueden
+representarse como variables internas no expuestas. Esa representacion
+no es una lectura fisica, pero no garantiza inaccesibilidad a quien
+inspeccione la memoria. No se incorpora sin aclarar esta restriccion.</p>
+<p>Incluso resuelto el bloque de dos caminos, queda por realizar su
+composicion con controles y correlaciones para V1, V2 y V3 sin un
+registro exponencial. Las formulas locales, por si solas, no implementan
+esa composicion. Este es un estado del programa, no una refutacion del MD.</p>
+
+</body>
+</html>

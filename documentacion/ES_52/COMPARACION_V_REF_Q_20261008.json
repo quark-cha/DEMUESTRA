@@ -1,0 +1,2471 @@
+{
+  "scope": "V_ref ideal real signal model versus local Qiskit; not physical V or Q",
+  "utc": "2026-10-08T00:24:22.275141+00:00",
+  "versions": {
+    "numpy": "2.5.3",
+    "qiskit": "2.5.2"
+  },
+  "model_sha256": "1063e231f17d8a738bd16108f3bd22b45233c80a0eb020d0bd8c7d3d4d937119",
+  "source_sha256": "839f355c61c20f0f7bf09e2b577eccd7b0fd6be7b1c0da8a2225d4df1007ae64",
+  "tolerance": 1e-10,
+  "branch_floor": 1e-14,
+  "sampling": "enumerated probabilities; no hardware shots",
+  "passed": true,
+  "positive_cases": [
+    {
+      "case": "zero",
+      "dimension": 2,
+      "steps": 1,
+      "passed": true,
+      "max_probability_error": 0.0,
+      "max_posterior_entry_error": 0.0,
+      "max_total_mass_error": 0.0,
+      "outcomes": [
+        {
+          "history": [
+            "0"
+          ],
+          "p_v": 1.0,
+          "p_q": 1.0
+        }
+      ]
+    },
+    {
+      "case": "one",
+      "dimension": 2,
+      "steps": 1,
+      "passed": true,
+      "max_probability_error": 0.0,
+      "max_posterior_entry_error": 0.0,
+      "max_total_mass_error": 0.0,
+      "outcomes": [
+        {
+          "history": [
+            "1"
+          ],
+          "p_v": 1.0,
+          "p_q": 1.0
+        }
+      ]
+    },
+    {
+      "case": "H",
+      "dimension": 2,
+      "steps": 2,
+      "passed": true,
+      "max_probability_error": 0.0,
+      "max_posterior_entry_error": 0.0,
+      "max_total_mass_error": 2.220446049250313e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0"
+          ],
+          "p_v": 0.4999999999999999,
+          "p_q": 0.4999999999999999
+        },
+        {
+          "history": [
+            "1"
+          ],
+          "p_v": 0.4999999999999999,
+          "p_q": 0.4999999999999999
+        }
+      ]
+    },
+    {
+      "case": "H_H",
+      "dimension": 2,
+      "steps": 3,
+      "passed": true,
+      "max_probability_error": 1.1102230246251565e-16,
+      "max_posterior_entry_error": 1.1102230246251565e-16,
+      "max_total_mass_error": 4.440892098500626e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0"
+          ],
+          "p_v": 0.9999999999999996,
+          "p_q": 0.9999999999999997
+        }
+      ]
+    },
+    {
+      "case": "interference_00",
+      "dimension": 2,
+      "steps": 4,
+      "passed": true,
+      "max_probability_error": 1.1102230246251565e-16,
+      "max_posterior_entry_error": 1.1102230246251565e-16,
+      "max_total_mass_error": 4.440892098500626e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0"
+          ],
+          "p_v": 0.9999999999999996,
+          "p_q": 0.9999999999999997
+        }
+      ]
+    },
+    {
+      "case": "interference_01",
+      "dimension": 2,
+      "steps": 4,
+      "passed": true,
+      "max_probability_error": 4.163336342344337e-17,
+      "max_posterior_entry_error": 1.1648768597320993e-16,
+      "max_total_mass_error": 4.440892098500626e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0"
+          ],
+          "p_v": 0.9619397662556429,
+          "p_q": 0.9619397662556429
+        },
+        {
+          "history": [
+            "1"
+          ],
+          "p_v": 0.03806023374435659,
+          "p_q": 0.03806023374435663
+        }
+      ]
+    },
+    {
+      "case": "interference_02",
+      "dimension": 2,
+      "steps": 4,
+      "passed": true,
+      "max_probability_error": 8.326672684688674e-17,
+      "max_posterior_entry_error": 8.333478635378934e-17,
+      "max_total_mass_error": 5.551115123125783e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0"
+          ],
+          "p_v": 0.8535533905932733,
+          "p_q": 0.8535533905932733
+        },
+        {
+          "history": [
+            "1"
+          ],
+          "p_v": 0.14644660940672616,
+          "p_q": 0.14644660940672624
+        }
+      ]
+    },
+    {
+      "case": "interference_03",
+      "dimension": 2,
+      "steps": 4,
+      "passed": true,
+      "max_probability_error": 1.1102230246251565e-16,
+      "max_posterior_entry_error": 1.3465584680886485e-16,
+      "max_total_mass_error": 4.440892098500626e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0"
+          ],
+          "p_v": 0.6913417161825447,
+          "p_q": 0.6913417161825447
+        },
+        {
+          "history": [
+            "1"
+          ],
+          "p_v": 0.3086582838174549,
+          "p_q": 0.308658283817455
+        }
+      ]
+    },
+    {
+      "case": "interference_04",
+      "dimension": 2,
+      "steps": 4,
+      "passed": true,
+      "max_probability_error": 0.0,
+      "max_posterior_entry_error": 2.2371143170757388e-17,
+      "max_total_mass_error": 2.220446049250313e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0"
+          ],
+          "p_v": 0.4999999999999999,
+          "p_q": 0.4999999999999999
+        },
+        {
+          "history": [
+            "1"
+          ],
+          "p_v": 0.4999999999999999,
+          "p_q": 0.4999999999999999
+        }
+      ]
+    },
+    {
+      "case": "interference_05",
+      "dimension": 2,
+      "steps": 4,
+      "passed": true,
+      "max_probability_error": 1.1102230246251565e-16,
+      "max_posterior_entry_error": 1.1109783780102162e-16,
+      "max_total_mass_error": 3.3306690738754696e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0"
+          ],
+          "p_v": 0.3086582838174551,
+          "p_q": 0.3086582838174551
+        },
+        {
+          "history": [
+            "1"
+          ],
+          "p_v": 0.6913417161825447,
+          "p_q": 0.6913417161825446
+        }
+      ]
+    },
+    {
+      "case": "interference_06",
+      "dimension": 2,
+      "steps": 4,
+      "passed": true,
+      "max_probability_error": 0.0,
+      "max_posterior_entry_error": 7.850462293418872e-17,
+      "max_total_mass_error": 4.440892098500626e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0"
+          ],
+          "p_v": 0.14644660940672624,
+          "p_q": 0.14644660940672624
+        },
+        {
+          "history": [
+            "1"
+          ],
+          "p_v": 0.8535533905932733,
+          "p_q": 0.8535533905932733
+        }
+      ]
+    },
+    {
+      "case": "interference_07",
+      "dimension": 2,
+      "steps": 4,
+      "passed": true,
+      "max_probability_error": 6.938893903907228e-18,
+      "max_posterior_entry_error": 5.392758788390046e-17,
+      "max_total_mass_error": 4.440892098500626e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0"
+          ],
+          "p_v": 0.038060233744356624,
+          "p_q": 0.03806023374435663
+        },
+        {
+          "history": [
+            "1"
+          ],
+          "p_v": 0.9619397662556429,
+          "p_q": 0.9619397662556429
+        }
+      ]
+    },
+    {
+      "case": "interference_08",
+      "dimension": 2,
+      "steps": 4,
+      "passed": true,
+      "max_probability_error": 1.1102230246251565e-16,
+      "max_posterior_entry_error": 1.1102230246251565e-16,
+      "max_total_mass_error": 4.440892098500626e-16,
+      "outcomes": [
+        {
+          "history": [
+            "1"
+          ],
+          "p_v": 0.9999999999999996,
+          "p_q": 0.9999999999999997
+        }
+      ]
+    },
+    {
+      "case": "interference_09",
+      "dimension": 2,
+      "steps": 4,
+      "passed": true,
+      "max_probability_error": 4.85722573273506e-17,
+      "max_posterior_entry_error": 4.859004972057681e-17,
+      "max_total_mass_error": 4.440892098500626e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0"
+          ],
+          "p_v": 0.03806023374435658,
+          "p_q": 0.03806023374435663
+        },
+        {
+          "history": [
+            "1"
+          ],
+          "p_v": 0.9619397662556429,
+          "p_q": 0.9619397662556429
+        }
+      ]
+    },
+    {
+      "case": "interference_10",
+      "dimension": 2,
+      "steps": 4,
+      "passed": true,
+      "max_probability_error": 2.7755575615628914e-17,
+      "max_posterior_entry_error": 5.551115123125783e-17,
+      "max_total_mass_error": 5.551115123125783e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0"
+          ],
+          "p_v": 0.14644660940672616,
+          "p_q": 0.14644660940672613
+        },
+        {
+          "history": [
+            "1"
+          ],
+          "p_v": 0.8535533905932733,
+          "p_q": 0.8535533905932733
+        }
+      ]
+    },
+    {
+      "case": "interference_11",
+      "dimension": 2,
+      "steps": 4,
+      "passed": true,
+      "max_probability_error": 1.1102230246251565e-16,
+      "max_posterior_entry_error": 1.110390820219132e-16,
+      "max_total_mass_error": 4.440892098500626e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0"
+          ],
+          "p_v": 0.3086582838174547,
+          "p_q": 0.3086582838174547
+        },
+        {
+          "history": [
+            "1"
+          ],
+          "p_v": 0.6913417161825449,
+          "p_q": 0.6913417161825448
+        }
+      ]
+    },
+    {
+      "case": "interference_12",
+      "dimension": 2,
+      "steps": 4,
+      "passed": true,
+      "max_probability_error": 0.0,
+      "max_posterior_entry_error": 2.77555756156289e-17,
+      "max_total_mass_error": 3.3306690738754696e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0"
+          ],
+          "p_v": 0.4999999999999998,
+          "p_q": 0.4999999999999998
+        },
+        {
+          "history": [
+            "1"
+          ],
+          "p_v": 0.4999999999999999,
+          "p_q": 0.4999999999999999
+        }
+      ]
+    },
+    {
+      "case": "interference_13",
+      "dimension": 2,
+      "steps": 4,
+      "passed": true,
+      "max_probability_error": 1.1102230246251565e-16,
+      "max_posterior_entry_error": 1.2288639553922937e-16,
+      "max_total_mass_error": 2.220446049250313e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0"
+          ],
+          "p_v": 0.6913417161825449,
+          "p_q": 0.6913417161825448
+        },
+        {
+          "history": [
+            "1"
+          ],
+          "p_v": 0.3086582838174549,
+          "p_q": 0.30865828381745497
+        }
+      ]
+    },
+    {
+      "case": "interference_14",
+      "dimension": 2,
+      "steps": 4,
+      "passed": true,
+      "max_probability_error": 5.551115123125783e-17,
+      "max_posterior_entry_error": 5.635340254514467e-17,
+      "max_total_mass_error": 4.440892098500626e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0"
+          ],
+          "p_v": 0.8535533905932733,
+          "p_q": 0.8535533905932733
+        },
+        {
+          "history": [
+            "1"
+          ],
+          "p_v": 0.1464466094067263,
+          "p_q": 0.14644660940672624
+        }
+      ]
+    },
+    {
+      "case": "interference_15",
+      "dimension": 2,
+      "steps": 4,
+      "passed": true,
+      "max_probability_error": 6.938893903907228e-18,
+      "max_posterior_entry_error": 1.6831416815717523e-16,
+      "max_total_mass_error": 3.3306690738754696e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0"
+          ],
+          "p_v": 0.9619397662556429,
+          "p_q": 0.9619397662556429
+        },
+        {
+          "history": [
+            "1"
+          ],
+          "p_v": 0.038060233744356735,
+          "p_q": 0.03806023374435673
+        }
+      ]
+    },
+    {
+      "case": "interference_16",
+      "dimension": 2,
+      "steps": 4,
+      "passed": true,
+      "max_probability_error": 1.1102230246251565e-16,
+      "max_posterior_entry_error": 1.1102230246251565e-16,
+      "max_total_mass_error": 4.440892098500626e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0"
+          ],
+          "p_v": 0.9999999999999996,
+          "p_q": 0.9999999999999997
+        }
+      ]
+    },
+    {
+      "case": "basis_X",
+      "dimension": 2,
+      "steps": 3,
+      "passed": true,
+      "max_probability_error": 2.220446049250313e-16,
+      "max_posterior_entry_error": 1.1102230246251565e-16,
+      "max_total_mass_error": 2.220446049250313e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0",
+            "0"
+          ],
+          "p_v": 1.0,
+          "p_q": 0.9999999999999998
+        }
+      ]
+    },
+    {
+      "case": "basis_Y",
+      "dimension": 2,
+      "steps": 3,
+      "passed": true,
+      "max_probability_error": 0.0,
+      "max_posterior_entry_error": 0.0,
+      "max_total_mass_error": 2.220446049250313e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0",
+            "0"
+          ],
+          "p_v": 0.4999999999999999,
+          "p_q": 0.4999999999999999
+        },
+        {
+          "history": [
+            "1",
+            "1"
+          ],
+          "p_v": 0.4999999999999999,
+          "p_q": 0.4999999999999999
+        }
+      ]
+    },
+    {
+      "case": "basis_Z",
+      "dimension": 2,
+      "steps": 3,
+      "passed": true,
+      "max_probability_error": 0.0,
+      "max_posterior_entry_error": 0.0,
+      "max_total_mass_error": 2.220446049250313e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0",
+            "0"
+          ],
+          "p_v": 0.4999999999999999,
+          "p_q": 0.4999999999999999
+        },
+        {
+          "history": [
+            "1",
+            "1"
+          ],
+          "p_v": 0.4999999999999999,
+          "p_q": 0.4999999999999999
+        }
+      ]
+    },
+    {
+      "case": "Z_then_X",
+      "dimension": 2,
+      "steps": 3,
+      "passed": true,
+      "max_probability_error": 0.0,
+      "max_posterior_entry_error": 1.1102230246251565e-16,
+      "max_total_mass_error": 2.220446049250313e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0",
+            "0"
+          ],
+          "p_v": 0.24999999999999994,
+          "p_q": 0.24999999999999994
+        },
+        {
+          "history": [
+            "0",
+            "1"
+          ],
+          "p_v": 0.24999999999999994,
+          "p_q": 0.24999999999999994
+        },
+        {
+          "history": [
+            "1",
+            "0"
+          ],
+          "p_v": 0.24999999999999994,
+          "p_q": 0.24999999999999994
+        },
+        {
+          "history": [
+            "1",
+            "1"
+          ],
+          "p_v": 0.24999999999999994,
+          "p_q": 0.24999999999999994
+        }
+      ]
+    },
+    {
+      "case": "visible_feed_forward",
+      "dimension": 2,
+      "steps": 4,
+      "passed": true,
+      "max_probability_error": 0.0,
+      "max_posterior_entry_error": 0.0,
+      "max_total_mass_error": 2.220446049250313e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0",
+            "0"
+          ],
+          "p_v": 0.4999999999999999,
+          "p_q": 0.4999999999999999
+        },
+        {
+          "history": [
+            "1",
+            "0"
+          ],
+          "p_v": 0.4999999999999999,
+          "p_q": 0.4999999999999999
+        }
+      ]
+    },
+    {
+      "case": "Bell_joint_sequential",
+      "dimension": 4,
+      "steps": 4,
+      "passed": true,
+      "max_probability_error": 0.0,
+      "max_posterior_entry_error": 0.0,
+      "max_total_mass_error": 2.220446049250313e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0",
+            "0"
+          ],
+          "p_v": 0.4999999999999999,
+          "p_q": 0.4999999999999999
+        },
+        {
+          "history": [
+            "1",
+            "1"
+          ],
+          "p_v": 0.4999999999999999,
+          "p_q": 0.4999999999999999
+        }
+      ]
+    },
+    {
+      "case": "mixed_preparation",
+      "dimension": 2,
+      "steps": 2,
+      "passed": true,
+      "max_probability_error": 0.0,
+      "max_posterior_entry_error": 2.7755575615628914e-17,
+      "max_total_mass_error": 2.220446049250313e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0"
+          ],
+          "p_v": 0.4999999999999999,
+          "p_q": 0.4999999999999999
+        },
+        {
+          "history": [
+            "1"
+          ],
+          "p_v": 0.4999999999999999,
+          "p_q": 0.4999999999999999
+        }
+      ]
+    },
+    {
+      "case": "amplitude_damping_0.0",
+      "dimension": 2,
+      "steps": 2,
+      "passed": true,
+      "max_probability_error": 0.0,
+      "max_posterior_entry_error": 0.0,
+      "max_total_mass_error": 0.0,
+      "outcomes": [
+        {
+          "history": [
+            "unobserved",
+            "1"
+          ],
+          "p_v": 1.0,
+          "p_q": 1.0
+        }
+      ]
+    },
+    {
+      "case": "phase_noise_0.0",
+      "dimension": 2,
+      "steps": 4,
+      "passed": true,
+      "max_probability_error": 2.220446049250313e-16,
+      "max_posterior_entry_error": 2.220446049250313e-16,
+      "max_total_mass_error": 4.440892098500626e-16,
+      "outcomes": [
+        {
+          "history": [
+            "unobserved",
+            "0"
+          ],
+          "p_v": 0.9999999999999998,
+          "p_q": 0.9999999999999996
+        }
+      ]
+    },
+    {
+      "case": "amplitude_damping_0.1",
+      "dimension": 2,
+      "steps": 2,
+      "passed": true,
+      "max_probability_error": 1.1102230246251565e-16,
+      "max_posterior_entry_error": 1.1102230246251565e-16,
+      "max_total_mass_error": 1.1102230246251565e-16,
+      "outcomes": [
+        {
+          "history": [
+            "unobserved",
+            "0"
+          ],
+          "p_v": 0.1,
+          "p_q": 0.10000000000000002
+        },
+        {
+          "history": [
+            "unobserved",
+            "1"
+          ],
+          "p_v": 0.8999999999999999,
+          "p_q": 0.9
+        }
+      ]
+    },
+    {
+      "case": "phase_noise_0.1",
+      "dimension": 2,
+      "steps": 4,
+      "passed": true,
+      "max_probability_error": 1.1102230246251565e-16,
+      "max_posterior_entry_error": 1.1102230246251565e-16,
+      "max_total_mass_error": 4.440892098500626e-16,
+      "outcomes": [
+        {
+          "history": [
+            "unobserved",
+            "0"
+          ],
+          "p_v": 0.8999999999999997,
+          "p_q": 0.8999999999999996
+        },
+        {
+          "history": [
+            "unobserved",
+            "1"
+          ],
+          "p_v": 0.09999999999999995,
+          "p_q": 0.09999999999999992
+        }
+      ]
+    },
+    {
+      "case": "amplitude_damping_0.5",
+      "dimension": 2,
+      "steps": 2,
+      "passed": true,
+      "max_probability_error": 0.0,
+      "max_posterior_entry_error": 0.0,
+      "max_total_mass_error": 2.220446049250313e-16,
+      "outcomes": [
+        {
+          "history": [
+            "unobserved",
+            "0"
+          ],
+          "p_v": 0.5000000000000001,
+          "p_q": 0.5000000000000001
+        },
+        {
+          "history": [
+            "unobserved",
+            "1"
+          ],
+          "p_v": 0.5000000000000001,
+          "p_q": 0.5000000000000001
+        }
+      ]
+    },
+    {
+      "case": "phase_noise_0.5",
+      "dimension": 2,
+      "steps": 4,
+      "passed": true,
+      "max_probability_error": 1.1102230246251565e-16,
+      "max_posterior_entry_error": 1.1102230246251565e-16,
+      "max_total_mass_error": 4.440892098500626e-16,
+      "outcomes": [
+        {
+          "history": [
+            "unobserved",
+            "0"
+          ],
+          "p_v": 0.4999999999999998,
+          "p_q": 0.4999999999999999
+        },
+        {
+          "history": [
+            "unobserved",
+            "1"
+          ],
+          "p_v": 0.4999999999999998,
+          "p_q": 0.4999999999999999
+        }
+      ]
+    },
+    {
+      "case": "amplitude_damping_1.0",
+      "dimension": 2,
+      "steps": 2,
+      "passed": true,
+      "max_probability_error": 0.0,
+      "max_posterior_entry_error": 0.0,
+      "max_total_mass_error": 0.0,
+      "outcomes": [
+        {
+          "history": [
+            "unobserved",
+            "0"
+          ],
+          "p_v": 1.0,
+          "p_q": 1.0
+        }
+      ]
+    },
+    {
+      "case": "phase_noise_1.0",
+      "dimension": 2,
+      "steps": 4,
+      "passed": true,
+      "max_probability_error": 2.220446049250313e-16,
+      "max_posterior_entry_error": 2.220446049250313e-16,
+      "max_total_mass_error": 4.440892098500626e-16,
+      "outcomes": [
+        {
+          "history": [
+            "unobserved",
+            "1"
+          ],
+          "p_v": 0.9999999999999998,
+          "p_q": 0.9999999999999996
+        }
+      ]
+    },
+    {
+      "case": "instrument_hidden_nu",
+      "dimension": 2,
+      "steps": 3,
+      "passed": true,
+      "max_probability_error": 1.1102230246251565e-16,
+      "max_posterior_entry_error": 1.1102230246251565e-16,
+      "max_total_mass_error": 3.3306690738754696e-16,
+      "outcomes": [
+        {
+          "history": [
+            "a",
+            "0"
+          ],
+          "p_v": 0.19999999999999998,
+          "p_q": 0.19999999999999993
+        },
+        {
+          "history": [
+            "a",
+            "1"
+          ],
+          "p_v": 0.2999999999999999,
+          "p_q": 0.2999999999999999
+        },
+        {
+          "history": [
+            "b",
+            "0"
+          ],
+          "p_v": 0.09999999999999996,
+          "p_q": 0.09999999999999996
+        },
+        {
+          "history": [
+            "b",
+            "1"
+          ],
+          "p_v": 0.39999999999999986,
+          "p_q": 0.39999999999999997
+        }
+      ]
+    },
+    {
+      "case": "random_d2_00",
+      "dimension": 2,
+      "steps": 5,
+      "passed": true,
+      "max_probability_error": 5.551115123125783e-17,
+      "max_posterior_entry_error": 2.2796193928591247e-16,
+      "max_total_mass_error": 8.881784197001252e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0",
+            "0"
+          ],
+          "p_v": 0.5657661598722127,
+          "p_q": 0.5657661598722127
+        },
+        {
+          "history": [
+            "1",
+            "1"
+          ],
+          "p_v": 0.43423384012778826,
+          "p_q": 0.4342338401277883
+        }
+      ]
+    },
+    {
+      "case": "random_d2_01",
+      "dimension": 2,
+      "steps": 5,
+      "passed": true,
+      "max_probability_error": 1.1102230246251565e-16,
+      "max_posterior_entry_error": 3.6386374513239115e-16,
+      "max_total_mass_error": 2.220446049250313e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0",
+            "0"
+          ],
+          "p_v": 0.8430089913421492,
+          "p_q": 0.8430089913421493
+        },
+        {
+          "history": [
+            "1",
+            "1"
+          ],
+          "p_v": 0.15699100865785054,
+          "p_q": 0.15699100865785065
+        }
+      ]
+    },
+    {
+      "case": "random_d2_02",
+      "dimension": 2,
+      "steps": 5,
+      "passed": true,
+      "max_probability_error": 5.551115123125783e-17,
+      "max_posterior_entry_error": 2.435166772709987e-16,
+      "max_total_mass_error": 2.220446049250313e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0",
+            "0"
+          ],
+          "p_v": 0.30397612362436965,
+          "p_q": 0.3039761236243697
+        },
+        {
+          "history": [
+            "1",
+            "1"
+          ],
+          "p_v": 0.6960238763756306,
+          "p_q": 0.6960238763756306
+        }
+      ]
+    },
+    {
+      "case": "random_d2_03",
+      "dimension": 2,
+      "steps": 5,
+      "passed": true,
+      "max_probability_error": 4.440892098500626e-16,
+      "max_posterior_entry_error": 3.351957484309585e-16,
+      "max_total_mass_error": 4.440892098500626e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0",
+            "0"
+          ],
+          "p_v": 0.27102007522323757,
+          "p_q": 0.27102007522323746
+        },
+        {
+          "history": [
+            "1",
+            "1"
+          ],
+          "p_v": 0.7289799247767625,
+          "p_q": 0.7289799247767621
+        }
+      ]
+    },
+    {
+      "case": "random_d2_04",
+      "dimension": 2,
+      "steps": 5,
+      "passed": true,
+      "max_probability_error": 1.6653345369377348e-16,
+      "max_posterior_entry_error": 2.3832510423218656e-16,
+      "max_total_mass_error": 6.661338147750939e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0",
+            "0"
+          ],
+          "p_v": 0.6766671576501758,
+          "p_q": 0.6766671576501758
+        },
+        {
+          "history": [
+            "1",
+            "1"
+          ],
+          "p_v": 0.32333284234982473,
+          "p_q": 0.32333284234982484
+        }
+      ]
+    },
+    {
+      "case": "random_d2_05",
+      "dimension": 2,
+      "steps": 5,
+      "passed": true,
+      "max_probability_error": 2.220446049250313e-16,
+      "max_posterior_entry_error": 2.482534153247273e-16,
+      "max_total_mass_error": 4.440892098500626e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0",
+            "0"
+          ],
+          "p_v": 0.4230154993778549,
+          "p_q": 0.42301549937785465
+        },
+        {
+          "history": [
+            "1",
+            "1"
+          ],
+          "p_v": 0.5769845006221457,
+          "p_q": 0.5769845006221455
+        }
+      ]
+    },
+    {
+      "case": "random_d2_06",
+      "dimension": 2,
+      "steps": 5,
+      "passed": true,
+      "max_probability_error": 2.220446049250313e-16,
+      "max_posterior_entry_error": 2.237726045655905e-16,
+      "max_total_mass_error": 4.440892098500626e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0",
+            "0"
+          ],
+          "p_v": 0.6290457503877819,
+          "p_q": 0.6290457503877817
+        },
+        {
+          "history": [
+            "1",
+            "1"
+          ],
+          "p_v": 0.37095424961221857,
+          "p_q": 0.37095424961221835
+        }
+      ]
+    },
+    {
+      "case": "random_d2_07",
+      "dimension": 2,
+      "steps": 5,
+      "passed": true,
+      "max_probability_error": 6.661338147750939e-16,
+      "max_posterior_entry_error": 8.080039250488147e-16,
+      "max_total_mass_error": 6.661338147750939e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0",
+            "0"
+          ],
+          "p_v": 0.035404035615186645,
+          "p_q": 0.035404035615186666
+        },
+        {
+          "history": [
+            "1",
+            "1"
+          ],
+          "p_v": 0.9645959643848133,
+          "p_q": 0.9645959643848127
+        }
+      ]
+    },
+    {
+      "case": "random_d2_08",
+      "dimension": 2,
+      "steps": 5,
+      "passed": true,
+      "max_probability_error": 1.1102230246251565e-16,
+      "max_posterior_entry_error": 2.2206482708132896e-16,
+      "max_total_mass_error": 2.220446049250313e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0",
+            "0"
+          ],
+          "p_v": 0.8331351654222202,
+          "p_q": 0.8331351654222203
+        },
+        {
+          "history": [
+            "1",
+            "1"
+          ],
+          "p_v": 0.1668648345777795,
+          "p_q": 0.16686483457777954
+        }
+      ]
+    },
+    {
+      "case": "random_d2_09",
+      "dimension": 2,
+      "steps": 5,
+      "passed": true,
+      "max_probability_error": 2.220446049250313e-16,
+      "max_posterior_entry_error": 1.5968929988753907e-15,
+      "max_total_mass_error": 4.440892098500626e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0",
+            "0"
+          ],
+          "p_v": 0.9522166695980112,
+          "p_q": 0.9522166695980114
+        },
+        {
+          "history": [
+            "1",
+            "1"
+          ],
+          "p_v": 0.04778333040198898,
+          "p_q": 0.04778333040198901
+        }
+      ]
+    },
+    {
+      "case": "random_d2_10",
+      "dimension": 2,
+      "steps": 5,
+      "passed": true,
+      "max_probability_error": 2.220446049250313e-16,
+      "max_posterior_entry_error": 2.231010639278632e-16,
+      "max_total_mass_error": 2.220446049250313e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0",
+            "0"
+          ],
+          "p_v": 0.14631454769676286,
+          "p_q": 0.14631454769676283
+        },
+        {
+          "history": [
+            "1",
+            "1"
+          ],
+          "p_v": 0.8536854523032373,
+          "p_q": 0.8536854523032371
+        }
+      ]
+    },
+    {
+      "case": "random_d2_11",
+      "dimension": 2,
+      "steps": 5,
+      "passed": true,
+      "max_probability_error": 2.220446049250313e-16,
+      "max_posterior_entry_error": 2.622053590810176e-16,
+      "max_total_mass_error": 4.440892098500626e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0",
+            "0"
+          ],
+          "p_v": 0.409294511101153,
+          "p_q": 0.4092945111011528
+        },
+        {
+          "history": [
+            "1",
+            "1"
+          ],
+          "p_v": 0.5907054888988476,
+          "p_q": 0.5907054888988476
+        }
+      ]
+    },
+    {
+      "case": "random_d2_12",
+      "dimension": 2,
+      "steps": 5,
+      "passed": true,
+      "max_probability_error": 1.1102230246251565e-16,
+      "max_posterior_entry_error": 2.302012499967235e-16,
+      "max_total_mass_error": 4.440892098500626e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0",
+            "0"
+          ],
+          "p_v": 0.07921176796303231,
+          "p_q": 0.07921176796303225
+        },
+        {
+          "history": [
+            "1",
+            "1"
+          ],
+          "p_v": 0.920788232036968,
+          "p_q": 0.9207882320369679
+        }
+      ]
+    },
+    {
+      "case": "random_d2_13",
+      "dimension": 2,
+      "steps": 5,
+      "passed": true,
+      "max_probability_error": 1.1102230246251565e-16,
+      "max_posterior_entry_error": 3.3315100108807675e-16,
+      "max_total_mass_error": 2.220446049250313e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0",
+            "0"
+          ],
+          "p_v": 0.5625404235770107,
+          "p_q": 0.5625404235770108
+        },
+        {
+          "history": [
+            "1",
+            "1"
+          ],
+          "p_v": 0.4374595764229893,
+          "p_q": 0.43745957642298944
+        }
+      ]
+    },
+    {
+      "case": "random_d2_14",
+      "dimension": 2,
+      "steps": 5,
+      "passed": true,
+      "max_probability_error": 1.1102230246251565e-16,
+      "max_posterior_entry_error": 6.22127908876135e-16,
+      "max_total_mass_error": 3.3306690738754696e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0",
+            "0"
+          ],
+          "p_v": 0.14596841604501629,
+          "p_q": 0.14596841604501623
+        },
+        {
+          "history": [
+            "1",
+            "1"
+          ],
+          "p_v": 0.8540315839549836,
+          "p_q": 0.8540315839549835
+        }
+      ]
+    },
+    {
+      "case": "random_d2_15",
+      "dimension": 2,
+      "steps": 5,
+      "passed": true,
+      "max_probability_error": 3.3306690738754696e-16,
+      "max_posterior_entry_error": 3.60604237740552e-16,
+      "max_total_mass_error": 4.440892098500626e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0",
+            "0"
+          ],
+          "p_v": 0.3405385302118225,
+          "p_q": 0.34053853021182257
+        },
+        {
+          "history": [
+            "1",
+            "1"
+          ],
+          "p_v": 0.6594614697881777,
+          "p_q": 0.659461469788178
+        }
+      ]
+    },
+    {
+      "case": "random_d2_16",
+      "dimension": 2,
+      "steps": 5,
+      "passed": true,
+      "max_probability_error": 1.3877787807814457e-16,
+      "max_posterior_entry_error": 3.7974137173437734e-16,
+      "max_total_mass_error": 2.220446049250313e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0",
+            "0"
+          ],
+          "p_v": 0.7753512925434252,
+          "p_q": 0.7753512925434252
+        },
+        {
+          "history": [
+            "1",
+            "1"
+          ],
+          "p_v": 0.2246487074565748,
+          "p_q": 0.22464870745657467
+        }
+      ]
+    },
+    {
+      "case": "random_d2_17",
+      "dimension": 2,
+      "steps": 5,
+      "passed": true,
+      "max_probability_error": 2.220446049250313e-16,
+      "max_posterior_entry_error": 3.0283088091299085e-16,
+      "max_total_mass_error": 4.440892098500626e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0",
+            "0"
+          ],
+          "p_v": 0.5353037889117079,
+          "p_q": 0.535303788911708
+        },
+        {
+          "history": [
+            "1",
+            "1"
+          ],
+          "p_v": 0.4646962110882922,
+          "p_q": 0.4646962110882924
+        }
+      ]
+    },
+    {
+      "case": "random_d2_18",
+      "dimension": 2,
+      "steps": 5,
+      "passed": true,
+      "max_probability_error": 1.6653345369377348e-16,
+      "max_posterior_entry_error": 2.5481475563055666e-16,
+      "max_total_mass_error": 4.440892098500626e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0",
+            "0"
+          ],
+          "p_v": 0.39956378069831133,
+          "p_q": 0.39956378069831117
+        },
+        {
+          "history": [
+            "1",
+            "1"
+          ],
+          "p_v": 0.6004362193016892,
+          "p_q": 0.6004362193016891
+        }
+      ]
+    },
+    {
+      "case": "random_d2_19",
+      "dimension": 2,
+      "steps": 5,
+      "passed": true,
+      "max_probability_error": 3.3306690738754696e-16,
+      "max_posterior_entry_error": 1.1161298394070735e-14,
+      "max_total_mass_error": 1.1102230246251565e-15,
+      "outcomes": [
+        {
+          "history": [
+            "0",
+            "0"
+          ],
+          "p_v": 0.003335150541607267,
+          "p_q": 0.003335150541607372
+        },
+        {
+          "history": [
+            "1",
+            "1"
+          ],
+          "p_v": 0.996664849458394,
+          "p_q": 0.9966648494583936
+        }
+      ]
+    },
+    {
+      "case": "random_d4_00",
+      "dimension": 4,
+      "steps": 6,
+      "passed": true,
+      "max_probability_error": 2.7755575615628914e-16,
+      "max_posterior_entry_error": 6.202152331080378e-16,
+      "max_total_mass_error": 2.220446049250313e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0",
+            "0",
+            "0"
+          ],
+          "p_v": 0.3416999425715122,
+          "p_q": 0.34169994257151215
+        },
+        {
+          "history": [
+            "0",
+            "0",
+            "1"
+          ],
+          "p_v": 0.0800872358960993,
+          "p_q": 0.08008723589609935
+        },
+        {
+          "history": [
+            "1",
+            "1",
+            "0"
+          ],
+          "p_v": 0.21473537293129563,
+          "p_q": 0.2147353729312959
+        },
+        {
+          "history": [
+            "1",
+            "1",
+            "1"
+          ],
+          "p_v": 0.3634774486010929,
+          "p_q": 0.3634774486010928
+        }
+      ]
+    },
+    {
+      "case": "random_d4_01",
+      "dimension": 4,
+      "steps": 6,
+      "passed": true,
+      "max_probability_error": 2.220446049250313e-16,
+      "max_posterior_entry_error": 1.191435590617902e-15,
+      "max_total_mass_error": 2.220446049250313e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0",
+            "0",
+            "0"
+          ],
+          "p_v": 0.7491728296268015,
+          "p_q": 0.7491728296268018
+        },
+        {
+          "history": [
+            "0",
+            "0",
+            "1"
+          ],
+          "p_v": 0.009622107535570546,
+          "p_q": 0.009622107535570544
+        },
+        {
+          "history": [
+            "1",
+            "1",
+            "0"
+          ],
+          "p_v": 0.03571994888662567,
+          "p_q": 0.035719948886625746
+        },
+        {
+          "history": [
+            "1",
+            "1",
+            "1"
+          ],
+          "p_v": 0.20548511395100205,
+          "p_q": 0.20548511395100208
+        }
+      ]
+    },
+    {
+      "case": "random_d4_02",
+      "dimension": 4,
+      "steps": 6,
+      "passed": true,
+      "max_probability_error": 2.220446049250313e-16,
+      "max_posterior_entry_error": 1.4462378294091432e-15,
+      "max_total_mass_error": 4.440892098500626e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0",
+            "0",
+            "0"
+          ],
+          "p_v": 0.19347125421296707,
+          "p_q": 0.19347125421296693
+        },
+        {
+          "history": [
+            "0",
+            "0",
+            "1"
+          ],
+          "p_v": 0.16101519429901884,
+          "p_q": 0.16101519429901884
+        },
+        {
+          "history": [
+            "1",
+            "1",
+            "0"
+          ],
+          "p_v": 0.6178037373539008,
+          "p_q": 0.6178037373539007
+        },
+        {
+          "history": [
+            "1",
+            "1",
+            "1"
+          ],
+          "p_v": 0.027709814134113747,
+          "p_q": 0.02770981413411372
+        }
+      ]
+    },
+    {
+      "case": "random_d4_03",
+      "dimension": 4,
+      "steps": 6,
+      "passed": true,
+      "max_probability_error": 2.220446049250313e-16,
+      "max_posterior_entry_error": 2.664558668037161e-16,
+      "max_total_mass_error": 2.220446049250313e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0",
+            "0",
+            "0"
+          ],
+          "p_v": 0.4625556471798402,
+          "p_q": 0.46255564717984
+        },
+        {
+          "history": [
+            "0",
+            "0",
+            "1"
+          ],
+          "p_v": 0.21050505229333183,
+          "p_q": 0.21050505229333188
+        },
+        {
+          "history": [
+            "1",
+            "1",
+            "0"
+          ],
+          "p_v": 0.10232605257440817,
+          "p_q": 0.10232605257440822
+        },
+        {
+          "history": [
+            "1",
+            "1",
+            "1"
+          ],
+          "p_v": 0.22461324795241996,
+          "p_q": 0.22461324795241996
+        }
+      ]
+    },
+    {
+      "case": "random_d4_04",
+      "dimension": 4,
+      "steps": 6,
+      "passed": true,
+      "max_probability_error": 2.220446049250313e-16,
+      "max_posterior_entry_error": 2.6714547711432944e-16,
+      "max_total_mass_error": 7.771561172376096e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0",
+            "0",
+            "0"
+          ],
+          "p_v": 0.3217832671487433,
+          "p_q": 0.32178326714874333
+        },
+        {
+          "history": [
+            "0",
+            "0",
+            "1"
+          ],
+          "p_v": 0.23770235566930137,
+          "p_q": 0.23770235566930142
+        },
+        {
+          "history": [
+            "1",
+            "1",
+            "0"
+          ],
+          "p_v": 0.13974509161096615,
+          "p_q": 0.13974509161096618
+        },
+        {
+          "history": [
+            "1",
+            "1",
+            "1"
+          ],
+          "p_v": 0.3007692855709885,
+          "p_q": 0.30076928557098864
+        }
+      ]
+    },
+    {
+      "case": "random_d4_05",
+      "dimension": 4,
+      "steps": 6,
+      "passed": true,
+      "max_probability_error": 1.6653345369377348e-16,
+      "max_posterior_entry_error": 8.767070175606439e-16,
+      "max_total_mass_error": 4.440892098500626e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0",
+            "0",
+            "0"
+          ],
+          "p_v": 0.05146513659222425,
+          "p_q": 0.05146513659222416
+        },
+        {
+          "history": [
+            "0",
+            "0",
+            "1"
+          ],
+          "p_v": 0.25447781732495417,
+          "p_q": 0.2544778173249541
+        },
+        {
+          "history": [
+            "1",
+            "1",
+            "0"
+          ],
+          "p_v": 0.6486368342176553,
+          "p_q": 0.6486368342176552
+        },
+        {
+          "history": [
+            "1",
+            "1",
+            "1"
+          ],
+          "p_v": 0.04542021186516607,
+          "p_q": 0.045420211865166114
+        }
+      ]
+    },
+    {
+      "case": "random_d4_06",
+      "dimension": 4,
+      "steps": 6,
+      "passed": true,
+      "max_probability_error": 2.220446049250313e-16,
+      "max_posterior_entry_error": 9.39188966358397e-16,
+      "max_total_mass_error": 2.220446049250313e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0",
+            "0",
+            "0"
+          ],
+          "p_v": 0.13782398223796322,
+          "p_q": 0.13782398223796327
+        },
+        {
+          "history": [
+            "0",
+            "0",
+            "1"
+          ],
+          "p_v": 0.739412736532491,
+          "p_q": 0.7394127365324911
+        },
+        {
+          "history": [
+            "1",
+            "1",
+            "0"
+          ],
+          "p_v": 0.02821766535694728,
+          "p_q": 0.028217665356947308
+        },
+        {
+          "history": [
+            "1",
+            "1",
+            "1"
+          ],
+          "p_v": 0.09454561587259855,
+          "p_q": 0.09454561587259858
+        }
+      ]
+    },
+    {
+      "case": "random_d4_07",
+      "dimension": 4,
+      "steps": 6,
+      "passed": true,
+      "max_probability_error": 3.0531133177191805e-16,
+      "max_posterior_entry_error": 6.707437923744492e-16,
+      "max_total_mass_error": 6.661338147750939e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0",
+            "0",
+            "0"
+          ],
+          "p_v": 0.19818879886924373,
+          "p_q": 0.19818879886924376
+        },
+        {
+          "history": [
+            "0",
+            "0",
+            "1"
+          ],
+          "p_v": 0.5649152616059173,
+          "p_q": 0.5649152616059172
+        },
+        {
+          "history": [
+            "1",
+            "1",
+            "0"
+          ],
+          "p_v": 0.06707765722166577,
+          "p_q": 0.06707765722166587
+        },
+        {
+          "history": [
+            "1",
+            "1",
+            "1"
+          ],
+          "p_v": 0.16981828230317372,
+          "p_q": 0.16981828230317386
+        }
+      ]
+    },
+    {
+      "case": "random_d4_08",
+      "dimension": 4,
+      "steps": 6,
+      "passed": true,
+      "max_probability_error": 1.1102230246251565e-16,
+      "max_posterior_entry_error": 2.6040684312070086e-16,
+      "max_total_mass_error": 6.661338147750939e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0",
+            "0",
+            "0"
+          ],
+          "p_v": 0.5986449542745774,
+          "p_q": 0.5986449542745775
+        },
+        {
+          "history": [
+            "0",
+            "0",
+            "1"
+          ],
+          "p_v": 0.0312156325668963,
+          "p_q": 0.031215632566896252
+        },
+        {
+          "history": [
+            "1",
+            "1",
+            "0"
+          ],
+          "p_v": 0.2216293713644672,
+          "p_q": 0.22162937136446717
+        },
+        {
+          "history": [
+            "1",
+            "1",
+            "1"
+          ],
+          "p_v": 0.14851004179405858,
+          "p_q": 0.14851004179405855
+        }
+      ]
+    },
+    {
+      "case": "random_d4_09",
+      "dimension": 4,
+      "steps": 6,
+      "passed": true,
+      "max_probability_error": 3.3306690738754696e-16,
+      "max_posterior_entry_error": 1.4693409437168218e-15,
+      "max_total_mass_error": 1.1102230246251565e-15,
+      "outcomes": [
+        {
+          "history": [
+            "0",
+            "0",
+            "0"
+          ],
+          "p_v": 0.18753698586851372,
+          "p_q": 0.18753698586851364
+        },
+        {
+          "history": [
+            "0",
+            "0",
+            "1"
+          ],
+          "p_v": 0.014378925755982232,
+          "p_q": 0.01437892575598225
+        },
+        {
+          "history": [
+            "1",
+            "1",
+            "0"
+          ],
+          "p_v": 0.3827890350134491,
+          "p_q": 0.3827890350134491
+        },
+        {
+          "history": [
+            "1",
+            "1",
+            "1"
+          ],
+          "p_v": 0.41529505336205613,
+          "p_q": 0.4152950533620558
+        }
+      ]
+    },
+    {
+      "case": "random_d4_10",
+      "dimension": 4,
+      "steps": 6,
+      "passed": true,
+      "max_probability_error": 2.220446049250313e-16,
+      "max_posterior_entry_error": 2.9855009705609767e-15,
+      "max_total_mass_error": 4.440892098500626e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0",
+            "0",
+            "0"
+          ],
+          "p_v": 0.01159654870339095,
+          "p_q": 0.01159654870339099
+        },
+        {
+          "history": [
+            "0",
+            "0",
+            "1"
+          ],
+          "p_v": 0.5704580131072309,
+          "p_q": 0.5704580131072309
+        },
+        {
+          "history": [
+            "1",
+            "1",
+            "0"
+          ],
+          "p_v": 0.37895717715129507,
+          "p_q": 0.378957177151295
+        },
+        {
+          "history": [
+            "1",
+            "1",
+            "1"
+          ],
+          "p_v": 0.03898826103808296,
+          "p_q": 0.038988261038083005
+        }
+      ]
+    },
+    {
+      "case": "random_d4_11",
+      "dimension": 4,
+      "steps": 6,
+      "passed": true,
+      "max_probability_error": 2.220446049250313e-16,
+      "max_posterior_entry_error": 3.876649771745796e-16,
+      "max_total_mass_error": 4.440892098500626e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0",
+            "0",
+            "0"
+          ],
+          "p_v": 0.6399349065532969,
+          "p_q": 0.6399349065532969
+        },
+        {
+          "history": [
+            "0",
+            "0",
+            "1"
+          ],
+          "p_v": 0.1833818923919861,
+          "p_q": 0.18338189239198607
+        },
+        {
+          "history": [
+            "1",
+            "1",
+            "0"
+          ],
+          "p_v": 0.0011576552034525275,
+          "p_q": 0.0011576552034525643
+        },
+        {
+          "history": [
+            "1",
+            "1",
+            "1"
+          ],
+          "p_v": 0.17552554585126487,
+          "p_q": 0.17552554585126492
+        }
+      ]
+    },
+    {
+      "case": "random_d4_12",
+      "dimension": 4,
+      "steps": 6,
+      "passed": true,
+      "max_probability_error": 2.220446049250313e-16,
+      "max_posterior_entry_error": 6.679023307106314e-16,
+      "max_total_mass_error": 6.661338147750939e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0",
+            "0",
+            "0"
+          ],
+          "p_v": 0.10626867810347569,
+          "p_q": 0.10626867810347566
+        },
+        {
+          "history": [
+            "0",
+            "0",
+            "1"
+          ],
+          "p_v": 0.7787317646519435,
+          "p_q": 0.7787317646519435
+        },
+        {
+          "history": [
+            "1",
+            "1",
+            "0"
+          ],
+          "p_v": 0.0613812830786555,
+          "p_q": 0.06138128307865553
+        },
+        {
+          "history": [
+            "1",
+            "1",
+            "1"
+          ],
+          "p_v": 0.0536182741659259,
+          "p_q": 0.053618274165925905
+        }
+      ]
+    },
+    {
+      "case": "random_d4_13",
+      "dimension": 4,
+      "steps": 6,
+      "passed": true,
+      "max_probability_error": 3.3306690738754696e-16,
+      "max_posterior_entry_error": 1.2496947273198774e-15,
+      "max_total_mass_error": 4.440892098500626e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0",
+            "0",
+            "0"
+          ],
+          "p_v": 0.1605817124037911,
+          "p_q": 0.1605817124037911
+        },
+        {
+          "history": [
+            "0",
+            "0",
+            "1"
+          ],
+          "p_v": 0.019730757023367754,
+          "p_q": 0.019730757023367754
+        },
+        {
+          "history": [
+            "1",
+            "1",
+            "0"
+          ],
+          "p_v": 0.7608307123338742,
+          "p_q": 0.7608307123338739
+        },
+        {
+          "history": [
+            "1",
+            "1",
+            "1"
+          ],
+          "p_v": 0.058856818238967316,
+          "p_q": 0.058856818238967316
+        }
+      ]
+    },
+    {
+      "case": "random_d4_14",
+      "dimension": 4,
+      "steps": 6,
+      "passed": true,
+      "max_probability_error": 2.220446049250313e-16,
+      "max_posterior_entry_error": 1.4542692431613392e-15,
+      "max_total_mass_error": 6.661338147750939e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0",
+            "0",
+            "0"
+          ],
+          "p_v": 0.04755217021505144,
+          "p_q": 0.04755217021505145
+        },
+        {
+          "history": [
+            "0",
+            "0",
+            "1"
+          ],
+          "p_v": 0.01908582953272324,
+          "p_q": 0.019085829532723215
+        },
+        {
+          "history": [
+            "1",
+            "1",
+            "0"
+          ],
+          "p_v": 0.4817184347975843,
+          "p_q": 0.4817184347975841
+        },
+        {
+          "history": [
+            "1",
+            "1",
+            "1"
+          ],
+          "p_v": 0.4516435654546416,
+          "p_q": 0.4516435654546416
+        }
+      ]
+    },
+    {
+      "case": "random_d4_15",
+      "dimension": 4,
+      "steps": 6,
+      "passed": true,
+      "max_probability_error": 2.220446049250313e-16,
+      "max_posterior_entry_error": 5.805352287415008e-16,
+      "max_total_mass_error": 2.220446049250313e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0",
+            "0",
+            "0"
+          ],
+          "p_v": 0.03947164880701559,
+          "p_q": 0.03947164880701561
+        },
+        {
+          "history": [
+            "0",
+            "0",
+            "1"
+          ],
+          "p_v": 0.35884973966392386,
+          "p_q": 0.35884973966392364
+        },
+        {
+          "history": [
+            "1",
+            "1",
+            "0"
+          ],
+          "p_v": 0.359064405804836,
+          "p_q": 0.359064405804836
+        },
+        {
+          "history": [
+            "1",
+            "1",
+            "1"
+          ],
+          "p_v": 0.24261420572422437,
+          "p_q": 0.24261420572422457
+        }
+      ]
+    },
+    {
+      "case": "random_d4_16",
+      "dimension": 4,
+      "steps": 6,
+      "passed": true,
+      "max_probability_error": 1.1102230246251565e-16,
+      "max_posterior_entry_error": 2.1804870518616106e-15,
+      "max_total_mass_error": 1.1102230246251565e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0",
+            "0",
+            "0"
+          ],
+          "p_v": 0.2808460848946594,
+          "p_q": 0.28084608489465934
+        },
+        {
+          "history": [
+            "0",
+            "0",
+            "1"
+          ],
+          "p_v": 0.02238281576957379,
+          "p_q": 0.022382815769573808
+        },
+        {
+          "history": [
+            "1",
+            "1",
+            "0"
+          ],
+          "p_v": 0.057127790915877295,
+          "p_q": 0.057127790915877205
+        },
+        {
+          "history": [
+            "1",
+            "1",
+            "1"
+          ],
+          "p_v": 0.6396433084198896,
+          "p_q": 0.6396433084198896
+        }
+      ]
+    },
+    {
+      "case": "random_d4_17",
+      "dimension": 4,
+      "steps": 6,
+      "passed": true,
+      "max_probability_error": 2.220446049250313e-16,
+      "max_posterior_entry_error": 1.084985800280116e-15,
+      "max_total_mass_error": 6.661338147750939e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0",
+            "0",
+            "0"
+          ],
+          "p_v": 0.020037070611676533,
+          "p_q": 0.020037070611676568
+        },
+        {
+          "history": [
+            "0",
+            "0",
+            "1"
+          ],
+          "p_v": 0.45549252245238936,
+          "p_q": 0.45549252245238914
+        },
+        {
+          "history": [
+            "1",
+            "1",
+            "0"
+          ],
+          "p_v": 0.5173351594868502,
+          "p_q": 0.51733515948685
+        },
+        {
+          "history": [
+            "1",
+            "1",
+            "1"
+          ],
+          "p_v": 0.00713524744908463,
+          "p_q": 0.007135247449084647
+        }
+      ]
+    },
+    {
+      "case": "random_d4_18",
+      "dimension": 4,
+      "steps": 6,
+      "passed": true,
+      "max_probability_error": 1.6653345369377348e-16,
+      "max_posterior_entry_error": 6.693872513849059e-16,
+      "max_total_mass_error": 6.661338147750939e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0",
+            "0",
+            "0"
+          ],
+          "p_v": 0.2398517345840686,
+          "p_q": 0.2398517345840686
+        },
+        {
+          "history": [
+            "0",
+            "0",
+            "1"
+          ],
+          "p_v": 0.01828272770952477,
+          "p_q": 0.018282727709524788
+        },
+        {
+          "history": [
+            "1",
+            "1",
+            "0"
+          ],
+          "p_v": 0.3976534030084131,
+          "p_q": 0.39765340300841295
+        },
+        {
+          "history": [
+            "1",
+            "1",
+            "1"
+          ],
+          "p_v": 0.34421213469799417,
+          "p_q": 0.3442121346979941
+        }
+      ]
+    },
+    {
+      "case": "random_d4_19",
+      "dimension": 4,
+      "steps": 6,
+      "passed": true,
+      "max_probability_error": 8.326672684688674e-17,
+      "max_posterior_entry_error": 3.3288215252844263e-16,
+      "max_total_mass_error": 2.220446049250313e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0",
+            "0",
+            "0"
+          ],
+          "p_v": 0.3962840644901201,
+          "p_q": 0.39628406449012005
+        },
+        {
+          "history": [
+            "0",
+            "0",
+            "1"
+          ],
+          "p_v": 0.17117085270934662,
+          "p_q": 0.17117085270934668
+        },
+        {
+          "history": [
+            "1",
+            "1",
+            "0"
+          ],
+          "p_v": 0.2592472139688568,
+          "p_q": 0.25924721396885675
+        },
+        {
+          "history": [
+            "1",
+            "1",
+            "1"
+          ],
+          "p_v": 0.1732978688316766,
+          "p_q": 0.1732978688316767
+        }
+      ]
+    }
+  ],
+  "negative_controls": [
+    {
+      "case": "interference_08",
+      "dimension": 2,
+      "steps": 4,
+      "passed": false,
+      "max_probability_error": 0.9999999999999997,
+      "max_posterior_entry_error": 0.9999999999999998,
+      "max_total_mass_error": 4.440892098500626e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0"
+          ],
+          "p_v": 0.9999999999999996,
+          "p_q": 0.0
+        },
+        {
+          "history": [
+            "1"
+          ],
+          "p_v": 0.0,
+          "p_q": 0.9999999999999997
+        }
+      ]
+    },
+    {
+      "case": "Bell_joint_sequential",
+      "dimension": 4,
+      "steps": 4,
+      "passed": false,
+      "max_probability_error": 0.24999999999999994,
+      "max_posterior_entry_error": 0.75,
+      "max_total_mass_error": 2.220446049250313e-16,
+      "outcomes": [
+        {
+          "history": [
+            "0",
+            "0"
+          ],
+          "p_v": 0.24999999999999994,
+          "p_q": 0.4999999999999999
+        },
+        {
+          "history": [
+            "0",
+            "1"
+          ],
+          "p_v": 0.24999999999999994,
+          "p_q": 0.0
+        },
+        {
+          "history": [
+            "1",
+            "0"
+          ],
+          "p_v": 0.24999999999999994,
+          "p_q": 0.0
+        },
+        {
+          "history": [
+            "1",
+            "1"
+          ],
+          "p_v": 0.24999999999999994,
+          "p_q": 0.4999999999999999
+        }
+      ]
+    }
+  ]
+}

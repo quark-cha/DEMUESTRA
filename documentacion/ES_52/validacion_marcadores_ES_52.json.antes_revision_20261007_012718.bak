@@ -1,0 +1,87 @@
+{
+  "document": "ES_52_Maquina_V_UNIHOLOG.md",
+  "markers": 35,
+  "counts": {
+    "D": 24,
+    "A": 1,
+    "P": 7,
+    "T": 3
+  },
+  "graph_and_dependencies": "OK",
+  "nodes": [
+    "D_PROTOCOLO",
+    "D_HIPOTESISV",
+    "P_INVERSION",
+    "D_DESCONOCIDO",
+    "D_LECTURA",
+    "D_RELACIONES",
+    "D_TIEMPO",
+    "D_AMPLITUDES",
+    "A_EVOLUCIONQ",
+    "D_CIRCUITOV",
+    "P_NORMAV",
+    "T_AMPLITUDECOND",
+    "P_SOLUCION",
+    "D_GENERADORCONJUNTO",
+    "P_INTERFERENCIA",
+    "D_PROTOCOLOFASE",
+    "D_COMPARADOR",
+    "D_CONDICIONREFERENCIA",
+    "P_LECTURAUNIFORME",
+    "D_ACTUALIZACION",
+    "T_SECUENCIACOND",
+    "D_FRECUENCIAS",
+    "D_DISTRIBUCIONCONJUNTA",
+    "D_CORRELACIONES",
+    "P_CHSHLOCAL",
+    "D_REGISTROREF",
+    "D_CONEXIONREF",
+    "P_CIERRECONJUNTO",
+    "T_COMPOSICIONCOND",
+    "D_SIMETRIA",
+    "D_REGISTROBINARIO",
+    "D_OBJETIVORELACIONAL",
+    "D_EQUIVALENCIA",
+    "D_ALCANCE",
+    "D_ESTADOINVESTIGACION"
+  ],
+  "formula_compilation": "OK",
+  "claims": {
+    "P_INVERSION": [
+      "\\boxed{A\\neq B.}"
+    ],
+    "P_INTERFERENCIA": [
+      "\\boxed{P_{INTERFERENCIA}:\\quad\n|1+e^{i\\phi}|^2=4\\cos^2\\left(\\frac{\\phi}{2}\\right),\n\\qquad\n|1-e^{i\\phi}|^2=4\\sin^2\\left(\\frac{\\phi}{2}\\right).}"
+    ],
+    "P_NORMAV": [
+      "\\frac{d}{dt}(s^\\dagger s)\n=i s^\\dagger G_V^\\dagger s-i s^\\dagger G_Vs=0."
+    ],
+    "P_SOLUCION": [
+      "\\boxed{P_{SOLUCION}:\\quad\\alpha_X(t)=e^{-i\\Omega_X\\tau}\n\\left[(c_X-i\\Delta_X h_X)\\alpha_X(t_i)\n-i\\kappa_X e^{-i\\chi_X}h_X\\beta_X(t_i)\\right],\n\\qquad\n\\beta_X(t)=e^{-i\\Omega_X\\tau}\n\\left[-i\\kappa_X e^{i\\chi_X}h_X\\alpha_X(t_i)\n+(c_X+i\\Delta_X h_X)\\beta_X(t_i)\\right].}"
+    ],
+    "T_AMPLITUDECOND": [
+      "(G_V=G_Q\\land z_V(t_i)=z_Q(t_i))\\implies z_V(t)=z_Q(t)."
+    ],
+    "P_CHSHLOCAL": [
+      "\\boxed{P_{CHSHLOCAL}:\\quad |S_V|\\leq2.}"
+    ],
+    "P_CIERRECONJUNTO": [
+      "\\boxed{P_{CIERRECONJUNTO}:\\quad\nz'_{AB}=\\frac1{\\sqrt2}\\operatorname{col}(1,0,0,1),\\qquad\n\\det\\operatorname{mat}((z'_{00},z'_{01}),(z'_{10},z'_{11}))=\\frac12.}"
+    ],
+    "P_LECTURAUNIFORME": [
+      "P_V(v=0\\mid C_\\phi)\n=P(r(t_0)<w\\mid C_\\phi)\n=\\int_0^w dr=w."
+    ],
+    "T_SECUENCIACOND": [
+      "P_V(a_1,\\ldots,a_m\\mid C)\n=\\prod_{k=1}^m P_V(a_k\\mid a_1,\\ldots,a_{k-1},C)\n=P_Q(a_1,\\ldots,a_m\\mid C)."
+    ],
+    "T_COMPOSICIONCOND": [
+      "\\boxed{T_{COMPOSICIONCOND}:\\quad\n\\mathsf R(U_m)\\cdots\\mathsf R(U_1)F(z)\n=F(U_m\\cdots U_1z).}"
+    ]
+  },
+  "physical_equivalence_certified": false,
+  "formula_count": 223,
+  "all_formula_errors": [],
+  "lean_frontend_coverage": "OK",
+  "lean_emission": "ERROR",
+  "lean_emission_error": "No se pueden emitir formulas sin tipo:\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:12:D_PROTOCOLO:formula-2: MUL requiere operandos numericos; obtuvo Real y Set[Complex].\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:129:D_HIPOTESISV:formula-1: EQ compara tipos incompatibles: Real y Prop.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:129:D_HIPOTESISV:formula-4: OR requiere Prop y Prop; obtuvo Nat y Nat.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:260:D_LECTURA:formula-2: OR requiere Prop y Prop; obtuvo Real y Nat.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:260:D_LECTURA:formula-7: MUL requiere operandos numericos; obtuvo Real y Prop.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:260:D_LECTURA:formula-8: MUL requiere operandos numericos; obtuvo Real y Prop.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:260:D_LECTURA:formula-9: la negacion requiere Prop, se obtuvo Real.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:341:D_RELACIONES:formula-1: nombre simbolico no valido: binary.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:341:D_RELACIONES:formula-2: AND requiere Prop y Prop; obtuvo Prop y Real.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:341:D_RELACIONES:formula-4: la negacion requiere Prop, se obtuvo Real.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:453:D_AMPLITUDES:formula-2: argumento de sqrt: se esperaba Nat, se obtuvo Set[Nat].\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1200:D_FRECUENCIAS:formula-1: DIV requiere operandos numericos; obtuvo Real y Set[Nat].\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1200:D_FRECUENCIAS:formula-4: MUL requiere operandos numericos; obtuvo Real y Prop.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1200:D_FRECUENCIAS:formula-5: MUL requiere operandos numericos; obtuvo Real y Prop.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1905:D_REGISTROBINARIO:formula-1: AND requiere Prop y Prop; obtuvo Prop y Real.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1905:D_REGISTROBINARIO:formula-2: EQ compara tipos incompatibles: Real y Tuple[Real,Real,Real,Real].\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1905:D_REGISTROBINARIO:formula-3: la negacion requiere Prop, se obtuvo Real.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:383:D_TIEMPO:formula-4: AND requiere Prop y Prop; obtuvo Real y Real.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:725:P_INTERFERENCIA:formula-6: argumento de abs: se esperaba Real, se obtuvo Complex.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1261:D_DISTRIBUCIONCONJUNTA:formula-2: AND requiere Prop y Prop; obtuvo Real y Prop.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1261:D_DISTRIBUCIONCONJUNTA:formula-3: AND requiere Prop y Prop; obtuvo Real y Real.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1261:D_DISTRIBUCIONCONJUNTA:formula-5: la variable de sumatoria debe ser un identificador.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:772:D_PROTOCOLOFASE:formula-3: nombre simbolico no valido: power.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:772:D_PROTOCOLOFASE:formula-5: nombre simbolico no valido: power.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1322:D_CORRELACIONES:formula-1: la variable de sumatoria debe ser un identificador.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1448:D_REGISTROREF:formula-1: nombre simbolico no valido: binary.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1448:D_REGISTROREF:formula-2: nombre simbolico no valido: binary.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1448:D_REGISTROREF:formula-4: potencia incompatible: base Real, exponente Sign.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1448:D_REGISTROREF:formula-6: la variable de sumatoria debe ser un identificador.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1448:D_REGISTROREF:formula-7: potencia incompatible: base Real, exponente Sign.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:891:D_COMPARADOR:formula-3: nombre simbolico no valido: power.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1621:D_CONEXIONREF:formula-3: simbolo no declarado: Re.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1621:D_CONEXIONREF:formula-4: EQ compara tipos incompatibles: Set[Complex] y Real.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1947:D_OBJETIVORELACIONAL:formula-1: simbolo no declarado: alpha_j.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:2082:D_ALCANCE:formula-2: MUL requiere operandos numericos; obtuvo Real y Prop.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:2082:D_ALCANCE:formula-3: EQ compara tipos incompatibles: Real y Prop.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1036:D_ACTUALIZACION:formula-3: simbolo no declarado: Re.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1036:D_ACTUALIZACION:formula-4: potencia incompatible: base Real, exponente Sign.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1036:D_ACTUALIZACION:formula-5: potencia incompatible: base Real, exponente Sign.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1140:T_SECUENCIACOND:formula-1: MUL requiere operandos numericos; obtuvo Real y Set[Complex].\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:2129:D_ESTADOINVESTIGACION:formula-1: EQ compara tipos incompatibles: Real y Prop.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:2129:D_ESTADOINVESTIGACION:formula-3: OR requiere Prop y Prop; obtuvo Nat y Nat."
+}

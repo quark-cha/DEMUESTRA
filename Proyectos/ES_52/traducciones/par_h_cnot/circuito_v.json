@@ -1,0 +1,26 @@
+{
+  "unidades": 2,
+  "bits_clasicos": 2,
+  "operaciones": [
+    [
+      "h",
+      0
+    ],
+    [
+      "cnot",
+      0,
+      1
+    ]
+  ],
+  "medidas": [
+    [
+      0,
+      0
+    ],
+    [
+      1,
+      1
+    ]
+  ],
+  "sha256_qasm": "2fb143875ed170f0535a9227c3f6bece9ac82278de05a5a9513aec75dc9ada33"
+}

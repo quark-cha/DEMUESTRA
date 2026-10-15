@@ -6,7 +6,6 @@
 :- dynamic md_node/3.
 :- dynamic md_rule/3.
 :- dynamic md_formula_line/3.
-:- dynamic md_qed/2.
 :- dynamic md_inferred_dependency/3.
 
 :- initialization(main, main).
@@ -24,7 +23,6 @@ run([File], Code) :- !,
     retractall(md_node(_, _, _)),
     retractall(md_rule(_, _, _)),
     retractall(md_formula_line(_, _, _)),
-    retractall(md_qed(_, _)),
     retractall(md_inferred_dependency(_, _, _)),
     read_file_to_string(Absolute, Text, []),
     split_string(Text, "\n", "\r", Lines),
@@ -48,7 +46,6 @@ parse_lines([Line|Rest], Number, Current0, InMath0) :-
     update_current(Normalized, Number, Current0, Current1),
     record_dependencies(Normalized, Number, Current1),
     record_proof_references(Normalized, Number, Current1),
-    record_qed(Normalized, Number, Current1),
     record_formula(Line, Number, Current1, InMath0, InMath1),
     Next is Number + 1,
     parse_lines(Rest, Next, Current1, InMath1).
@@ -80,7 +77,6 @@ record_dependencies(_, _, _).
 
 record_proof_references(Line, Number, Current) :-
     Current \== none,
-    \+ md_qed(Current, _),
     proof_reference_line(Line),
     line_nodes(Line, Mentioned0),
     include(declared_before(Number, Current), Mentioned0, Mentioned),
@@ -120,12 +116,6 @@ part_node(Part, Node) :-
     re_matchsub("(?<node>[ADPT]_[A-Za-z0-9_]+)", Part, Match, []), !,
     normalize_node(Match.node, Node).
 part_node(_, none).
-
-record_qed(Line, Number, Current) :-
-    Current \== none,
-    sub_string(Line, _, _, _, "Q.E.D."), !,
-    assertz(md_qed(Current, Number)).
-record_qed(_, _, _).
 
 record_formula(Line, Number, Current, InMath0, InMath1) :-
     normalize_space(string(Trimmed), Line),
@@ -198,13 +188,11 @@ target_conclusion_present(Node) :-
 evaluate_goal(Goal, 0) :-
     md_node(Goal, _, DeclarationLine),
     md_rule(Goal, _, RuleLine),
-    md_qed(Goal, QedLine),
     target_conclusion_present(Goal),
     prove(Goal, Proof, []), !,
     format('OBJETIVO: ~w~n', [Goal]),
     format('DECLARACION_MD_LINEA: ~d~n', [DeclarationLine]),
     format('REGLA_MD_LINEA: ~d~n', [RuleLine]),
-    format('QED_MD_LINEA: ~d~n', [QedLine]),
     writeln('CONCLUSION_OBJETIVO: BLOQUE_FORMAL_DECLARADO'),
     writeln('RESULTADO PROLOG MD: TEOREMA_DERIVADO_DESDE_PREMISAS_DECLARADAS'),
     writeln('ALCANCE: prueba deductiva interna del sistema declarado por el Markdown; no sustituye la verificacion semantica de cada premisa.'),
@@ -218,10 +206,6 @@ evaluate_goal(Goal, 2) :-
     ),
     ( md_rule(Goal, _, RuleLine)
     -> format('REGLA_MD_LINEA: ~d~n', [RuleLine])
-    ;  true
-    ),
-    ( md_qed(Goal, QedLine)
-    -> format('QED_MD_LINEA: ~d~n', [QedLine])
     ;  true
     ),
     ( target_conclusion_present(Goal)
@@ -252,7 +236,15 @@ emit_inventory(Absolute) :-
         md_inferred_dependency(Node, Dependency, Line),
         format('DEPENDENCIA_PRUEBA|~w|~w|~d~n', [Node, Dependency, Line])
     ),
-    emit_adec_nodes.
+    emit_adec_nodes,
+    forall(md_node(Node, _, _), emit_node_result(Node)).
+
+emit_node_result(Node) :-
+    ( premise(Node, _) -> State = premisa_declarada
+    ; prove(Node, _, []) -> State = certificado_estructural
+    ; State = pendiente
+    ),
+    format('COBERTURA_MD|~w|~w~n', [Node, State]).
 
 emit_adec_nodes :-
     forall(
@@ -292,7 +284,6 @@ emit_proof(derivation(Node, Line, Proofs), Indent) :-
 emit_missing_conditions(Goal) :-
     ( md_node(Goal, _, _) -> true ; writeln('FALTA: declaracion del objetivo') ),
     ( md_rule(Goal, _, _) -> true ; writeln('FALTA: regla Deps del objetivo') ),
-    ( md_qed(Goal, _) -> true ; writeln('FALTA: Q.E.D. asociado al objetivo') ),
     ( target_conclusion_present(Goal) -> true ; writeln('FALTA: conclusion formal esperada en el bloque matematico') ),
     ( prove(Goal, _, [])
     -> true

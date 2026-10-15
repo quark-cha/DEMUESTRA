@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Propuesta numerica de lectura conjunta por caminos</title>
+<style>
+body {
+    font-family: Georgia, serif;
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 20px;
+    line-height: 1.6;
+    background: #fcfcfc;
+    color: #222;
+}
+h1, h2, h3, h4 {
+    color: #1a1a1a;
+}
+table {
+    border-collapse: collapse;
+    width:100%;
+    margin:20px 0;
+}
+th, td {
+    border:1px solid #ccc;
+    padding:8px 12px;
+}
+th {
+    background:#f0f0f0;
+}
+blockquote {
+    border-left:4px solid #0077cc;
+    padding-left:16px;
+}
+code {
+    background:#eee;
+    padding:2px 6px;
+}
+pre {
+    background:#f4f4f4;
+    padding:12px;
+    overflow-x:auto;
+}
+img {
+    max-width:100%;
+    height:auto;
+}
+math {
+    font-size:1.1em;
+}
+</style>
+</head>
+<body>
+<h1>Propuesta numerica de lectura conjunta por caminos</h1>
+<p><strong>Estado actualizado: ensayo no aplicable a la maquina V del autor.</strong>
+El autor exige que la medida solo se desencadene en <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>t</mi><mo>=</mo><msub><mi>t</mi><mn>0</mn></msub></mrow></math>, sin recorrer
+caminos o salidas para calcular el resultado. Esta propuesta no cumple
+ese requisito y se retira como candidata a ejecucion de V. El desarrollo
+y sus datos se conservan como historial numerico, no como resultados de V.
+No se refuta la propuesta del autor.</p>
+<p>Fecha: 10 de octubre de 2026.</p>
+<p>Esta es una propuesta de desarrollo autorizada para estudiar la lectura
+que faltaba. No modifica las premisas del autor ni el MD principal.
+Es un modelo numerico clasico, no una maquina cuantica fisicamente
+construida. Su activacion es explicita; V1, V2 y V3 no lo adoptan por defecto.</p>
+<h2>Regla candidata</h2>
+<p>Sea <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>x</mi><mn>0</mn></msub></mrow></math> la preparacion binaria declarada, y sean <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>U</mi><mn>1</mn></msub><mo>,</mo><mi>…</mi><mo>,</mo><msub><mi>U</mi><mi>m</mi></msub></mrow></math>
+los bloques en el orden del circuito. Para una palabra final <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>y</mi></mrow></math>, definimos:</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>A</mi><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo><mo>=</mo><munder><mo>∑</mo><mrow><msub><mi>x</mi><mn>1</mn></msub><mo>,</mo><mi>…</mi><mo>,</mo><msub><mi>x</mi><mrow><mi>m</mi><mo>−</mo><mn>1</mn></mrow></msub></mrow></munder><munderover><mo>∏</mo><mrow><mi>j</mi><mo>=</mo><mn>1</mn></mrow><mrow><mi>m</mi></mrow></munderover><mi>⟨</mi><msub><mi>x</mi><mi>j</mi></msub><mo stretchy="false">|</mo><msub><mi>U</mi><mi>j</mi></msub><mo stretchy="false">|</mo><msub><mi>x</mi><mrow><mi>j</mi><mo>−</mo><mn>1</mn></mrow></msub><mi>⟩</mi><mo>,</mo><mspace width="2em" /><msub><mi>x</mi><mi>m</mi></msub><mo>=</mo><mi>y</mi><mo>.</mo></mrow></math></p>
+<p>La suma se evalua recorriendo caminos uno a uno, no almacenando el
+vector conjunto. Los bloques de fase aportan factores complejos; no se
+eliminan ni se sustituyen por cambios sobre bits medidos previamente.
+NOT, CNOT, SWAP, Toffoli y la multiplicacion modular aportan conexiones
+reversibles. H y Rx pueden abrir dos caminos en cada paso local.</p>
+<p>Las matrices locales de tamaño fijo proceden de las puertas de Qiskit.
+El evaluador no utiliza <code>Statevector</code>, un operador matricial conjunto,
+una lista de amplitudes finales ni una tabla completa de probabilidades.</p>
+<p>Al medir, se calcula una probabilidad de salida cada vez:</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>p</mi><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">|</mo><mi>A</mi><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo><msup><mo stretchy="false">|</mo><mn>2</mn></msup><mo>.</mo></mrow></math></p>
+<p>Una primera pasada comprueba la masa total:</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>M</mi><mo>=</mo><munder><mo>∑</mo><mi>y</mi></munder><mi>p</mi><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo><mo>.</mo></mrow></math></p>
+<p>En aritmetica exacta, la composicion unitaria implica <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>M</mi><mo>=</mo><mn>1</mn></mrow></math>.
+El programa trabaja con precision finita y exige una masa numericamente
+proxima a uno. Si no supera la comprobacion, no entrega una salida.</p>
+<p>En una segunda pasada se acumula la masa hasta localizar una unica palabra:</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><munder><mo>∑</mo><mrow><mi>z</mi><mo>&lt;</mo><mi>y</mi></mrow></munder><mi>p</mi><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo><mo>≤</mo><mi>r</mi><mi>M</mi><mo>&lt;</mo><munder><mo>∑</mo><mrow><mi>z</mi><mo>≤</mo><mi>y</mi></mrow></munder><mi>p</mi><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo><mo>,</mo><mspace width="2em" /><mn>0</mn><mo>≤</mo><mi>r</mi><mo>&lt;</mo><mn>1</mn><mo>.</mo></mrow></math></p>
+<p>La palabra <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>y</mi></mrow></math> se convierte en bits con la unidad cero primero. Es una
+seleccion conjunta: no son comparadores independientes por unidad.</p>
+<h2>Que se esta suponiendo</h2>
+<p>Esta propuesta introduce explicitamente pesos complejos de camino y una
+lectura mediante modulo cuadrado. Esas reglas no se deducen solamente de
+que un resultado sea desconocido antes de medir. La coincidencia con Q
+comprueba esta construccion matematica; no demuestra que cualquier
+electronica que oculte sus bits realice esas transformaciones.</p>
+<p>Con una referencia continua uniforme, la regla de intervalos produce la
+distribucion normalizada <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>p</mi><mo stretchy="false">(</mo><mi>y</mi><mo stretchy="false">)</mo><mo>/</mo><mi>M</mi></mrow></math>. La implementacion por defecto obtiene
+una referencia discreta de 53 bits al medir, mediante <code>secrets</code>. Su precision
+es finita; no se identifica con una fuente fisica cuantica ni con una
+distribucion continua exactamente uniforme.</p>
+<p>Los ensayos reproducibles declaran una referencia fija <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>r</mi><mo>=</mo><mn>0.37</mn></mrow></math>.
+Ese valor es conocido por el comprobador: no acredita desconocimiento
+fisico de la preparacion ni representa repeticiones aleatorias de hardware.
+H, las fases y Fourier siguen siendo operaciones deterministas del circuito;
+la referencia pertenece exclusivamente a la seleccion final.</p>
+<h2>Tiempo, memoria e instante de medida</h2>
+<p>Durante la preparacion solo se guardan conexiones, coeficientes de puertas
+y condiciones declaradas. No se calcula ni se registra una salida.
+La evaluacion de caminos y la seleccion empiezan en la llamada de medida
+con coordenada <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>t</mi><mo>=</mo><msub><mi>t</mi><mn>0</mn></msub></mrow></math>. La interfaz muestra <code>@</code> antes de esa llamada.</p>
+<p>Esto no significa que el calculo numerico sea instantaneo en un reloj
+fisico. El tiempo empleado se registra por separado. La propuesta no
+resuelve la realizacion fisica de la evolucion previa ni la calibracion
+de un detector que responda en un instante real especificado.</p>
+<p>La pila conserva como maximo un numero de marcos proporcional al numero
+de puertas. Cada marco contiene un indice de palabra, un indice de puerta
+y un coeficiente complejo. La memoria es polinomial en la descripcion,
+pero existen variables numericas intermedias durante el calculo de medida.
+No se afirma que el programa carezca de estado interno.</p>
+<p>Se recorren posibles palabras finales sin guardarlas juntas: hasta <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msup><mn>2</mn><mi>n</mi></msup></mrow></math>
+palabras para <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>n</mi></mrow></math> unidades. Ademas, el numero de caminos puede crecer
+exponencialmente con las puertas que mezclan caminos. Eliminar la tabla
+exponencial no elimina el posible tiempo exponencial.</p>
+<p>Un limite de visitas protege la ejecucion. Si se alcanza, se registra
+<code>LIMITE_PROPUESTA</code>, sin inventar un bit ni volver a medir esa preparacion.</p>
+<h2>Implementacion y contrastes</h2>
+<ul>
+<li><code>comparacion/propuesta_lectura.py</code>: evaluacion por caminos y lectura unica.</li>
+<li><code>comparacion/verificar_propuesta.py</code>: contraste optativo y registro de resultados.</li>
+<li><code>comparacion/tests/test_propuesta_lectura.py</code>: interferencia, correlaciones,
+rotaciones, fases, Fourier, conexiones modulares, limite de trabajo y lectura.</li>
+</ul>
+<p>Pasan 49 pruebas del conjunto actual. Los nuevos contrastes incluyen
+amplitudes complejas, no solo frecuencias: H-fase-H para distintos angulos,
+Toffoli en superposicion, Fourier inversa para todas las entradas de tres
+unidades y varios circuitos V3. Tambien se contrasta la distribucion completa
+de control de la instancia pequeña <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>N</mi><mo>=</mo><mn>3</mn></mrow></math> de V2.</p>
+<p>El informe <code>VERIFICACION_PROPUESTA_LECTURA_20261010.json</code> registra ademas
+una lectura de la instancia <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>N</mi><mo>=</mo><mn>15</mn></mrow></math>. El resultado se conserva aunque no
+permita extraer factores; no se seleccionan solo ejecuciones favorables.
+Un unico ensayo favorable no determina una tasa de exito.</p>
+<h2>Alcance</h2>
+<p>La tecnica se encuadra en la simulacion clasica mediante sumas de caminos.
+Como antecedentes, <a href="https://arxiv.org/abs/1612.05903">Aaronson y Chen</a>
+estudian simulacion de circuitos generales con espacio polinomial y coste
+temporal elevado; <a href="https://quantum-journal.org/papers/q-2025-12-02-1926/">Amy y Stinchcombe</a>
+estudian simplificaciones de sumas simbolicas para una familia especifica.
+No se afirma que este programa implemente sus algoritmos ni sus mejoras.</p>
+<p>La regla permite ejecutar un modelo de lectura para los tres protocolos
+y comprobar su consistencia numerica. No demuestra construccion fisica de V,
+equivalencia universal de una arquitectura electronica ni igualdad de orden
+temporal con hardware Q. No sustituye silenciosamente la maquina propuesta
+por el autor. No se publica ni se certifica.</p>
+
+</body>
+</html>

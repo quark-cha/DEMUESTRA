@@ -1,0 +1,29 @@
+{
+  "project": "ES_46_RV6",
+  "source_sha256": "90cf88725aede8ecb78ee7ee7c5acc0f8e0ddc3c83ef5a69f2619fe37d9c71dd",
+  "diagnostic_scope": "TRANSLATOR_ONLY",
+  "document_verdict": "NO_EMITIDO",
+  "kernel_executed": false,
+  "generated_on": "2026-10-08T11:09:15+00:00",
+  "semantic_diagnostics": [
+    {
+      "location": "ES_46_RV6.md:912:D_Rim:formula-4",
+      "source": "\\boxed{\nZ_{\\rm Rim}^{\\rm triv}\n=\n\\{-2,-4,-6,\\ldots\\}\n=\n\\{-2m:m\\in\\mathbb N^+\\}.\n}",
+      "detail": "Error semantico en ES_46_RV6.md:912:D_Rim:formula-4: EQ compara tipos incompatibles: Set[Int] y Set[Real]."
+    },
+    {
+      "location": "ES_46_RV6.md:1454:P_Z:formula-15",
+      "source": "\\zeta",
+      "detail": "Error semantico en ES_46_RV6.md:1454:P_Z:formula-15: simbolo no declarado: zeta."
+    },
+    {
+      "location": "ES_46_RV6.md:1472:T_RIEMANN:formula-117",
+      "source": "\\zeta",
+      "detail": "Error semantico en ES_46_RV6.md:1472:T_RIEMANN:formula-117: simbolo no declarado: zeta."
+    }
+  ],
+  "emission_blockers": [],
+  "formula_count": 349,
+  "status": "EMISION_GENERADA_SIN_VERIFICACION_KERNEL",
+  "executable_sha256": "f8d3f0ba30758b09d7bd6af73264190f64d10138bf9ef86a0834d37822c91602"
+}

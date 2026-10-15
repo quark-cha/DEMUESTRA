@@ -1,5 +1,7 @@
 operacion,duracion_segundos,codigo_salida,finalizado_en
-lake env lean Proyectos\ES_46_RV6\ES_46_RV6.lean,53.750,0,2026-09-28T23:54:57+02:00
+lake env lean Proyectos\ES_46_RV6\ES_46_RV6.lean,1158.891,0,2026-10-11T02:58:01+02:00
 lake env lean Proyectos\ES_46_RV6\audit_prefix_708.lean,496.500,0,2026-09-25T15:53:58+02:00
 lake env lean Proyectos\ES_46_RV6\ES_46_RV6_candidate.lean,26.906,0,2026-09-25T15:54:58+02:00
-lake --version,1.141,0,2026-09-28T23:54:03+02:00
+lake --version,4.625,0,2026-10-11T02:38:42+02:00
+lake env lean Proyectos\ES_46_RV6\historial\5020154\ES_46_RV6.lean,89.640,0,2026-10-11T02:59:31+02:00
+lake env lean tests/familias_generadas.lean,66.710,0,2026-10-08T13:22:52+02:00

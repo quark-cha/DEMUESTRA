@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DEMUESTRA</title>
+<style>
+body {
+    font-family: Georgia, serif;
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 20px;
+    line-height: 1.6;
+    background: #fcfcfc;
+    color: #222;
+}
+h1, h2, h3, h4 {
+    color: #1a1a1a;
+}
+table {
+    border-collapse: collapse;
+    width:100%;
+    margin:20px 0;
+}
+th, td {
+    border:1px solid #ccc;
+    padding:8px 12px;
+}
+th {
+    background:#f0f0f0;
+}
+blockquote {
+    border-left:4px solid #0077cc;
+    padding-left:16px;
+}
+code {
+    background:#eee;
+    padding:2px 6px;
+}
+pre {
+    background:#f4f4f4;
+    padding:12px;
+    overflow-x:auto;
+}
+img {
+    max-width:100%;
+    height:auto;
+}
+math {
+    font-size:1.1em;
+}
+</style>
+</head>
+<body>
+<h1>DEMUESTRA</h1>
+<p>Repositorio previsto:</p>
+<pre><code class="language-text">quark-cha/DEMUESTRA
+</code></pre>
+<p><code>DEMUESTRA</code> es el entorno de verificacion formal de UNIHOLOG / Einstein-VED. Sigue el patron de organizacion de <code>PUBLICAR/PckPublica</code>: la raiz contiene los proyectos y el paquete interno contiene el codigo operativo.</p>
+<p>Debe vivir al mismo nivel que los demas proyectos principales:</p>
+<pre><code class="language-text">PUBLICAR/
+UNIHOLOG/
+Einstein-VED/
+DEMUESTRA/
+</code></pre>
+<h2>Organizacion</h2>
+<pre><code class="language-text">DEMUESTRA/
+  PckDemuestra/
+    Basic.lean
+    __init__.py
+    cli.py
+    config.py
+    demuestra.py
+    lean.py
+    logging.py
+    proyecto.py
+    scripts/
+      VALIDAR.ps1
+      NUEVO_PROYECTO.ps1
+      FINALIZAR_EVALUACION.ps1
+    docs/
+      INSTALAR_VSCODE_LEAN.md
+  PckDemuestra.lean
+  Proyectos.lean
+  lakefile.toml
+  lean-toolchain
+  README.md
+  Proyectos/
+    ES_46_RV5/
+      demuestra.py
+      README.md
+      MANIFEST.json
+      docs/
+      json/
+      lean/
+      evaluaciones/
+      logs/
+  YaEvaluado/
+</code></pre>
+<h2>Tres zonas</h2>
+<p><code>PckDemuestra/</code> contiene el codigo real del sistema: modulos Python, scripts, documentacion tecnica, configuracion auxiliar y modulos Lean comunes.</p>
+<p><code>Proyectos/</code> contiene los proyectos pendientes o en evaluacion. Cada carpeta dentro de <code>Proyectos/</code> se trata como un proyecto separado y se evalua usando todo lo contenido en su directorio.</p>
+<p><code>YaEvaluado/</code> contiene los proyectos cuyo <code>.md</code>, <code>.json</code>, <code>.lean</code>, evaluaciones y logs ya fueron procesados y quedan archivados.</p>
+<h2>Como montar un proyecto</h2>
+<p>Un proyecto debe colgar de:</p>
+<pre><code class="language-text">Proyectos/NOMBRE_DEL_PROYECTO/
+</code></pre>
+<p>Estructura recomendada:</p>
+<pre><code class="language-text">NOMBRE_DEL_PROYECTO/
+  README.md
+  MANIFEST.json
+  docs/
+    teoria.md
+  json/
+    grafo_adec.json
+  lean/
+    demostracion.lean
+  evaluaciones/
+    evaluacion_adec.md
+    evaluacion_lean.md
+  logs/
+    compilacion.log
+</code></pre>
+<p>Para crear una carpeta base:</p>
+<pre><code class="language-powershell">.\PckDemuestra\scripts\NUEVO_PROYECTO.ps1 -Nombre ES_47_RV1
+</code></pre>
+<p>Cada proyecto incluye su propio punto de entrada, igual que <code>publica.py</code> en tus proyectos de publicacion:</p>
+<pre><code class="language-powershell">cd .\Proyectos\ES_46_RV5
+python demuestra.py
+</code></pre>
+<p>Ese archivo tiene una configuracion local por proyecto:</p>
+<pre><code class="language-python">TEST = 1 + 2
+INCLUIR_YA_EVALUADO = False
+FINALIZAR_AL_TERMINAR = False
+PREPARAR_CACHE_MATHLIB = False
+</code></pre>
+<p>Los flags iniciales son:</p>
+<pre><code class="language-text">1 = inspeccionar proyecto y listar archivos Lean
+2 = validar este proyecto con Lean 4
+4 = validar todos los proyectos pendientes
+8 = mover a YaEvaluado, solo si FINALIZAR_AL_TERMINAR=True
+16 = preparar/descargar cache de Mathlib
+</code></pre>
+<h2>Como arrancar la demostracion</h2>
+<p>Desde la raiz <code>DEMUESTRA/</code>:</p>
+<pre><code class="language-powershell">lake exe cache get
+.\PckDemuestra\scripts\VALIDAR.ps1
+</code></pre>
+<p>Tambien se puede invocar el motor Python directamente:</p>
+<pre><code class="language-powershell">python -m PckDemuestra.cli validar
+python -m PckDemuestra.cli validar --proyecto ES_46_RV5
+python -m PckDemuestra.cli nuevo ES_47_RV1
+python -m PckDemuestra.cli finalizar ES_46_RV5
+</code></pre>
+<p>Para evaluar un proyecto concreto:</p>
+<pre><code class="language-powershell">.\PckDemuestra\scripts\VALIDAR.ps1 -Proyecto ES_46_RV5
+</code></pre>
+<p>Para incluir tambien los proyectos archivados:</p>
+<pre><code class="language-powershell">.\PckDemuestra\scripts\VALIDAR.ps1 -IncluirYaEvaluado
+</code></pre>
+<p>Cuando un proyecto ya esta evaluado:</p>
+<pre><code class="language-powershell">.\PckDemuestra\scripts\FINALIZAR_EVALUACION.ps1 -Nombre ES_46_RV5
+</code></pre>
+<h2>Que verifica Lean 4</h2>
+<p>Lean 4 verifica que las formulas formalizadas y sus derivaciones son consistentes dentro del sistema logico del proyecto y bajo las hipotesis declaradas.</p>
+<p>Eso supone una verificacion parcial de la demostracion:</p>
+<pre><code class="language-text">si el archivo Lean compila sin errores,
+entonces las inferencias formalizadas han sido aceptadas por Lean.
+</code></pre>
+<p>No significa automaticamente que toda la teoria original este demostrada. Quedan fuera partes del <code>.md</code> no formalizadas, hipotesis declaradas como parametros, puentes semanticos pendientes e interpretaciones externas al codigo Lean.</p>
+<h2>Verificacion mas rigurosa</h2>
+<p>Una demostracion mas rigurosa debe combinar:</p>
+<pre><code class="language-text">1. Documento .md:
+   exposicion matematica completa.
+
+2. JSON / ADEC:
+   validacion estructural, semantica y de dependencias.
+
+3. Lean 4:
+   verificacion formal de formulas y derivaciones mecanizadas.
+
+4. Revision externa AC/ADEC:
+   contraste independiente de los puentes que Lean aun no formaliza.
+</code></pre>
+<p>La combinacion de verificacion desde este proyecto mas una evaluacion externa AC/ADEC es mas fuerte que cualquiera de las capas por separado.</p>
+<h2>Criterio de auditoria</h2>
+<p>Este repositorio no debe convertir hipotesis matematicas pendientes en axiomas para forzar una conclusion.</p>
+<p>En <code>ES_46_RV5</code>, la reduccion final queda formalizada bajo:</p>
+<pre><code class="language-lean">StabilityPreserved IsZeroRim
+</code></pre>
+<p>Esa hipotesis corresponde a <code>P_CONS_E</code>. Debe permanecer como objetivo matematico pendiente hasta que se demuestre desde definiciones o lemas previos.</p>
+
+</body>
+</html>

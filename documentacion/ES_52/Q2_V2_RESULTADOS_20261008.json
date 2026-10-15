@@ -1,0 +1,336 @@
+{
+  "scope": "finite real-channel V2_ref versus Q2 Shor local model",
+  "utc": "2026-10-08T01:59:26.524435+00:00",
+  "tolerance": 1e-10,
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.13.7",
+  "versions": {
+    "numpy": "2.5.3",
+    "qiskit": "2.5.2",
+    "sympy": "1.14.0"
+  },
+  "code_sha256": "4be06bd4c5a72d4a729d985784bb6a27c8037b95607a8bceaf2eaa7ffaee5ca7",
+  "source_sha256": "e73eed1c509b5e04b09e2e6d9f8db4bd4dc85875c9094101b853648a639a9e15",
+  "timing_scope": "local model construction and execution; no quantum hardware timing",
+  "classical_timing": "factorint cache cleared for every repetition; imports excluded",
+  "not_claimed": [
+    "quantum speedup",
+    "RSA-2048 factoring",
+    "physical realization",
+    "universal equivalence",
+    "unknown phase certified"
+  ],
+  "results": [
+    {
+      "N": "15",
+      "base": 2,
+      "resources": {
+        "input_bits": 4,
+        "work_bits": 4,
+        "control_bits": 8,
+        "register_bits": 12,
+        "v2_state_bytes_formula": "16 * 2**12",
+        "v2_fourier_kernel_bytes_formula": "16 * 2**16",
+        "supported": true
+      },
+      "q2_local_model_time": {
+        "median_seconds": 0.016277999995509163,
+        "runs_seconds": [
+          0.01847710000583902,
+          0.016214100003708154,
+          0.016277999995509163
+        ]
+      },
+      "v2_local_model_time": {
+        "median_seconds": 0.010326399991754442,
+        "runs_seconds": [
+          0.012584999989485368,
+          0.00962299999082461,
+          0.010326399991754442
+        ]
+      },
+      "classical_factorint_time": {
+        "median_seconds": 3.0199997127056122e-05,
+        "runs_seconds": [
+          6.839999696239829e-05,
+          3.0199997127056122e-05,
+          1.71000137925148e-05
+        ]
+      },
+      "classical_factors": {
+        "3": 1,
+        "5": 1
+      },
+      "v2_timing_scope": "fresh executions and classical postprocessing until success or four attempts",
+      "q2_timing_scope": "one local order-finding distribution; not full factoring runtime",
+      "v2_attempts": [
+        {
+          "phase_ticks": 190000,
+          "t0_ticks": 0,
+          "value": 0,
+          "outcome": null
+        },
+        {
+          "phase_ticks": 370000,
+          "t0_ticks": 0,
+          "value": 64,
+          "outcome": {
+            "factors": [
+              3,
+              5
+            ],
+            "verified_order_multiple": 4
+          }
+        }
+      ],
+      "v2_capture": {
+        "phase_ticks": 370000,
+        "t0_ticks": 0,
+        "value": 64,
+        "postprocessing_seconds": 1.2600008631125093e-05,
+        "outcome": {
+          "factors": [
+            3,
+            5
+          ],
+          "verified_order_multiple": 4
+        }
+      },
+      "max_probability_error": 6.106226635438361e-16,
+      "total_variation_distance": 1.2212453270880471e-15,
+      "q2_postprocessing_success_probability": 0.7499999999999982,
+      "v2_postprocessing_success_probability": 0.75,
+      "readout_peaks": [
+        {
+          "value": 0,
+          "p_q": 0.2499999999999994,
+          "p_v": 0.25
+        },
+        {
+          "value": 64,
+          "p_q": 0.2499999999999994,
+          "p_v": 0.25
+        },
+        {
+          "value": 128,
+          "p_q": 0.2499999999999994,
+          "p_v": 0.25
+        },
+        {
+          "value": 192,
+          "p_q": 0.2499999999999994,
+          "p_v": 0.25
+        },
+        {
+          "value": 16,
+          "p_q": 1.0204935153900033e-34,
+          "p_v": 3.0400506985758993e-33
+        },
+        {
+          "value": 48,
+          "p_q": 1.0204935153900033e-34,
+          "p_v": 4.350829915947185e-31
+        },
+        {
+          "value": 80,
+          "p_q": 1.0204935153900033e-34,
+          "p_v": 1.9283953355028597e-31
+        },
+        {
+          "value": 112,
+          "p_q": 1.0204935153900033e-34,
+          "p_v": 9.23643201480696e-31
+        },
+        {
+          "value": 144,
+          "p_q": 1.0204935153900033e-34,
+          "p_v": 1.673490443265287e-30
+        },
+        {
+          "value": 176,
+          "p_q": 1.0204935153900033e-34,
+          "p_v": 3.7475852886026836e-30
+        },
+        {
+          "value": 208,
+          "p_q": 1.0204935153900033e-34,
+          "p_v": 1.6490514699192513e-30
+        },
+        {
+          "value": 240,
+          "p_q": 1.0204935153900033e-34,
+          "p_v": 1.6963476897209413e-30
+        }
+      ],
+      "passed": true
+    },
+    {
+      "N": "21",
+      "base": 2,
+      "resources": {
+        "input_bits": 5,
+        "work_bits": 5,
+        "control_bits": 10,
+        "register_bits": 15,
+        "v2_state_bytes_formula": "16 * 2**15",
+        "v2_fourier_kernel_bytes_formula": "16 * 2**20",
+        "supported": true
+      },
+      "q2_local_model_time": {
+        "median_seconds": 0.08235109999077395,
+        "runs_seconds": [
+          0.42264330000034533,
+          0.08235109999077395,
+          0.06918029999360442
+        ]
+      },
+      "v2_local_model_time": {
+        "median_seconds": 0.07186000002548099,
+        "runs_seconds": [
+          0.07186000002548099,
+          0.07240790000651032,
+          0.06901849998394027
+        ]
+      },
+      "classical_factorint_time": {
+        "median_seconds": 1.8200022168457508e-05,
+        "runs_seconds": [
+          6.650001159869134e-05,
+          1.8200022168457508e-05,
+          1.2199976481497288e-05
+        ]
+      },
+      "classical_factors": {
+        "3": 1,
+        "7": 1
+      },
+      "v2_timing_scope": "fresh executions and classical postprocessing until success or four attempts",
+      "q2_timing_scope": "one local order-finding distribution; not full factoring runtime",
+      "v2_attempts": [
+        {
+          "phase_ticks": 190000,
+          "t0_ticks": 0,
+          "value": 170,
+          "outcome": {
+            "factors": [
+              3,
+              7
+            ],
+            "verified_order_multiple": 6
+          }
+        }
+      ],
+      "v2_capture": {
+        "phase_ticks": 190000,
+        "t0_ticks": 0,
+        "value": 170,
+        "postprocessing_seconds": 1.3299984857439995e-05,
+        "outcome": {
+          "factors": [
+            3,
+            7
+          ],
+          "verified_order_multiple": 6
+        }
+      },
+      "max_probability_error": 8.451572774959004e-15,
+      "total_variation_distance": 2.4522236980140067e-14,
+      "q2_postprocessing_success_probability": 0.8164850914712977,
+      "v2_postprocessing_success_probability": 0.8164850914712974,
+      "readout_peaks": [
+        {
+          "value": 0,
+          "p_q": 0.16666793823242126,
+          "p_v": 0.16666793823242188
+        },
+        {
+          "value": 512,
+          "p_q": 0.16666793823242126,
+          "p_v": 0.16666793823242188
+        },
+        {
+          "value": 171,
+          "p_q": 0.1139871278332314,
+          "p_v": 0.1139871278332335
+        },
+        {
+          "value": 683,
+          "p_q": 0.1139871278332314,
+          "p_v": 0.11398712783323912
+        },
+        {
+          "value": 341,
+          "p_q": 0.11398712783323134,
+          "p_v": 0.1139871278332268
+        },
+        {
+          "value": 853,
+          "p_q": 0.11398712783323134,
+          "p_v": 0.11398712783322289
+        },
+        {
+          "value": 170,
+          "p_q": 0.028497374646634016,
+          "p_v": 0.028497374646632836
+        },
+        {
+          "value": 682,
+          "p_q": 0.028497374646634016,
+          "p_v": 0.028497374646627698
+        },
+        {
+          "value": 342,
+          "p_q": 0.028497374646634013,
+          "p_v": 0.028497374646636618
+        },
+        {
+          "value": 854,
+          "p_q": 0.028497374646634013,
+          "p_v": 0.028497374646640403
+        },
+        {
+          "value": 172,
+          "p_q": 0.00712494654765732,
+          "p_v": 0.0071249465476572295
+        },
+        {
+          "value": 684,
+          "p_q": 0.00712494654765732,
+          "p_v": 0.007124946547656906
+        }
+      ],
+      "passed": true
+    }
+  ],
+  "larger_conventional_reference": {
+    "N": "982451659877161571",
+    "input_bits": 60,
+    "factorint": {
+      "1000000007": 1,
+      "982451653": 1
+    },
+    "time": {
+      "median_seconds": 0.09981310000875965,
+      "runs_seconds": [
+        0.09981310000875965,
+        0.09899320002296008,
+        0.10917880001943558
+      ]
+    },
+    "v2_status": "RESOURCE_LIMIT_NOT_EXECUTED"
+  },
+  "rsa2048_v2_resource_bound": {
+    "input_bits": 2048,
+    "work_bits": 2048,
+    "control_bits": 4096,
+    "register_bits": 6144,
+    "v2_state_bytes_formula": "16 * 2**6144",
+    "v2_fourier_kernel_bytes_formula": "16 * 2**8192",
+    "supported": false
+  },
+  "published_q2_estimate": {
+    "source": "https://arxiv.org/abs/2505.15917",
+    "description": "RSA-2048: under a week, under one million noisy qubits; estimate, not measured runtime"
+  },
+  "passed": true
+}

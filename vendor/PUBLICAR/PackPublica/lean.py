@@ -250,4 +250,5 @@ class Lean(Publicacion):
         self._source_formula_audit(graph, candidate)
         if re.search(r"\b(?:sorry|admit|axiom|opaque)\b", candidate):
             raise LeanSemanticAuditError("La salida Lean contiene una construccion prohibida.")
-        return candidate
+        from .autoria import resolve_authors, author_comment
+        return author_comment(resolve_authors(self.md.texto), "--") + candidate

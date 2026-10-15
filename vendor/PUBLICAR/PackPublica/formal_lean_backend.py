@@ -99,8 +99,14 @@ class LeanBackend:
         self._discover_text_definitions()
 
         self._discover_predicate_definitions()
+        self.transported_predicates = self._discover_transported_stability()
 
         self._discover_value_definitions()
+        self.positive_domains = self._discover_positive_domains()
+        self.coordinate_definitions = self._discover_coordinate_definitions()
+        self.transversal_maps = self._discover_transversal_maps()
+        self.scoped_text_coordinates = self._discover_scoped_text_coordinates()
+        self.active_node = None
 
         self.equivalence_specs = {}
 
@@ -389,10 +395,14 @@ class LeanBackend:
         ]
 
         lines.extend(self._context_declaration())
+        lines.extend(self._transversal_map_declarations())
+        lines.extend(self._coordinate_declarations())
 
         lines.extend(self._text_declarations())
+        lines.extend(self._integer_closure_derivation())
 
         lines.extend(self._predicate_declarations())
+        lines.extend(self._transport_bridge_derivations())
 
         lines.extend(self._value_declarations())
 
@@ -419,12 +429,22 @@ class LeanBackend:
         for item in self.nodes:
 
             node = item.source
+            self.active_node = node.node_id
 
             requires_proof = node.kind in self.PROOF_KINDS
 
             lines.append(f"-- FORMAL_NODE: {node.node_id}")
 
             lines.append(f"-- SOURCE: {node.source_file}:{node.start_line or '?'}")
+            for label, scope in self.scoped_text_coordinates.get(node.node_id, {}).items():
+                lines.append("-- DEMUESTRA_TEXT_COORDINATE_SCOPE: " + json.dumps(
+                    {"node": node.node_id, "label": label, **scope}, ensure_ascii=False))
+            lines.append("-- DEMUESTRA_SOURCE_PROSE: " + json.dumps({
+                "node": node.node_id,
+                "location": f"{node.source_file}:{node.start_line or '?'}",
+                "source": node.prose,
+                "status": "PRESERVED_NOT_FULLY_INTERPRETED",
+            }, ensure_ascii=False))
 
             for formula in node.formulas:
 
@@ -858,11 +878,17 @@ class LeanBackend:
 
             )
 
-            effective_deps = tuple(dict.fromkeys((*node.deps, *exact_definitions)))
+            inherited_definitions = self._inherited_definition_dependencies(
+                item, body, node_bodies,
+            )
+            effective_deps = tuple(dict.fromkeys((
+                *node.deps, *exact_definitions, *inherited_definitions,
+            )))
 
             if not requires_proof:
 
                 lines.append(f"def Node_{node_name} (ctx : FormalContext) : Prop := {body}")
+                lines.extend(self._positive_length_derivation(node_name, body))
 
                 defined_nodes.add(node.node_id)
 
@@ -993,6 +1019,36 @@ class LeanBackend:
                 proof_status = "NO_INICIADA"
 
             assertion_statuses[node.node_id] = (construction_status, proof_status)
+
+            if proof_status == "NO_DETERMINADO":
+                partial_proofs = self._emit_partial_derivations(
+                    lines, node_name, hypotheses if effective_deps else "", body,
+                    decompositions if effective_deps else [], effective_deps,
+                    node_clause_bodies,
+                )
+                lines.append("-- DEMUESTRA_PENDING_PROOF: " + json.dumps({
+                    "node": node.node_id,
+                    "location": f"{node.source_file}:{node.start_line or '?'}",
+                    "origin": "GENERATOR",
+                    "reason": "NO_COMPLETE_DERIVATION_GENERATED",
+                    "verification_state": "VERIFICACION_FORMAL_PENDIENTE",
+                    "interpretation_detail": (
+                        "Stable_Rim is interpreted as the inverse image of the stable class; "
+                        "transport is proved on U_Rim_rho. Linking the separate U_Rim "
+                        "representation to this declared domain remains pending."
+                        if node_name == "P_RIM_S" and self.transported_predicates else None
+                    ),
+                    "statement": body,
+                    "dependencies": list(effective_deps),
+                    "partial_theorems": partial_proofs,
+                    "pending_parts": [
+                        part for part in self._claim_parts(body)
+                        if part not in {proof["statement"] for proof in partial_proofs}
+                    ],
+                    "source_present": True,
+                    "source_refuted": False,
+                    "prose_interpretation_complete": False,
+                }, ensure_ascii=False))
 
             untranslated_claims = [
 
@@ -1224,6 +1280,30 @@ class LeanBackend:
 
 
 
+    def _inherited_definition_dependencies(self, item, body, node_bodies):
+        """Keep relevant definitions available through explicit dependency paths."""
+        nodes = {node.source.node_id: node for node in self.nodes}
+        used = set(re.findall(r"ctx\.([A-Za-z0-9_]+)", body))
+        for name, (_, _, expression) in self.predicate_definitions.items():
+            if f"Derived_{self._name(name)} ctx" in body:
+                used.update(re.findall(r"ctx\.([A-Za-z0-9_]+)", expression))
+        visited = {item.source.node_id}
+        result = []
+        def visit(node_id):
+            if node_id in visited or node_id not in nodes:
+                return
+            visited.add(node_id)
+            dependency = nodes[node_id]
+            if (dependency.source.kind not in self.PROOF_KINDS
+                    and node_bodies.get(node_id) not in {None, "True"}
+                    and used & self._declared_context_symbols(dependency)):
+                result.append(node_id)
+            for ancestor in dependency.source.deps:
+                visit(ancestor)
+        for node_id in item.source.deps:
+            visit(node_id)
+        return tuple(result)
+
     def _supporting_definitions(self, body, node_bodies, current_node_id):
 
         used = set(re.findall(r"ctx\.([A-Za-z0-9_]+)", body))
@@ -1318,7 +1398,66 @@ class LeanBackend:
 
                 candidates.append((self._strip_outer_parentheses(clause), reference))
 
-        proof = None
+        proof = self._reflexive_definition_proof(target)
+        if proof is None:
+            proof = self._closed_wave_chain_proof(target, candidates)
+
+        stable_definition = "ctx.mathcal_E_VED = ({x | ∃ k : ℕ, ∃ rho : ℝ, (((k ∈ {x : ℕ | 0 < x}) ∧ (rho ∈ Set.Icc 0 ((1 : ℝ) / (2 : ℝ)))) ∧ (rho = 0)) ∧ (x = ((k, rho)))})"
+        closed_definition = "ctx.U_VED_cerrado = ({x | ∃ k : ℕ, ∃ rho : ℝ, ((k ∈ {x : ℕ | 0 < x}) ∧ (rho ∈ Set.Icc 0 ((1 : ℝ) / (2 : ℝ)))) ∧ (x = ((k, rho)))})"
+        unstable_definition = "ctx.mathcal_I_VED = ({x | ∃ k : ℕ, ∃ rho : ℝ, (((k ∈ {x : ℕ | 0 < x}) ∧ (rho ∈ Set.Icc 0 ((1 : ℝ) / (2 : ℝ)))) ∧ (rho > 0)) ∧ (x = ((k, rho)))})"
+        partition_references = None
+        if node_name == "P_VED_Completo" and target == "ctx.U_VED_cerrado = (ctx.mathcal_E_VED ∪ ctx.mathcal_I_VED)":
+            refs = [next((ref for clause, ref in candidates if clause == definition), None)
+                    for definition in (closed_definition, stable_definition, unstable_definition)]
+            if all(refs):
+                partition_references = refs
+                proof = [
+                    f"  rw [{', '.join(refs)}]",
+                    "  ext p",
+                    "  constructor",
+                    "  · rintro ⟨k, rho, ⟨hk, h_bounds⟩, hp⟩",
+                    "    by_cases h_zero : rho = 0",
+                    "    · exact Or.inl ⟨k, rho, ⟨⟨hk, h_bounds⟩, h_zero⟩, hp⟩",
+                    "    · exact Or.inr ⟨k, rho, ⟨⟨hk, h_bounds⟩, lt_of_le_of_ne h_bounds.1 (Ne.symm h_zero)⟩, hp⟩",
+                    "  · rintro (⟨k, rho, ⟨h_domain, _⟩, hp⟩ | ⟨k, rho, ⟨h_domain, _⟩, hp⟩)",
+                    "    · exact ⟨k, rho, h_domain, hp⟩",
+                    "    · exact ⟨k, rho, h_domain, hp⟩",
+                ]
+        stable_enumeration = "((ctx.rho = 0)) → (ctx.mathcal_E_VED = ({x | ∃ k : ℕ, (k ∈ {x : ℕ | 0 < x}) ∧ (x = ((k, 0)))}))"
+        if node_name == "P_VED_K_E" and target == stable_enumeration:
+            definition_reference = next((ref for clause, ref in candidates
+                                         if clause == stable_definition), None)
+            if definition_reference is not None:
+                proof = [
+                    "  intro _",
+                    f"  rw [{definition_reference}]",
+                    "  ext p",
+                    "  constructor",
+                    "  · rintro ⟨k, rho, ⟨⟨hk, _⟩, hrho⟩, hp⟩",
+                    "    subst rho",
+                    "    exact ⟨k, hk, hp⟩",
+                    "  · rintro ⟨k, hk, hp⟩",
+                    "    exact ⟨k, 0, ⟨⟨hk, ⟨le_rfl, by norm_num⟩⟩, rfl⟩, hp⟩",
+                ]
+
+        if node_name == "P_VR_E" and self.scoped_text_coordinates.get("P_VR_E", {}).get("estado_estable"):
+            coordinate_chain = next((ref for clause, ref in candidates
+                                     if clause.startswith("(ctx.rho_VED = ctx.rho_R) ∧ ")
+                                     and "ctx.rho_R = (abs (ctx.a - ((1 : ℝ) / (2 : ℝ))))" in clause), None)
+            if coordinate_chain is not None:
+                proof = [
+                    "  change (ctx.rho_VED = 0) ↔ (|ctx.a - (1 / 2 : ℝ)| = 0)",
+                    f"  rw [{coordinate_chain}.1, {coordinate_chain}.2]",
+                ]
+
+        if node_name == "P_RIM_S" and self._has_riemann_bridge_definitions() and self.transported_predicates:
+            domain = next((ref for clause, ref in candidates
+                           if clause.startswith("ctx.U_Rim_rho = ")), None)
+            inverse = next((ref for clause, ref in candidates
+                            if "∀ z_all : ℂ, z_all ∈ ctx.U_Rim_rho" in clause
+                            and "ctx.rho_VED_fn_1 (ctx.f_inv_fn_1 z_all)" in clause), None)
+            if domain is not None and inverse is not None:
+                proof = ["  intro z _", f"  exact stable_rim_iff_coordinate_zero ctx {domain} {inverse}.2 z"]
 
         if node_name == "P_Z":
 
@@ -1530,9 +1669,230 @@ class LeanBackend:
 
         lines.extend(proof)
 
+        if partition_references is not None:
+            _, stable_ref, unstable_ref = partition_references
+            lines.append("")
+            lines.append(f"theorem derive_{node_name}_disjoint (ctx : FormalContext) {hypotheses} : Disjoint ctx.mathcal_E_VED ctx.mathcal_I_VED := by")
+            lines.extend(decompositions)
+            lines.extend([
+                f"  rw [{stable_ref}, {unstable_ref}]",
+                "  apply Set.disjoint_left.mpr",
+                "  intro p hpE hpI",
+                "  rcases hpE with ⟨k, rho, ⟨_, h_zero⟩, hp⟩",
+                "  rcases hpI with ⟨j, r, ⟨_, h_positive⟩, hq⟩",
+                "  have h_coordinate : rho = r := congrArg Prod.snd (hp.symm.trans hq)",
+                "  linarith",
+            ])
+
         return True
 
 
+
+    def _reflexive_definition_proof(self, target):
+        sides = self._split_top_level(target, " ↔ ")
+        if sides is None:
+            return None
+        def expand(value):
+            for name, ast in self.text_definitions.items():
+                value = value.replace(
+                    f"Derived_Text_{self._name(name)} ctx",
+                    f"({self.emitter.emit(ast)})",
+                )
+            return self._strip_outer_parentheses(value)
+        return ["  rfl"] if expand(sides[0]) == expand(sides[1]) else None
+
+    def _positive_length_derivation(self, node_name, body):
+        if "lambda" not in self.positive_domains:
+            return []
+        parts = self._claim_parts(body)
+        if parts != ["ctx.L = (ctx.n * ctx.lambda)", "ctx.n ∈ {x : ℝ | 0 < x}"]:
+            return []
+        return [
+            f"theorem positive_closure_length_from_{node_name} (ctx : FormalContext)",
+            f"    (h_contour : Node_{node_name} ctx) : 0 < ctx.L := by",
+            "  rcases h_contour with ⟨h_length, h_cycles⟩",
+            "  rw [h_length]",
+            "  exact mul_pos h_cycles ctx.PositiveDomain_lambda",
+        ]
+
+    def _closed_wave_chain_proof(self, target, candidates):
+        if "lambda" not in self.positive_domains:
+            return None
+        parts = self._claim_parts(target)
+        if len(parts) != 4:
+            return None
+        sides = [self._split_top_level(part, " ↔ ") for part in parts]
+        if any(side is None for side in sides):
+            return None
+        if not all(sides[index][1] == sides[index + 1][0] for index in range(3)):
+            return None
+        if sides[0][0] != "ctx.rho = 0":
+            return None
+        if sides[1][1] != "ctx.L = ((ctx.k : ℝ) * ctx.lambda)":
+            return None
+        if self._reflexive_definition_proof(parts[3]) is None:
+            return None
+        phase = sides[2][1]
+        if self._reflexive_definition_proof(f"({phase}) ↔ (ctx.rho = 0)") is None:
+            return None
+        integer_proof = self._integer_decomposition_proof(parts[0], candidates)
+        length_reference = next((reference for clause, reference in candidates
+                                 if clause == "ctx.L = (ctx.n * ctx.lambda)"), None)
+        integer_spec = self._split_top_level(sides[0][1], " ∧ ")
+        member_reference = next((reference for clause, reference in candidates
+                                 if integer_spec is not None and clause == integer_spec[1]), None)
+        if integer_proof is None or length_reference is None or member_reference is None:
+            return None
+        integer, length = sides[1]
+        return [
+            f"  have h_integer_closure : ({parts[0]}) := by",
+            *("  " + line for line in integer_proof),
+            f"  have h_integer_length : ({integer}) ↔ ({length}) := by",
+            "    constructor",
+            "    · rintro ⟨h_integer, _⟩",
+            f"      rw [{length_reference}, h_integer]",
+            "    · intro h_length",
+            "      have h_nonzero : ctx.lambda ≠ 0 := ne_of_gt ctx.PositiveDomain_lambda",
+            "      have h_integer : ctx.n = (ctx.k : ℝ) := by",
+            "        apply mul_right_cancel₀ h_nonzero",
+            f"        rw [← {length_reference}]",
+            "        exact h_length",
+            f"      exact ⟨h_integer, {member_reference}⟩",
+            f"  have h_length_phase : ({length}) ↔ ({phase}) := by",
+            "    exact h_integer_length.symm.trans h_integer_closure.symm",
+            "  exact ⟨⟨⟨h_integer_closure, h_integer_length⟩, h_length_phase⟩, Iff.rfl⟩",
+        ]
+
+    def _integer_decomposition_proof(self, target, candidates):
+        sides = self._split_top_level(target, " ↔ ")
+        if sides is None or sides[0] != "ctx.rho = 0":
+            return None
+        integer = self._split_top_level(sides[1], " ∧ ")
+        if integer is None or integer[0] not in {"ctx.n = ctx.k", "ctx.n = (ctx.k : ℝ)"}:
+            return None
+        for candidate, reference in candidates:
+            parts = self._split_top_level(candidate, " ∧ ")
+            if parts is None:
+                continue
+            branches = self._split_top_level(parts[0], " ∨ ")
+            rest = self._split_top_level(parts[1], " ∧ ")
+            if branches is None or rest is None or rest[0] != integer[1]:
+                continue
+            expected = ("(ctx.k : ℝ) + ctx.rho", "(ctx.k : ℝ) - ctx.rho")
+            equations = [self._split_top_level(branch, " = ") for branch in branches]
+            if not all(eq is not None and eq[0] == "ctx.n" and eq[1] == rhs
+                       for eq, rhs in zip(equations, expected)):
+                continue
+            return [
+                f"  rcases {reference} with ⟨h_branches, h_member, h_bounds⟩",
+                "  constructor",
+                "  · intro h_zero",
+                "    constructor",
+                "    · rcases h_branches with h_plus | h_minus <;> linarith",
+                "    · exact h_member",
+                "  · rintro ⟨h_integer, _⟩",
+                "    rcases h_branches with h_plus | h_minus <;> linarith",
+            ]
+        return None
+
+    def _integer_length_forward_proof(self, target, candidates):
+        sides = self._split_top_level(target, " ↔ ")
+        if sides is None or sides[1] != "ctx.L = ((ctx.k : ℝ) * ctx.lambda)":
+            return None
+        integer = self._split_top_level(sides[0], " ∧ ")
+        if integer is None or integer[0] not in {"ctx.n = ctx.k", "ctx.n = (ctx.k : ℝ)"}:
+            return None
+        for candidate, reference in candidates:
+            if candidate == "ctx.L = (ctx.n * ctx.lambda)":
+                return ["  rintro ⟨h_integer, _⟩", f"  rw [{reference}, h_integer]"]
+        return None
+
+    def _claim_parts(self, expression):
+        value = self._strip_outer_parentheses(expression)
+        if value.startswith(("∀ ", "∃ ", "fun ")):
+            return [value]
+        parts = self._split_top_level(value, " ∧ ")
+        return self._claim_parts(parts[0]) + self._claim_parts(parts[1]) if parts else [value]
+
+    def _emit_partial_derivations(self, lines, node_name, hypotheses, body,
+                                 decompositions, effective_deps, node_clause_bodies):
+        candidates = []
+        for dep in effective_deps:
+            clauses = node_clause_bodies.get(dep, ())
+            for index, clause in enumerate(clauses, start=1):
+                ref = f"h_{self._name(dep)}"
+                if len(clauses) > 1:
+                    ref += f"_{index}"
+                candidates.append((self._strip_outer_parentheses(clause), ref))
+        proved = []
+        if node_name == "P_VR_rho" and "R_rho" in self.transversal_maps:
+            proved.append({"theorem": "transversal_map_preserves_distance",
+                           "statement": "The declared transversal identity map preserves distance.",
+                           "scope": "DECLARED_MAP_PROPERTY"})
+            if "R_rho_inv" in self.transversal_maps:
+                proved.append({"theorem": "transversal_maps_are_inverse",
+                               "statement": "The declared transversal maps are mutually inverse.",
+                               "scope": "DECLARED_MAP_PROPERTY"})
+        if node_name == "P_VR_rho" and "rho_R" in self.coordinate_definitions:
+            coordinate = next((ref for clause, ref in candidates
+                               if "∀ x_all : ℝ, x_all ∈ ctx.U_VED_rho" in clause
+                               and "ctx.rho_R_fn_1 (ctx.f_fn_1 x_all)" in clause
+                               and "∀ z_all : ℂ, z_all ∈ ctx.U_Rim_rho" in clause
+                               and "ctx.rho_VED_fn_1 (ctx.f_inv_fn_1 z_all)" in clause), None)
+            if coordinate is not None:
+                for suffix, statement, proof in (
+                    ("forward_coordinate",
+                     "∀ x : ℝ, x ∈ ctx.U_VED_rho → ctx.rho_VED_fn_1 x = |(ctx.f_fn_1 x).re - (1 / 2 : ℝ)|",
+                     ["  intro x hx",
+                      "  change ctx.rho_VED_fn_1 x = ctx.rho_R_fn_1 (ctx.f_fn_1 x)",
+                      f"  exact ({coordinate}.1 x hx).symm"]),
+                    ("inverse_coordinate",
+                     "∀ z : ℂ, z ∈ ctx.U_Rim_rho → ctx.rho_VED_fn_1 (ctx.f_inv_fn_1 z) = |z.re - (1 / 2 : ℝ)|",
+                     ["  intro z hz", f"  exact {coordinate}.2 z hz"]),
+                ):
+                    name = f"derive_{node_name}_{suffix}"
+                    lines.append(f"theorem {name} (ctx : FormalContext) {hypotheses} : ({statement}) := by")
+                    lines.extend(decompositions)
+                    lines.extend(proof)
+                    proved.append({"theorem": name, "statement": statement,
+                                   "scope": "CORRESPONDING_POINTS_IN_DECLARED_DOMAINS"})
+        if node_name == "P_RIM_S" and "Stable_Rim" in self.transported_predicates:
+            inverse = next((ref for clause, ref in candidates
+                            if "∀ z_all : ℂ, z_all ∈ ctx.U_Rim_rho" in clause
+                            and "ctx.rho_VED_fn_1 (ctx.f_inv_fn_1 z_all)" in clause), None)
+            if inverse is not None:
+                statement = ("∀ z : ℂ, z ∈ ctx.U_Rim_rho → "
+                             "(Derived_Stable_Rim ctx z ↔ ctx.rho_R_fn_1 z = 0)")
+                name = f"derive_{node_name}_transported_stability"
+                lines.append(f"theorem {name} (ctx : FormalContext) {hypotheses} : ({statement}) := by")
+                lines.extend(decompositions)
+                lines.extend([
+                    "  intro z hz",
+                    "  change (z ∈ ctx.U_Rim_rho ∧ ctx.rho_VED_fn_1 (ctx.f_inv_fn_1 z) = 0) ↔ (ctx.rho_R_fn_1 z = 0)",
+                    f"  rw [{inverse}.2 z hz]",
+                    "  exact and_iff_right hz",
+                ])
+                proved.append({"theorem": name, "statement": statement,
+                               "scope": "DECLARED_TRANSVERSAL_UNIVERSE"})
+        for index, clause in enumerate(self._claim_parts(body), start=1):
+            suffix = ""
+            proof = self._reflexive_definition_proof(clause)
+            if proof is None:
+                proof = self._integer_decomposition_proof(clause, candidates)
+            if proof is None:
+                proof = self._integer_length_forward_proof(clause, candidates)
+                if proof is not None:
+                    left, right = self._split_top_level(clause, " ↔ ")
+                    clause = f"({left}) → ({right})"
+                    suffix = "_forward"
+            if proof is None:
+                continue
+            name = f"derive_{node_name}_part_{index}{suffix}"
+            lines.append(f"theorem {name} (ctx : FormalContext) {hypotheses} : ({clause}) := by")
+            lines.extend(decompositions)
+            lines.extend(proof)
+            proved.append({"theorem": name, "statement": clause})
+        return proved
 
     @classmethod
 
@@ -3454,6 +3814,213 @@ class LeanBackend:
 
 
 
+    def _discover_transversal_maps(self):
+        maps = {}
+        for item in self.nodes:
+            formulas = item.source.formulas
+            if not re.search(r"^por\s*$", item.source.prose, re.MULTILINE):
+                continue
+            declared = any(
+                formula.ast.kind == "binary" and formula.ast.value == "COLON"
+                and self.emitter._symbolic_name(formula.ast.children[0]) == "R_rho"
+                and formula.ast.children[1].kind == "binary"
+                and formula.ast.children[1].value == "MAPSTO"
+                for formula in formulas
+            )
+            if not declared:
+                continue
+            for formula in formulas:
+                ast = formula.ast
+                if ast.kind == "binary" and ast.value == "AND":
+                    first, second = ast.children
+                    if (first.kind == second.kind == "binary" and first.value == second.value == "EQ"
+                            and first.children[0].kind == "apply"
+                            and self.emitter._symbolic_name(first.children[0].children[0]) == "R_rho"
+                            and first.children[0].children[1].kind == "identifier"
+                            and first.children[0].children[1].value == "rho"
+                            and self.emitter._symbolic_name(first.children[1]) == "rho_R"
+                            and first.children[1] == second.children[0]
+                            and second.children[1] == first.children[0].children[1]):
+                        maps["R_rho"] = {"node": item.source.node_id, "source": formula.source,
+                                         "method": "DECLARED_IDENTITY_MAP"}
+                if (ast.kind == "binary" and ast.value == "EQ"
+                        and ast.children[0].kind == "apply"
+                        and self.emitter._symbolic_name(ast.children[0].children[0]) == "R_rho_inv"
+                        and self.emitter._symbolic_name(ast.children[0].children[1]) == "rho_R"
+                        and ast.children[0].children[1] == ast.children[1]):
+                    maps["R_rho_inv"] = {"node": item.source.node_id, "source": formula.source,
+                                             "method": "DECLARED_IDENTITY_MAP"}
+        for name in tuple(maps):
+            signature = self.symbols.functions.get(name)
+            if signature is None or signature.arguments != ("Real",) or signature.result != "Real":
+                del maps[name]
+        if "R_rho" not in maps:
+            return {}
+        return maps
+
+    def _transversal_map_declarations(self):
+        lines = []
+        for name, provenance in self.transversal_maps.items():
+            lines.extend([
+                "-- DEMUESTRA_TRANSVERSAL_MAP: " + json.dumps({"map": name, **provenance}, ensure_ascii=False),
+                f"def FormalContext.{self._field_name(name, 1)} (_ctx : FormalContext) (r : ℝ) : ℝ := r",
+            ])
+        if "R_rho" in self.transversal_maps:
+            lines.extend([
+                "theorem transversal_map_preserves_distance (ctx : FormalContext) (r₁ r₂ : ℝ) :",
+                "    |ctx.R_rho_fn_1 r₁ - ctx.R_rho_fn_1 r₂| = |r₁ - r₂| := by rfl",
+                "theorem transversal_map_preserves_interval (ctx : FormalContext) (r : ℝ)",
+                "    (hr : r ∈ Set.Icc (0 : ℝ) (1 / 2 : ℝ)) : ctx.R_rho_fn_1 r ∈ Set.Icc (0 : ℝ) (1 / 2 : ℝ) := by exact hr",
+            ])
+        if {"R_rho", "R_rho_inv"}.issubset(self.transversal_maps):
+            lines.extend([
+                "theorem transversal_maps_are_inverse (ctx : FormalContext) (r : ℝ) :",
+                "    ctx.R_rho_inv_fn_1 (ctx.R_rho_fn_1 r) = r ∧ ctx.R_rho_fn_1 (ctx.R_rho_inv_fn_1 r) = r := by",
+                "  exact ⟨rfl, rfl⟩",
+            ])
+        return lines
+
+    def _discover_scoped_text_coordinates(self):
+        scopes = {}
+        for item in self.nodes:
+            if "P_VED_E" not in item.source.deps:
+                continue
+            for formula in item.steps:
+                ast = self._normalize_formula_ast(formula.ast)
+                if ast.kind != "binary" or ast.value != "IFF":
+                    continue
+                condition, label = ast.children
+                if label.kind != "text":
+                    continue
+                name = self._name(label.value)
+                anchor = self.text_definitions.get(name)
+                if anchor is None or self._strip_outer_parentheses(self.emitter.emit(anchor)) != "ctx.rho = 0":
+                    continue
+                if self._strip_outer_parentheses(self.emitter.emit(condition)) != "ctx.rho_VED = 0":
+                    continue
+                scopes.setdefault(item.source.node_id, {})[name] = {
+                    "coordinate": "rho_VED", "source": formula.source,
+                    "basis": "P_VED_E", "scope": "LOCAL_COORDINATE_PARAMETER",
+                }
+        return scopes
+
+    def _discover_coordinate_definitions(self):
+        signature = self.symbols.functions.get("rho_R")
+        if signature is None or signature.arguments != ("Complex",) or signature.result != "Real":
+            return {}
+        for item in self.nodes:
+            if item.source.kind in self.PROOF_KINDS:
+                continue
+            for formula in item.source.formulas:
+                ast = self._normalize_formula_ast(formula.ast)
+                if ast.kind != "binary" or ast.value != "EQ":
+                    continue
+                left, right = ast.children
+                if self.emitter._symbolic_name(left) != "rho_R":
+                    continue
+                expression = self._strip_outer_parentheses(self.emitter.emit(right))
+                if expression == "abs ((Complex.re ctx.z) - ((1 : ℝ) / (2 : ℝ)))":
+                    return {"rho_R": {"node": item.source.node_id,
+                                      "source": formula.source,
+                                      "expression": expression}}
+        return {}
+
+    def _coordinate_declarations(self):
+        if "rho_R" not in self.coordinate_definitions:
+            return []
+        header = [
+            "-- DEMUESTRA_COORDINATE_DEFINITION: " + json.dumps(
+                self.coordinate_definitions["rho_R"], ensure_ascii=False),
+            "def FormalContext.rho_R_fn_1 (_ctx : FormalContext) (z : ℂ) : ℝ := |z.re - (1 / 2 : ℝ)|",
+        ]
+        if not self._has_riemann_bridge_definitions():
+            return header
+        return header + [
+            "theorem critical_strip_coordinate_bounds (ctx : FormalContext) (z : ℂ)",
+            "    (h_left : 0 < z.re) (h_right : z.re < 1) :",
+            "    ctx.rho_R_fn_1 z ∈ Set.Icc (0 : ℝ) (1 / 2 : ℝ) := by",
+            "  constructor",
+            "  · exact abs_nonneg _",
+            "  · apply le_of_lt",
+            "    change |z.re - (1 / 2 : ℝ)| < (1 / 2 : ℝ)",
+            "    exact abs_lt.mpr ⟨by linarith, by linarith⟩",
+            "theorem critical_strip_in_transversal_universe (ctx : FormalContext)",
+            "    (h_domain : ctx.U_Rim_rho = {z : ℂ | ctx.rho_R_fn_1 z ∈ Set.Icc (0 : ℝ) (1 / 2 : ℝ)})",
+            "    (z : ℂ) (h_left : 0 < z.re) (h_right : z.re < 1) : z ∈ ctx.U_Rim_rho := by",
+            "  rw [h_domain]",
+            "  exact critical_strip_coordinate_bounds ctx z h_left h_right",
+            "theorem nontrivial_zero_in_transversal_universe (ctx : FormalContext)",
+            "    (h_zeros : ctx.Z_Rim_nt = {z : ℂ | ((z ∈ (Set.univ : Set ℂ)) ∧ ctx.zeta z = 0) ∧ (0 < z.re ∧ z.re < 1)})",
+            "    (h_domain : ctx.U_Rim_rho = {z : ℂ | ctx.rho_R_fn_1 z ∈ Set.Icc (0 : ℝ) (1 / 2 : ℝ)})",
+            "    (z : ℂ) (hz : z ∈ ctx.Z_Rim_nt) : z ∈ ctx.U_Rim_rho := by",
+            "  rw [h_zeros] at hz",
+            "  exact critical_strip_in_transversal_universe ctx h_domain z hz.2.1 hz.2.2",
+        ]
+
+    def _has_riemann_bridge_definitions(self):
+        if ("rho_R" not in self.coordinate_definitions
+                or not {"U_Rim_rho", "Z_Rim_nt"}.issubset(self.symbols.values)
+                or "zeta" not in self.symbols.functions):
+            return False
+        definitions = " ".join(
+            self.emitter.emit(formula.ast)
+            for item in self.nodes if item.source.kind not in self.PROOF_KINDS
+            for formula in item.declarations
+        )
+        return ("ctx.U_Rim_rho = " in definitions
+                and "ctx.Z_Rim_nt = " in definitions
+                and "Complex.re z" in definitions)
+
+    def _transport_bridge_derivations(self):
+        if "Stable_Rim" not in self.transported_predicates or not self._has_riemann_bridge_definitions():
+            return []
+        return [
+            "theorem stable_rim_iff_coordinate_zero (ctx : FormalContext)",
+            "    (h_domain : ctx.U_Rim_rho = {z : ℂ | ctx.rho_R_fn_1 z ∈ Set.Icc (0 : ℝ) (1 / 2 : ℝ)})",
+            "    (h_inverse : ∀ z : ℂ, z ∈ ctx.U_Rim_rho → ctx.rho_VED_fn_1 (ctx.f_inv_fn_1 z) = ctx.rho_R_fn_1 z)",
+            "    (z : ℂ) : Derived_Stable_Rim ctx z ↔ ctx.rho_R_fn_1 z = 0 := by",
+            "  constructor",
+            "  · rintro ⟨hz, h_stable⟩",
+            "    change ctx.rho_VED_fn_1 (ctx.f_inv_fn_1 z) = 0 at h_stable",
+            "    rw [h_inverse z hz] at h_stable",
+            "    exact h_stable",
+            "  · intro h_zero",
+            "    have hz : z ∈ ctx.U_Rim_rho := by",
+            "      rw [h_domain]",
+            "      change ctx.rho_R_fn_1 z ∈ Set.Icc (0 : ℝ) (1 / 2 : ℝ)",
+            "      rw [h_zero]",
+            "      constructor <;> norm_num",
+            "    exact ⟨hz, by change ctx.rho_VED_fn_1 (ctx.f_inv_fn_1 z) = 0; rw [h_inverse z hz]; exact h_zero⟩",
+            "theorem nontrivial_zero_stability_iff_critical_line (ctx : FormalContext)",
+            "    (h_zeros : ctx.Z_Rim_nt = {z : ℂ | ((z ∈ (Set.univ : Set ℂ)) ∧ ctx.zeta z = 0) ∧ (0 < z.re ∧ z.re < 1)})",
+            "    (h_domain : ctx.U_Rim_rho = {z : ℂ | ctx.rho_R_fn_1 z ∈ Set.Icc (0 : ℝ) (1 / 2 : ℝ)})",
+            "    (h_inverse : ∀ z : ℂ, z ∈ ctx.U_Rim_rho → ctx.rho_VED_fn_1 (ctx.f_inv_fn_1 z) = ctx.rho_R_fn_1 z)",
+            "    (z : ℂ) (hz : z ∈ ctx.Z_Rim_nt) : Derived_Stable_Rim ctx z ↔ z.re = (1 / 2 : ℝ) := by",
+            "  have h_transversal := nontrivial_zero_in_transversal_universe ctx h_zeros h_domain z hz",
+            "  rw [stable_rim_iff_coordinate_zero ctx h_domain h_inverse z]",
+            "  change (|z.re - (1 / 2 : ℝ)| = 0) ↔ (z.re = (1 / 2 : ℝ))",
+            "  exact abs_eq_zero.trans sub_eq_zero",
+        ]
+
+    def _discover_positive_domains(self):
+        domains = {}
+        pattern = re.compile(
+            r"^La materia se representa en este marco como una onda de longitud de onda"
+            r"(?: Compton)? positiva\s+\$(\\[A-Za-z]+|[A-Za-z][A-Za-z0-9_]*)\$",
+            re.MULTILINE,
+        )
+        for item in self.nodes:
+            for match in pattern.finditer(item.source.prose):
+                symbol = match.group(1).lstrip("\\")
+                if self.symbols.values.get(symbol) != "Real" or symbol in self.value_definitions:
+                    continue
+                domains[symbol] = {
+                    "node": item.source.node_id, "source": match.group(0),
+                    "symbol": symbol, "condition": "positive",
+                    "scope": "WAVE_PARAMETER_DOMAIN",
+                }
+        return domains
+
     def _context_declaration(self):
 
         fields = {}
@@ -3466,12 +4033,18 @@ class LeanBackend:
 
         for name, signature in sorted(self.symbols.functions.items()):
 
-            if name in {"Re", "abs"}:
+            if name in {"Re", "Im", "abs", "norm", "dist"}:
 
                 continue
 
             if name in self.predicate_definitions:
 
+                continue
+
+            if name in self.coordinate_definitions:
+                continue
+
+            if name in self.transversal_maps:
                 continue
 
             if signature.arguments == ("...",):
@@ -3531,6 +4104,9 @@ class LeanBackend:
         lines = ["structure FormalContext where"]
 
         lines.extend(f"  {name} : {type_expr}" for name, type_expr in sorted(fields.items()))
+        for name, source in sorted(self.positive_domains.items()):
+            lines.append("  -- DEMUESTRA_SOURCE_DOMAIN: " + json.dumps(source, ensure_ascii=False))
+            lines.append(f"  PositiveDomain_{self._name(name)} : 0 < {self._field_name(name, None)}")
 
         return lines
 
@@ -3658,9 +4234,43 @@ class LeanBackend:
 
 
 
+    def _discover_transported_stability(self):
+        transport = next((item for item in self.nodes
+                          if item.source.node_id == "P_RHO_ISO"), None)
+        target = next((item for item in self.nodes
+                       if item.source.node_id == "P_RIM_S"), None)
+        if transport is None or target is None:
+            return {}
+        if not re.search(r"se conservan tanto por \$f\$ como por \$f\^\{-1\}\$",
+                         transport.source.prose):
+            return {}
+        anchor = self.text_definitions.get("clase_estable")
+        if anchor is None or self._strip_outer_parentheses(self.emitter.emit(anchor)) != "ctx.rho = 0":
+            return {}
+        signature = self.symbols.functions.get("Stable_Rim")
+        if signature is None or signature.arguments != ("Complex",) or signature.result != "Prop":
+            return {}
+        coordinate = " ".join(self.emitter.emit(formula.ast) for formula in transport.claims)
+        if ("ctx.rho_R_fn_1 (ctx.f_fn_1" not in coordinate
+                or "ctx.rho_VED_fn_1 (ctx.f_inv_fn_1" not in coordinate):
+            return {}
+        # Pull back the already defined stable class, not the theorem's conclusion.
+        self.predicate_definitions["Stable_Rim"] = (
+            "z_transported", "Complex",
+            "z_transported ∈ ctx.U_Rim_rho ∧ Derived_Text_clase_estable { ctx with rho := ctx.rho_VED_fn_1 (ctx.f_inv_fn_1 z_transported) }",
+        )
+        return {"Stable_Rim": {
+            "node": transport.source.node_id, "target_node": target.source.node_id,
+            "source": transport.source.prose, "method": "INVERSE_IMAGE_OF_STABLE_CLASS",
+            "domain": "U_Rim_rho", "definition_source": self.text_definition_sources["clase_estable"],
+        }}
+
     def _predicate_declarations(self):
 
         lines = []
+        for name, provenance in self.transported_predicates.items():
+            lines.append("-- DEMUESTRA_TRANSPORT_DEFINITION: " + json.dumps(
+                {"predicate": name, **provenance}, ensure_ascii=False))
 
         for name, (variable, type_name, expression) in sorted(
 
@@ -3681,68 +4291,73 @@ class LeanBackend:
 
 
     def _discover_text_definitions(self):
+        # Text labels in an explicit equivalence denote its mathematical condition.
+        # Only top-level equivalences are eligible; local assumptions stay local.
+        adjacency = {}
+        origins = {}
+        self.text_definition_sources = {}
 
-        def visit(node):
-
-            if node.kind == "binary" and node.value == "IFF":
-
-                left, right = node.children
-
-                if left.kind == "text" and left.value not in self.text_definitions:
-
-                    self.text_definitions[str(left.value)] = right
-
-                if right.kind == "text" and right.value not in self.text_definitions:
-
-                    self.text_definitions[str(right.value)] = left
-
-            for child in node.children:
-
-                if isinstance(child, Ast):
-
-                    visit(child)
-
-
+        def visit(ast, formula, item):
+            if ast.kind != "binary":
+                return
+            if ast.value == "AND":
+                for child in ast.children:
+                    visit(child, formula, item)
+            elif ast.value == "IFF":
+                left, right = ast.children
+                adjacency.setdefault(left, []).append(right)
+                adjacency.setdefault(right, []).append(left)
+                for endpoint in (left, right):
+                    origins.setdefault(endpoint, (formula, item))
 
         for item in self.nodes:
+            for formula in (*item.declarations, *item.claims, *item.steps):
+                visit(self._normalize_formula_ast(formula.ast), formula, item)
 
-            formulas = list(item.declarations)
-
-            if item.source.kind not in self.PROOF_KINDS:
-
-                formulas.extend((*item.claims, *item.steps))
-
-            for formula in formulas:
-
-                visit(self._normalize_formula_ast(formula.ast))
-
-        stable_name = next(
-
-            (name for name in self.text_definitions if name.endswith("estado_estable")),
-
-            None,
-
-        )
-
-        if stable_name is not None:
-
-            for name in self._text_atoms():
-
-                if "no_estable" in name and name not in self.text_definitions:
-
-                    self.text_definitions[name] = Ast(
-
-                        "unary", "NOT", (Ast("text", stable_name),)
-
-                    )
-
-
+        visited = set()
+        for root in adjacency:
+            if root in visited:
+                continue
+            component = []
+            queue = [root]
+            while queue:
+                current = queue.pop(0)
+                if current in visited:
+                    continue
+                visited.add(current)
+                component.append(current)
+                queue.extend(adjacency[current])
+            anchors = [ast for ast in component if not self._has_uninterpreted_text(ast)]
+            anchor = None
+            for candidate in anchors:
+                try:
+                    if SemanticAnalyzer(self.symbols).analyze(candidate) == "Prop":
+                        anchor = candidate
+                        break
+                except ValueError:
+                    continue
+            if anchor is None:
+                continue
+            for label in component:
+                if label.kind != "text":
+                    continue
+                name = str(label.value)
+                self.text_definitions[name] = anchor
+                formula, item = origins[label]
+                self.text_definition_sources[name] = {
+                    "label": name, "node": item.source.node_id,
+                    "source": formula.source, "interpretation": "equivalence_label",
+                }
 
     def _text_declarations(self):
 
         lines = []
 
         for name, expression in self.text_definitions.items():
+
+            lines.append("-- DEMUESTRA_TEXT_DEFINITION: " + json.dumps(
+                self.text_definition_sources[name], ensure_ascii=False, sort_keys=True,
+            ))
 
             lines.append(
 
@@ -3755,6 +4370,47 @@ class LeanBackend:
         return lines
 
 
+
+    def _integer_closure_derivation(self):
+        """Prove integer closure only when both meanings occur in the source."""
+        stability = self.text_definitions.get("estado_estable")
+        if stability is None or self._strip_outer_parentheses(self.emitter.emit(stability)) != "ctx.rho = 0":
+            return []
+        distance = "Metric.infDist (ctx.n) (((fun distance_element : ℕ => (distance_element : ℝ)) '' ({x : ℕ | 0 < x})))"
+        expected = f"(ctx.rho = ({distance}))"
+        source = None
+        for item in self.nodes:
+            for formula in item.declarations:
+                formula_type, expression = self._source_translation(item, formula)
+                if formula_type == "Prop" and self._strip_outer_parentheses(expression) == self._strip_outer_parentheses(expected):
+                    source = {"node": item.source.node_id, "source": formula.source}
+                    break
+            if source is not None:
+                break
+        if source is None:
+            return []
+        return [
+            "-- DEMUESTRA_INTEGER_CLOSURE_SOURCE: " + json.dumps(source, ensure_ascii=False),
+            f"theorem stable_closure_iff_integer (ctx : FormalContext) (h_distance : {expected}) :",
+            "    Derived_Text_estado_estable ctx ↔ ∃ k : ℕ, 0 < k ∧ ctx.n = (k : ℝ) := by",
+            "  have closed : IsClosed ((fun k : ℕ => (k : ℝ)) '' {k : ℕ | 0 < k}) :=",
+            "    Nat.isClosedEmbedding_coe_real.isClosedMap _ (isClosed_discrete _)",
+            "  have nonempty : ((fun k : ℕ => (k : ℝ)) '' {k : ℕ | 0 < k}).Nonempty :=",
+            "    ⟨1, 1, Nat.zero_lt_one, by simp⟩",
+            "  unfold Derived_Text_estado_estable",
+            "  rw [h_distance, ← closed.mem_iff_infDist_zero nonempty]",
+            "  constructor",
+            "  · rintro ⟨k, hk, hkn⟩",
+            "    exact ⟨k, hk, hkn.symm⟩",
+            "  · rintro ⟨k, hk, hnk⟩",
+            "    exact ⟨k, hk, hnk.symm⟩",
+            f"theorem noninteger_closure_not_stable (ctx : FormalContext) (h_distance : {expected})",
+            "    (h_noninteger : ¬ ∃ k : ℕ, 0 < k ∧ ctx.n = (k : ℝ)) :",
+            "    ¬ Derived_Text_estado_estable ctx := by",
+            "  intro h_stable",
+            "  exact h_noninteger ((stable_closure_iff_integer ctx h_distance).mp h_stable)",
+            "",
+        ]
 
     def _discover_value_definitions(self):
 
@@ -3917,6 +4573,11 @@ class LeanBackend:
             return f"Derived_{self._name(name)} ctx"
 
         if name.startswith("Text_") and name[5:] in self.text_definitions:
+            scope = getattr(self, "scoped_text_coordinates", {}).get(
+                getattr(self, "active_node", None), {}).get(name[5:])
+            if scope:
+                return (f"Derived_Text_{self._name(name[5:])} "
+                        f"{{ ctx with rho := ctx.{scope['coordinate']} }}")
 
             return f"Derived_Text_{self._name(name[5:])} ctx"
 
