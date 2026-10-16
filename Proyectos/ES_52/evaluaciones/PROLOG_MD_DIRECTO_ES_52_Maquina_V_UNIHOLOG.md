@@ -13,7 +13,7 @@ Reglas Deps extraidas: `26`
 Premisas declaradas: `4`
 Lineas matematicas extraidas: `188`
 Dependencias recuperadas del texto de prueba: `0`
-SHA-256 del Markdown: `6c2ac8edb842e2d5ef0c7f0965f0cbaf203e974f3bcdb2acf875162cbb5467d0`
+SHA-256 del Markdown: `4d1ea2607a1bf718e94477e2c446a63b87b3191b9923628525956785fdb44896`
 SHA-256 del auditor: `a9ad83b7361bf9b2bd40247fa7733d2fa85011c8c93cac3a506d1dc1d400b8ed`
 
 ## Teoremas

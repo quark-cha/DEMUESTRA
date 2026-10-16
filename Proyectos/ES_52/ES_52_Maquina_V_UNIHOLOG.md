@@ -9,7 +9,7 @@
 [Láminas de construcción y comparación Q-V](./ES_52_Laminas_Q_V.pdf)
 · [Traductores y compiladores de V](./Traductores_V/ES_52_Traductores_y_compiladores_de_V.pdf)
 · [Presentación a la comunidad](./ES_52_Presentacion_comunidad.pdf)
-· [Índice completo de recursos](./ES_52_Indice_recursos.pdf).
+· [Índice completo de recursos](./ES_52_Indice_recursos.pdf) · [Relaciones, medida y Bell](./ES_52_Relaciones_medida_y_Bell.pdf).
 
 ------------------------------------------------------------------------
 

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="author" content="Víctor Estrada Díaz">
+<meta name="author-orcid" content="0000-0001-9942-1021">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Evaluacion Prolog directa del Markdown - ES_52_Maquina_V_UNIHOLOG</title>
+<style>
+body {
+    font-family: Georgia, serif;
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 20px;
+    line-height: 1.6;
+    background: #fcfcfc;
+    color: #222;
+}
+h1, h2, h3, h4 {
+    color: #1a1a1a;
+}
+table {
+    border-collapse: collapse;
+    width:100%;
+    margin:20px 0;
+}
+th, td {
+    border:1px solid #ccc;
+    padding:8px 12px;
+}
+th {
+    background:#f0f0f0;
+}
+blockquote {
+    border-left:4px solid #0077cc;
+    padding-left:16px;
+}
+code {
+    background:#eee;
+    padding:2px 6px;
+}
+pre {
+    background:#f4f4f4;
+    padding:12px;
+    overflow-x:auto;
+}
+img {
+    max-width:100%;
+    height:auto;
+}
+math {
+    font-size:1.1em;
+}
+</style>
+</head>
+<body>
+<h1>Evaluacion Prolog directa del Markdown - ES_52_Maquina_V_UNIHOLOG</h1>
+<h2>Veredicto</h2>
+<p><strong>TEOREMA DERIVADO DESDE PREMISAS DECLARADAS</strong></p>
+<p>Certificados estructurales: 26/26. Refutaciones: 0.
+Alcance: cierre de dependencias bajo premisas declaradas; no certificacion matematica global.</p>
+<p>Entrada unica: <code>ES_52_Maquina_V_UNIHOLOG.md</code>
+Nodos extraidos: <code>30</code>
+Reglas Deps extraidas: <code>26</code>
+Premisas declaradas: <code>4</code>
+Lineas matematicas extraidas: <code>188</code>
+Dependencias recuperadas del texto de prueba: <code>0</code>
+SHA-256 del Markdown: <code>6c2ac8edb842e2d5ef0c7f0965f0cbaf203e974f3bcdb2acf875162cbb5467d0</code>
+SHA-256 del auditor: <code>a9ad83b7361bf9b2bd40247fa7733d2fa85011c8c93cac3a506d1dc1d400b8ed</code></p>
+<h2>Teoremas</h2>
+<ul>
+<li><code>T_AMPLITUDECOND</code>: <strong>DERIVADO</strong></li>
+<li><code>T_SECUENCIACOND</code>: <strong>DERIVADO</strong></li>
+</ul>
+<h2>Obligaciones abiertas</h2>
+<ul>
+<li>Ninguna.</li>
+</ul>
+<h2>Dependencias recuperadas de la prueba</h2>
+<h2>Premisas usadas por el objetivo</h2>
+<ul>
+<li><code>D_PROTOCOLO</code> declarada en la linea <code>18</code></li>
+<li><code>D_DESCONOCIDO</code> declarada en la linea <code>246</code></li>
+</ul>
+<h2>Arbol de prueba</h2>
+<pre><code class="language-text">    TEOREMA t_secuenciacond por Deps (linea 1110)
+      PREMISA_MD d_protocolo (linea 18)
+      TEOREMA d_actualizacion por Deps (linea 1005)
+        TEOREMA d_circuitov por Deps (linea 539)
+          TEOREMA d_amplitudes por Deps (linea 472)
+            PREMISA_MD d_protocolo (linea 18)
+            TEOREMA d_lectura por Deps (linea 275)
+              PREMISA_MD d_desconocido (linea 246)
+        TEOREMA d_comparador por Deps (linea 860)
+          TEOREMA d_lectura por Deps (linea 275)
+            PREMISA_MD d_desconocido (linea 246)
+          TEOREMA d_protocolofase por Deps (linea 741)
+            PREMISA_MD d_protocolo (linea 18)
+            TEOREMA d_amplitudes por Deps (linea 472)
+              PREMISA_MD d_protocolo (linea 18)
+              TEOREMA d_lectura por Deps (linea 275)
+                PREMISA_MD d_desconocido (linea 246)
+            TEOREMA p_interferencia por Deps (linea 694)
+              TEOREMA d_amplitudes por Deps (linea 472)
+                PREMISA_MD d_protocolo (linea 18)
+                TEOREMA d_lectura por Deps (linea 275)
+                  PREMISA_MD d_desconocido (linea 246)
+        TEOREMA p_lecturauniforme por Deps (linea 952)
+          TEOREMA d_comparador por Deps (linea 860)
+            TEOREMA d_lectura por Deps (linea 275)
+              PREMISA_MD d_desconocido (linea 246)
+            TEOREMA d_protocolofase por Deps (linea 741)
+              PREMISA_MD d_protocolo (linea 18)
+              TEOREMA d_amplitudes por Deps (linea 472)
+                PREMISA_MD d_protocolo (linea 18)
+                TEOREMA d_lectura por Deps (linea 275)
+                  PREMISA_MD d_desconocido (linea 246)
+              TEOREMA p_interferencia por Deps (linea 694)
+                TEOREMA d_amplitudes por Deps (linea 472)
+                  PREMISA_MD d_protocolo (linea 18)
+                  TEOREMA d_lectura por Deps (linea 275)
+                    PREMISA_MD d_desconocido (linea 246)
+          TEOREMA d_condicionreferencia por Deps (linea 925)
+            TEOREMA d_comparador por Deps (linea 860)
+              TEOREMA d_lectura por Deps (linea 275)
+                PREMISA_MD d_desconocido (linea 246)
+              TEOREMA d_protocolofase por Deps (linea 741)
+                PREMISA_MD d_protocolo (linea 18)
+                TEOREMA d_amplitudes por Deps (linea 472)
+                  PREMISA_MD d_protocolo (linea 18)
+                  TEOREMA d_lectura por Deps (linea 275)
+                    PREMISA_MD d_desconocido (linea 246)
+                TEOREMA p_interferencia por Deps (linea 694)
+                  TEOREMA d_amplitudes por Deps (linea 472)
+                    PREMISA_MD d_protocolo (linea 18)
+                    TEOREMA d_lectura por Deps (linea 275)
+                      PREMISA_MD d_desconocido (linea 246)
+      TEOREMA p_lecturauniforme por Deps (linea 952)
+        TEOREMA d_comparador por Deps (linea 860)
+          TEOREMA d_lectura por Deps (linea 275)
+            PREMISA_MD d_desconocido (linea 246)
+          TEOREMA d_protocolofase por Deps (linea 741)
+            PREMISA_MD d_protocolo (linea 18)
+            TEOREMA d_amplitudes por Deps (linea 472)
+              PREMISA_MD d_protocolo (linea 18)
+              TEOREMA d_lectura por Deps (linea 275)
+                PREMISA_MD d_desconocido (linea 246)
+            TEOREMA p_interferencia por Deps (linea 694)
+              TEOREMA d_amplitudes por Deps (linea 472)
+                PREMISA_MD d_protocolo (linea 18)
+                TEOREMA d_lectura por Deps (linea 275)
+                  PREMISA_MD d_desconocido (linea 246)
+        TEOREMA d_condicionreferencia por Deps (linea 925)
+          TEOREMA d_comparador por Deps (linea 860)
+            TEOREMA d_lectura por Deps (linea 275)
+              PREMISA_MD d_desconocido (linea 246)
+            TEOREMA d_protocolofase por Deps (linea 741)
+              PREMISA_MD d_protocolo (linea 18)
+              TEOREMA d_amplitudes por Deps (linea 472)
+                PREMISA_MD d_protocolo (linea 18)
+                TEOREMA d_lectura por Deps (linea 275)
+                  PREMISA_MD d_desconocido (linea 246)
+              TEOREMA p_interferencia por Deps (linea 694)
+                TEOREMA d_amplitudes por Deps (linea 472)
+                  PREMISA_MD d_protocolo (linea 18)
+                  TEOREMA d_lectura por Deps (linea 275)
+                    PREMISA_MD d_desconocido (linea 246)
+</code></pre>
+<h2>Alcance</h2>
+<p>Lee exclusivamente el Markdown y comprueba las reglas Deps, las referencias explicitas de la prueba y las premisas declaradas. Certifica la derivacion interna de T_SECUENCIACOND en ese sistema; no convierte automaticamente cada premisa declarada en verdad matematica externa.</p>
+
+</body>
+</html>

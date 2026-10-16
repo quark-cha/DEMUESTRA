@@ -3,14 +3,14 @@
   "tool": "SWI-Prolog",
   "branch": "INITIAL_JSON_TO_PROLOG",
   "input_file": "ES_52_Maquina_V_UNIHOLOG.extracted.json",
-  "generated_on": "2026-10-16T01:12:15+00:00",
+  "generated_on": "2026-10-16T13:13:08+00:00",
   "passed": true,
   "refuted": false,
   "mathematical_status": "NO DETERMINADO",
   "scope": "Alcanzabilidad en el grafo de dependencias declarado del JSON inicial. No verifica la validez matematica de las reglas ni consulta las otras ramas.",
   "verdict": "ALCANZABLE_EN_GRAFO_DECLARADO",
   "exit_code": 0,
-  "input_sha256": "05754122949fc7b1579fbfc4761b741c3d1e8124701beffbadb7bad82354251b",
+  "input_sha256": "c5e9260a296abb70c5cb9be17c56c8e342dc5159f6642c6a1f1caffc4d5d8e64",
   "goal": "T_SECUENCIACOND",
   "diagnosis": "ALCANZABLE_EN_GRAFO_DECLARADO. Alcanzabilidad en el grafo de dependencias declarado del JSON inicial. No verifica la validez matematica de las reglas ni consulta las otras ramas.",
   "output": "RESULTADO PROLOG JSON: OBJETIVO_ALCANZABLE_DESDE_PREMISAS_DECLARADAS\nALCANCE: reglas de dependencias declaradas; no verifica identidades matematicas ni pruebas Lean.\n",
@@ -609,11 +609,9 @@
     {
       "id": "EVAL_PROLOG_JSON_ES_52_Maquina_V_UNIHOLOG",
       "kind": "meta_validation",
-      "name": "Resultado independiente de Prolog desde el JSON inicial",
+      "name": "Prolog desde el JSON inicial",
       "description": "ALCANZABLE_EN_GRAFO_DECLARADO. Alcanzabilidad en el grafo de dependencias declarado del JSON inicial. No verifica la validez matematica de las reglas ni consulta las otras ramas.",
-      "deps": [
-        "T_SECUENCIACOND"
-      ],
+      "deps": [],
       "measurement_relationship": "additive",
       "proof": {
         "method": "SWI-Prolog",

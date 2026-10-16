@@ -8,7 +8,7 @@ td, td a, td code { overflow-wrap: anywhere; word-break: break-word; white-space
 **Víctor Estrada Díaz · Einstein-VED — UNIHOLOG**  
 11 de octubre de 2026.
 
-[Artículo de presentación](https://estradad.es/teorias/pdf/DEMUESTRA/proyectos/ES_52/ES_52_Presentacion_comunidad.pdf) · [Documento base](https://estradad.es/teorias/pdf/DEMUESTRA/proyectos/ES_52/ES_52_Maquina_V_UNIHOLOG.pdf) · [Ficha del proyecto y navegación web](https://estradad.es/teorias/pdf/DEMUESTRA/proyectos/ES_52/).
+[Artículo de presentación](./ES_52_Presentacion_comunidad.pdf) · [Documento base](./ES_52_Maquina_V_UNIHOLOG.pdf) · [Ficha del proyecto y navegación web](https://estradad.es/teorias/pdf/DEMUESTRA/proyectos/ES_52/).
 
 Este índice enlaza el catálogo de documentos, sus adjuntos explícitos, todas las imágenes y los complementos declarados para publicación. Los enlaces web de los materiales nuevos estarán disponibles después de publicar. Los materiales están agrupados para facilitar su consulta.
 
@@ -20,6 +20,7 @@ Este índice enlaza el catálogo de documentos, sus adjuntos explícitos, todas 
 | Laminas de construccion y comparacion Q-V | [HTML](https://estradad.es/teorias/pdf/DEMUESTRA/proyectos/ES_52/ES_52_Laminas_Q_V.html) · [PDF](https://estradad.es/teorias/pdf/DEMUESTRA/proyectos/ES_52/ES_52_Laminas_Q_V.pdf) |
 | Traductores y compiladores de V | [HTML](https://estradad.es/teorias/pdf/DEMUESTRA/proyectos/ES_52/Traductores_V/ES_52_Traductores_y_compiladores_de_V.html) · [PDF](https://estradad.es/teorias/pdf/DEMUESTRA/proyectos/ES_52/Traductores_V/ES_52_Traductores_y_compiladores_de_V.pdf) |
 | Máquina V: presentación a la comunidad | [HTML](https://estradad.es/teorias/pdf/DEMUESTRA/proyectos/ES_52/ES_52_Presentacion_comunidad.html) · [PDF](https://estradad.es/teorias/pdf/DEMUESTRA/proyectos/ES_52/ES_52_Presentacion_comunidad.pdf) |
+| Relaciones, medida y Bell | [HTML](./ES_52_Relaciones_medida_y_Bell.html) · [PDF](./ES_52_Relaciones_medida_y_Bell.pdf) |
 
 ## Programas y adjuntos portatiles
 

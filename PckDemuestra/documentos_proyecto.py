@@ -3,6 +3,7 @@
 import hashlib
 import json
 from pathlib import Path
+import re
 import shutil
 
 
@@ -29,7 +30,73 @@ def leer_catalogo(proyecto):
         seen.add(source)
     if ruta_local(root, data['principal']) not in seen:
         raise ValueError('El documento principal no esta en el catalogo')
+    url_documento_pdf(data, data['principal'])
     return data
+
+
+def url_documento_pdf(catalogo, relativa):
+    """Resolve PDF links for print without changing portable Markdown or HTML."""
+    from urllib.parse import quote, urljoin, urlsplit
+
+    base = catalogo.get('base_url_pdf')
+    if base is None:
+        return None
+    if not isinstance(base, str):
+        raise ValueError('base_url_pdf debe ser una URL HTTP(S) terminada en /')
+    url = urlsplit(base)
+    if url.scheme not in ('http', 'https') or not url.netloc or url.query or url.fragment or not base.endswith('/'):
+        raise ValueError('base_url_pdf debe ser una URL HTTP(S) terminada en /')
+    return urljoin(base, quote(Path(relativa).with_suffix('.pdf').as_posix(), safe='/'))
+
+
+def validar_enlaces_documentales(proyecto):
+    """Check reciprocal PDF links for marked, non-evaluable companion documents."""
+    from markdown_it import MarkdownIt
+    from urllib.parse import unquote, urlsplit
+
+    root = Path(proyecto).resolve()
+    catalog = leer_catalogo(root)
+    main = ruta_local(root, catalog['principal'])
+    heading = main.read_text(encoding='utf-8-sig').splitlines()[0]
+    match = re.fullmatch(r'# ([A-Z]{2}_[0-9]+):.*', heading)
+    if not match:
+        return {'principal': catalog['principal'], 'complementarios': [], 'enlaces_comprobados': 0}
+    marker = '# -' + match[1] + ':'
+    companions = []
+    registered = {ruta_local(root, entry['fuente']) for entry in catalog['documentos']}
+    for path in sorted(root.rglob('*.md')):
+        if {'bck', 'respaldos', 'archivo_local', '.git', '__pycache__'}.intersection(path.relative_to(root).parts):
+            continue
+        lines = path.read_text(encoding='utf-8-sig').splitlines()
+        if not lines or not lines[0].startswith(marker):
+            continue
+        if path.resolve() not in registered:
+            raise ValueError(f'Complementario no incluido en el catalogo: {path.relative_to(root)}')
+        companions.append(path.resolve())
+
+    def targets(source):
+        found = set()
+        for token in MarkdownIt().parse(source.read_text(encoding='utf-8-sig')):
+            for child in token.children or ():
+                if child.type != 'link_open':
+                    continue
+                url = urlsplit(child.attrGet('href') or '')
+                if url.scheme or url.netloc or not url.path:
+                    continue
+                target = (source.parent / unquote(url.path)).resolve()
+                if target.is_relative_to(root):
+                    found.add(target)
+        return found
+
+    outgoing = targets(main)
+    for companion in companions:
+        if companion.with_suffix('.pdf') not in outgoing:
+            raise ValueError(f'{main.name}: falta enlace PDF relativo a {companion.relative_to(root)}')
+        if main.with_suffix('.pdf') not in targets(companion):
+            raise ValueError(f'{companion.relative_to(root)}: falta enlace PDF relativo al principal')
+    return {'principal': catalog['principal'],
+            'complementarios': [p.relative_to(root).as_posix() for p in companions],
+            'enlaces_comprobados': 2 * len(companions)}
 
 
 def generar_locales(proyecto):
@@ -40,6 +107,7 @@ def generar_locales(proyecto):
 
     root = Path(proyecto).resolve()
     catalog = leer_catalogo(root)
+    validar_enlaces_documentales(root)
     records = []
     with sync_playwright() as engine:
         browser = engine.chromium.launch(timeout=30000)
@@ -51,6 +119,13 @@ def generar_locales(proyecto):
                 page = browser.new_page()
                 try:
                     page.set_content(html, wait_until='networkidle')
+                    base = url_documento_pdf(catalog, source.relative_to(root))
+                    if base:
+                        page.evaluate('''href => {
+                            const base = document.createElement('base');
+                            base.href = href;
+                            document.head.prepend(base);
+                        }''', base)
                     page.evaluate('document.fonts.ready')
                     if not page.evaluate('Array.from(document.images).every(i=>i.complete && i.naturalWidth>0)'):
                         raise RuntimeError(f'Imagen no cargada en {source.name}')
@@ -82,6 +157,7 @@ def archivos_publicables(proyecto):
 
     root = Path(proyecto).resolve()
     catalog = leer_catalogo(root)
+    validar_enlaces_documentales(root)
     report_path = root / 'CONSISTENCIA_DOCUMENTOS.json'
     if not report_path.is_file():
         raise ValueError('Ejecuta publica.py --documentos-locales antes de publicar los anexos')

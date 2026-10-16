@@ -73,6 +73,64 @@ class DocumentosTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             MODULE.sincronizar_locales(self.root, self.root.parent / 'otro')
 
+    def make_marked_project(self):
+        (self.root / 'base.md').write_text('# ES_52: Base\n\n[Anexo](anexo.pdf)', encoding='utf-8')
+        (self.root / 'anexo.md').write_text('# -ES_52: Anexo\n\n[Base](base.pdf)', encoding='utf-8')
+
+    def test_marked_companions_require_reciprocal_pdf_links(self):
+        self.make_marked_project()
+        report = MODULE.validar_enlaces_documentales(self.root)
+        self.assertEqual(report['enlaces_comprobados'], 2)
+        self.assertEqual(report['complementarios'], ['anexo.md'])
+        self.assertFalse((self.root / 'base.pdf').exists())
+
+    def test_links_to_source_markdown_do_not_replace_pdf_navigation(self):
+        self.make_marked_project()
+        (self.root / 'anexo.md').write_text('# -ES_52: Anexo\n\n[Base](base.md)', encoding='utf-8')
+        with self.assertRaisesRegex(ValueError, 'PDF relativo al principal'):
+            MODULE.validar_enlaces_documentales(self.root)
+
+    def test_new_marked_document_cannot_be_silently_omitted(self):
+        self.make_marked_project()
+        (self.root / 'nuevo.md').write_text('# -ES_52: Nuevo', encoding='utf-8')
+        with self.assertRaisesRegex(ValueError, 'no incluido en el catalogo'):
+            MODULE.validar_enlaces_documentales(self.root)
+
+    def test_registered_companion_missing_from_main_is_reported(self):
+        self.make_marked_project()
+        (self.root / 'base.md').write_text('# ES_52: Base', encoding='utf-8')
+        with self.assertRaisesRegex(ValueError, 'falta enlace PDF relativo a anexo.md'):
+            MODULE.validar_enlaces_documentales(self.root)
+
+    def test_nested_relative_links_and_encoded_spaces(self):
+        self.make_marked_project()
+        directory = self.root / 'Con espacios'
+        directory.mkdir()
+        (directory / 'otro.md').write_text('# -ES_52: Otro\n\n[Base](../base.pdf)', encoding='utf-8')
+        with (self.root / 'base.md').open('a', encoding='utf-8') as stream:
+            stream.write('\n[Otro](Con%20espacios/otro.pdf)')
+        self.data['documentos'].append({'fuente': 'Con espacios/otro.md'})
+        self.save()
+        self.assertEqual(MODULE.validar_enlaces_documentales(self.root)['enlaces_comprobados'], 4)
+
+    def test_backup_is_not_an_active_companion(self):
+        self.make_marked_project()
+        (self.root / 'respaldos').mkdir()
+        (self.root / 'respaldos/anterior.md').write_text('# -ES_52: Anterior', encoding='utf-8')
+        self.assertEqual(MODULE.validar_enlaces_documentales(self.root)['enlaces_comprobados'], 2)
+
+    def test_pdf_base_resolves_nested_relative_links_without_rewriting_sources(self):
+        self.data['base_url_pdf'] = 'https://example.org/ES_52/'
+        self.assertEqual(MODULE.url_documento_pdf(self.data, 'Con espacios/otro.md'),
+                         'https://example.org/ES_52/Con%20espacios/otro.pdf')
+        self.assertEqual((self.root / 'base.md').read_text(encoding='utf-8'), '# Base')
+
+    def test_invalid_pdf_base_is_rejected_before_generation(self):
+        for base in ('file:///tmp/', 'https://example.org/ES_52',
+                     'https://example.org/?query=1/', 7):
+            with self.subTest(base=base), self.assertRaisesRegex(ValueError, 'base_url_pdf'):
+                MODULE.url_documento_pdf({'base_url_pdf': base}, 'base.md')
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -7,15 +7,15 @@
       "fuente": "ES_52_Maquina_V_UNIHOLOG.md",
       "titulo": "Documento base",
       "tipo": "investigacion",
-      "source_sha256": "6c2ac8edb842e2d5ef0c7f0965f0cbaf203e974f3bcdb2acf875162cbb5467d0",
+      "source_sha256": "4d1ea2607a1bf718e94477e2c446a63b87b3191b9923628525956785fdb44896",
       "derivados": {
         "html": {
           "ruta": "ES_52_Maquina_V_UNIHOLOG.html",
-          "sha256": "79492eb3330e804ef0316b29266ddea07d7925121ad0bca4fc1bca1a22ca3b07"
+          "sha256": "ee922b561e32a68401c553a54fb927e1068f88a8e0331413cb2dcfc2c4633857"
         },
         "pdf": {
           "ruta": "ES_52_Maquina_V_UNIHOLOG.pdf",
-          "sha256": "ecee9eac0d38da7aa980c44edc24c38a800876a0037bd79da27cdd430935c84c"
+          "sha256": "7440ae54b5d42160140ff772aea38c4811f44826c1b08e104cfb01917b098fe8"
         }
       },
       "certificacion": "NO_EVALUADA_POR_GENERACION_EDITORIAL"
@@ -32,7 +32,7 @@
         },
         "pdf": {
           "ruta": "ES_52_Laminas_Q_V.pdf",
-          "sha256": "805e52c3c0cf967e5a36bc7995ad3926766fba087ae995390bea9d953b86dd1c"
+          "sha256": "813a5efdfb30a92a86416cb6ffff5216abd2e81cbe9b648bb5df9f8bd9a7c7bb"
         }
       },
       "certificacion": "NO_EVALUADA_POR_GENERACION_EDITORIAL"
@@ -49,7 +49,7 @@
         },
         "pdf": {
           "ruta": "Traductores_V/ES_52_Traductores_y_compiladores_de_V.pdf",
-          "sha256": "cfc487734fb01597f7061f2f905cb66b9da155d5bf97e07bff29d599851c6381"
+          "sha256": "f2f924056d75a5f760b790d0ae38a1036223257f3cb170f2a9a2145299ac63d8"
         }
       },
       "certificacion": "NO_EVALUADA_POR_GENERACION_EDITORIAL"
@@ -58,15 +58,15 @@
       "fuente": "ES_52_Presentacion_comunidad.md",
       "titulo": "Máquina V: presentación a la comunidad",
       "tipo": "presentacion",
-      "source_sha256": "39be63eb5503bda2d61fff4d3efcb659b16c802ac19f7c319c0990e0761b96fb",
+      "source_sha256": "f48f023d8c14e7638c6c068681f7ec1e3ee8fef5d96f392ecda453149e033aa4",
       "derivados": {
         "html": {
           "ruta": "ES_52_Presentacion_comunidad.html",
-          "sha256": "0319eebfc4d779a5e590dc331b4d42fd774a0a51d8ab2b861e44bdbafe62b945"
+          "sha256": "a6188837b16ff982a877a21d6c1ed9c453c8484287e739fee493352e262181b9"
         },
         "pdf": {
           "ruta": "ES_52_Presentacion_comunidad.pdf",
-          "sha256": "7ac550d6f17926c7d7689bb989ded69de7ff419c8c80b2cac435b65057e6b041"
+          "sha256": "2fea7d44732de228ea489110d14d4e99e8c8c6d83f36948a78dd5e2f04e05129"
         }
       },
       "certificacion": "NO_EVALUADA_POR_GENERACION_EDITORIAL"
@@ -75,15 +75,32 @@
       "fuente": "ES_52_Indice_recursos.md",
       "titulo": "Índice completo de recursos del proyecto",
       "tipo": "indice",
-      "source_sha256": "235ed86e139498e585f3b378148ff9c758e8acfc17f9cf93a8dc0a3a6a4c3551",
+      "source_sha256": "2c0eaeef4f95ecf2f54a344ddb64d78efe88d68d860ed33004d7cb4ad888c1f6",
       "derivados": {
         "html": {
           "ruta": "ES_52_Indice_recursos.html",
-          "sha256": "1f923c90da05c27d7ef0f9eba0ce60dc3ffa945ccc64a2986a1efc1a8f5f58dd"
+          "sha256": "583e84e349188cfd37b5cd831fcf812a660d9689e2d7406bfb8ecfe889f919d7"
         },
         "pdf": {
           "ruta": "ES_52_Indice_recursos.pdf",
-          "sha256": "fbba19d71ccaab51341ccdbf4b744a49ea1ca9ccff9c5347b339794fa63506ed"
+          "sha256": "464233f6c4bdf809766746c55dec660752fc5ff6b51b4a758223603f0c5e7030"
+        }
+      },
+      "certificacion": "NO_EVALUADA_POR_GENERACION_EDITORIAL"
+    },
+    {
+      "fuente": "ES_52_Relaciones_medida_y_Bell.md",
+      "titulo": "Relaciones, medida y Bell",
+      "tipo": "articulo_complementario",
+      "source_sha256": "40ee2af7d259a31ba5890edba25cb3f50e8547d07b7cee677b1e5ad475c45c3b",
+      "derivados": {
+        "html": {
+          "ruta": "ES_52_Relaciones_medida_y_Bell.html",
+          "sha256": "2c46e4cb098b967f811f5238869bddb506b77787de83a12bbdafabd575a88996"
+        },
+        "pdf": {
+          "ruta": "ES_52_Relaciones_medida_y_Bell.pdf",
+          "sha256": "6b5abaceecfc3704c08b618b023d0894cd1b5d56368bea8e0ce85f99305c2c11"
         }
       },
       "certificacion": "NO_EVALUADA_POR_GENERACION_EDITORIAL"

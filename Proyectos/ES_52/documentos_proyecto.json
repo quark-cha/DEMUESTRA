@@ -1,12 +1,14 @@
 {
   "version": 1,
+  "base_url_pdf": "https://estradad.es/teorias/pdf/DEMUESTRA/proyectos/ES_52/",
   "principal": "ES_52_Maquina_V_UNIHOLOG.md",
   "documentos": [
     {"fuente": "ES_52_Maquina_V_UNIHOLOG.md", "titulo": "Documento base", "tipo": "investigacion"},
     {"fuente": "ES_52_Laminas_Q_V.md", "titulo": "Laminas de construccion y comparacion Q-V", "tipo": "laminas"},
     {"fuente": "Traductores_V/ES_52_Traductores_y_compiladores_de_V.md", "titulo": "Traductores y compiladores de V", "tipo": "software"},
     {"fuente": "ES_52_Presentacion_comunidad.md", "titulo": "Máquina V: presentación a la comunidad", "tipo": "presentacion"},
-    {"fuente": "ES_52_Indice_recursos.md", "titulo": "Índice completo de recursos del proyecto", "tipo": "indice"}
+    {"fuente": "ES_52_Indice_recursos.md", "titulo": "Índice completo de recursos del proyecto", "tipo": "indice"},
+    {"fuente": "ES_52_Relaciones_medida_y_Bell.md", "titulo": "Relaciones, medida y Bell", "tipo": "articulo_complementario"}
   ],
   "adjuntos": [
     "ES_52_Maquina_V_UNIHOLOG.extracted.json",

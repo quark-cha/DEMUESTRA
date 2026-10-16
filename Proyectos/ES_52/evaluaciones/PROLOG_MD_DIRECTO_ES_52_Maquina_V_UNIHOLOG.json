@@ -615,7 +615,7 @@
       "id": "EVAL_PROLOG_MD_DIRECTO_ES_52_Maquina_V_UNIHOLOG",
       "kind": "meta_validation",
       "name": "Resultado del evaluador Prolog directo del Markdown",
-      "description": "Lee exclusivamente el Markdown y comprueba las reglas Deps, las referencias explicitas de la prueba y las premisas declaradas. Certifica la derivacion interna de T_SECUENCIACOND en ese sistema; no convierte automaticamente cada premisa declarada en verdad matematica externa.",
+      "description": "TEOREMA DERIVADO DESDE PREMISAS DECLARADAS. Lee exclusivamente el Markdown y comprueba las reglas Deps, las referencias explicitas de la prueba y las premisas declaradas. Certifica la derivacion interna de T_SECUENCIACOND en ese sistema; no convierte automaticamente cada premisa declarada en verdad matematica externa.",
       "deps": [
         "T_SECUENCIACOND"
       ],
@@ -624,7 +624,7 @@
         "method": "SWI-Prolog Direct Markdown Auditor",
         "status": "verified",
         "steps": [
-          "Lee exclusivamente el Markdown y comprueba las reglas Deps, las referencias explicitas de la prueba y las premisas declaradas. Certifica la derivacion interna de T_SECUENCIACOND en ese sistema; no convierte automaticamente cada premisa declarada en verdad matematica externa."
+          "TEOREMA DERIVADO DESDE PREMISAS DECLARADAS. Lee exclusivamente el Markdown y comprueba las reglas Deps, las referencias explicitas de la prueba y las premisas declaradas. Certifica la derivacion interna de T_SECUENCIACOND en ese sistema; no convierte automaticamente cada premisa declarada en verdad matematica externa."
         ],
         "verification_scope": "prolog_direct_markdown_derivation"
       }
@@ -634,14 +634,14 @@
   "certificate_type": "SWI_PROLOG_DIRECT_MARKDOWN_DERIVATION",
   "project": "ES_52_Maquina_V_UNIHOLOG",
   "tool": "SWI-Prolog Direct Markdown Auditor",
-  "generated_on": "2026-10-16T01:12:19+00:00",
+  "generated_on": "2026-10-16T13:13:08+00:00",
   "verdict": "TEOREMA DERIVADO DESDE PREMISAS DECLARADAS",
   "passed": true,
   "refuted": false,
   "mathematical_status": "DERIVADO_EN_EL_SISTEMA_DECLARADO_POR_EL_MD",
   "exit_code": 0,
   "input": "ES_52_Maquina_V_UNIHOLOG.md",
-  "input_sha256": "6c2ac8edb842e2d5ef0c7f0965f0cbaf203e974f3bcdb2acf875162cbb5467d0",
+  "input_sha256": "4d1ea2607a1bf718e94477e2c446a63b87b3191b9923628525956785fdb44896",
   "auditor": "PckDemuestra\\audita_md.pl",
   "auditor_sha256": "a9ad83b7361bf9b2bd40247fa7733d2fa85011c8c93cac3a506d1dc1d400b8ed",
   "uses_generated_prolog": false,

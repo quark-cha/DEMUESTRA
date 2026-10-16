@@ -9,7 +9,7 @@
 **Víctor Estrada Díaz · Einstein-VED — UNIHOLOG**  
 11 de octubre de 2026 · [ORCID 0000-0001-9942-1021](https://orcid.org/0000-0001-9942-1021)
 
-**Acceso al proyecto:** [dossier en DEMUESTRA](https://estradad.es/teorias/pdf/DEMUESTRA/proyectos/ES_52/) · [documento base](https://estradad.es/teorias/pdf/DEMUESTRA/proyectos/ES_52/ES_52_Maquina_V_UNIHOLOG.pdf) · [láminas](https://estradad.es/teorias/pdf/DEMUESTRA/proyectos/ES_52/ES_52_Laminas_Q_V.pdf) · [traductores y compiladores](https://estradad.es/teorias/pdf/DEMUESTRA/proyectos/ES_52/Traductores_V/ES_52_Traductores_y_compiladores_de_V.pdf) · [índice completo de recursos](https://estradad.es/teorias/pdf/DEMUESTRA/proyectos/ES_52/ES_52_Indice_recursos.pdf).
+**Acceso al proyecto:** [dossier en DEMUESTRA](https://estradad.es/teorias/pdf/DEMUESTRA/proyectos/ES_52/) · [documento base](./ES_52_Maquina_V_UNIHOLOG.pdf) · [láminas](./ES_52_Laminas_Q_V.pdf) · [traductores y compiladores](./Traductores_V/ES_52_Traductores_y_compiladores_de_V.pdf) · [índice completo de recursos](./ES_52_Indice_recursos.pdf).
 
 ![Q y V: paralelismo temporal de la medida](./img/Q-V-medida-temporal.png)
 

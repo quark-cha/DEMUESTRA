@@ -4,7 +4,7 @@ from markdown_it import MarkdownIt
 from pathlib import Path
 import unittest
 from unittest.mock import patch
-from urllib.parse import unquote, urlsplit
+from urllib.parse import unquote, urljoin, urlsplit
 
 import publica
 
@@ -71,7 +71,8 @@ class PublicacionMaterialesTests(unittest.TestCase):
                 for child in token.children or ():
                     if child.type != 'link_open':
                         continue
-                    url = urlsplit(child.attrGet('href') or '')
+                    url = urlsplit(urljoin('https://estradad.es/teorias/pdf/DEMUESTRA/proyectos/ES_52/' + name,
+                                           child.attrGet('href') or ''))
                     self.assertFalse(url.path.endswith('.md'), (name, url.path))
                     if url.path.endswith('.pdf'):
                         pdf_count += 1

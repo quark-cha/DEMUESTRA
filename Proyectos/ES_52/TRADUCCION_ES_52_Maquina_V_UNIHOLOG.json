@@ -1,8 +1,13 @@
 {
   "project": "ES_52_Maquina_V_UNIHOLOG",
-  "source_sha256": "6c2ac8edb842e2d5ef0c7f0965f0cbaf203e974f3bcdb2acf875162cbb5467d0",
+  "source_sha256": "4d1ea2607a1bf718e94477e2c446a63b87b3191b9923628525956785fdb44896",
+  "status": "ERROR_HERRAMIENTA_TRADUCCION_LEAN",
+  "category": "tool_error",
   "document_verdict": "NO_EMITIDO",
   "formal_certification": "PENDIENTE",
+  "publication_blocked_by_translation": false,
+  "detail": "No se pueden emitir formulas sin tipo:\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:739:D_PROTOCOLOFASE:formula-1: argumento de mat: se esperaba Tuple[Real,Real], se obtuvo Tuple[Nat,Nat].\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1295:D_CORRELACIONES:formula-2: LIMITACION_DEL_TRADUCTOR: falta el modelo tipado de probabilidad condicionada; no es una multiplicacion.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:922:D_CONDICIONREFERENCIA:formula-1: LIMITACION_DEL_TRADUCTOR: falta el modelo tipado de probabilidad condicionada; no es una multiplicacion.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:949:P_LECTURAUNIFORME:formula-1: LIMITACION_DEL_TRADUCTOR: falta el modelo tipado de probabilidad condicionada; no es una multiplicacion.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1107:T_SECUENCIACOND:formula-1: LIMITACION_DEL_TRADUCTOR: falta el modelo tipado de probabilidad condicionada; no es una multiplicacion.",
+  "message": "Evaluacion Lean pendiente por limitacion del traductor. Esta via no emite un juicio sobre la validez del documento ni altera los resultados de los otros evaluadores. La vigencia de cada certificado se comprueba con sus propias evidencias.",
   "nodes": [
     {
       "id": "D_PROTOCOLO",
@@ -600,9 +605,7 @@
       "kind": "meta_validation",
       "name": "Diagnostico de la herramienta de traduccion; no es un veredicto cientifico",
       "description": "ERROR_HERRAMIENTA_TRADUCCION_LEAN",
-      "deps": [
-        "T_SECUENCIACOND"
-      ],
+      "deps": [],
       "measurement_relationship": "additive",
       "proof": {
         "method": "DEMUESTRA",
@@ -614,23 +617,18 @@
       }
     }
   ],
-  "authors": [
-    {
-      "name": "Víctor Estrada Díaz",
-      "orcid": "0000-0001-9942-1021"
-    }
-  ],
-  "status": "ERROR_HERRAMIENTA_TRADUCCION_LEAN",
-  "category": "tool_error",
-  "detail": "No se pueden emitir formulas sin tipo:\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:739:D_PROTOCOLOFASE:formula-1: argumento de mat: se esperaba Tuple[Real,Real], se obtuvo Tuple[Nat,Nat].\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1295:D_CORRELACIONES:formula-2: LIMITACION_DEL_TRADUCTOR: falta el modelo tipado de probabilidad condicionada; no es una multiplicacion.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:922:D_CONDICIONREFERENCIA:formula-1: LIMITACION_DEL_TRADUCTOR: falta el modelo tipado de probabilidad condicionada; no es una multiplicacion.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:949:P_LECTURAUNIFORME:formula-1: LIMITACION_DEL_TRADUCTOR: falta el modelo tipado de probabilidad condicionada; no es una multiplicacion.\n- Error semantico en ES_52_Maquina_V_UNIHOLOG.md:1107:T_SECUENCIACOND:formula-1: LIMITACION_DEL_TRADUCTOR: falta el modelo tipado de probabilidad condicionada; no es una multiplicacion.",
-  "publication_blocked_by_translation": false,
-  "message": "Evaluacion Lean pendiente por limitacion del traductor; no refuta el documento.",
   "schema": "ADEC_nodes_input_v1",
   "title": "ES_52: Podemos construir máquinas cuánticas con electrónica convencional",
   "version": "1.0",
   "validation_mode": "article_analysis",
   "artifact_stage": "translation_tool_diagnostic",
   "source": "ES_52_Maquina_V_UNIHOLOG.md",
+  "authors": [
+    {
+      "name": "Víctor Estrada Díaz",
+      "orcid": "0000-0001-9942-1021"
+    }
+  ],
   "adec_compatible": true,
   "adec_node_count": 31,
   "adec_access": {

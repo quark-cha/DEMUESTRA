@@ -1,0 +1,879 @@
+{
+  "schema": "ADEC_nodes_input_v1",
+  "title": "ES_52: Podemos construir máquinas cuánticas con electrónica convencional",
+  "version": "1.0",
+  "validation_mode": "article_analysis",
+  "artifact_stage": "prolog_direct_markdown_derivation",
+  "source": "ES_52_Maquina_V_UNIHOLOG.md",
+  "authors": [
+    {
+      "name": "Víctor Estrada Díaz",
+      "orcid": "0000-0001-9942-1021"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "D_PROTOCOLO",
+      "kind": "definition",
+      "name": "$D_{PROTOCOLO}$ — Protocolo y alcance de la comparación operacional.",
+      "description": "$D_{PROTOCOLO}$ — Protocolo y alcance de la comparación operacional.\n\nLa hipótesis de este trabajo es que existe una máquina física V,\nconstruible con electrónica convencional, operacionalmente equivalente\na una máquina cuántica Q en el modelo computacional considerado.\nLa comparación se regirá desde el principio por las siguientes premisas.\n\n**1. Simetría estricta del criterio.** Q y V deben someterse al mismo\nprotocolo operacional y a las mismas restricciones. No se exigirá a V\nun criterio que no se sostenga también para Q, ni se concederá a V una\ninformación o un recurso que no esté permitido a Q. Esta regla se aplica\nrecíprocamente a ambas máquinas.\n\n**2. Correspondencia explícita de las condiciones.** En cada comparación\nse definirán las preparaciones, entradas, transformaciones, configuraciones\nde medida e instantes de lectura correspondientes. Las realizaciones\nfísicas pueden ser distintas: lo que debe coincidir es el protocolo\noperacional que se compara. Las condiciones ambientales y de funcionamiento\nde cada realización se declararán, sin exigir componentes idénticos.\n\n**3. Igualdad de acceso a la información.** Si el protocolo no observa\nlos valores internos de Q durante el cálculo, tampoco exigirá observar\nlos de V. No se atribuirán resultados observados a medidas no realizadas\nen ninguna de las dos máquinas. Las condiciones de comunicación, control,\nsincronización y elección de las medidas se explicitarán para ambas.\nEsta restricción de acceso no presupone la naturaleza del estado físico\nde ninguna de ellas ni demuestra por sí sola su equivalencia.\n\n**4. Distinción entre predicción y resultado.** P representa la probabilidad\nprevista de obtener una salida; q y v representan los valores registrados\nal medir Q y V, respectivamente. Para una lectura binaria en t = t₀:\n\n$$\nq=M_Q(t_0)\\in\\{0,1\\},\\qquad v=M_V(t_0)\\in\\{0,1\\}.\n$$\n\n**Notación común desde el inicio.** Adoptamos $\\xi$ (xi) para indicar\nque el resultado de una lectura binaria todavía no ha sido observado.\nEs una convención de este documento, aplicada con idéntico significado\na Q y V, no un símbolo universal de la mecánica cuántica. Escribimos\n$K(A)=\\xi$ para expresar nuestro conocimiento del resultado asociado\na A, no una asignación del valor físico $A=\\xi$. En las expresiones\n$K(Q(t))$ y $K(V(t))$ hablamos del resultado de la lectura especificada\npor el protocolo, no del conocimiento completo del estado de la máquina.\n\nAl realizar esa lectura en $t=t_0$, se registra $b\\in\\{0,1\\}$.\nLas flechas que parten de $\\xi$ son esquemas de observación y conocimiento,\nno ecuaciones de evolución del estado físico. Reservamos $\\psi$ para\nla descripción del estado cuando el modelo la utilice; conocer ese estado\nno equivale a conocer el resultado de una ejecución antes de medir.\nCompartir $\\xi$ no presupone que Q y V tengan la misma dinámica o distribución.\nLos pares de predicciones que se muestran en los contrastes señalan las\ndos cantidades cuya igualdad debe comprobarse; no afirman su igualdad.\n\n**Convenciones de escritura de las fórmulas.** Para que las expresiones\nsean legibles por el compilador de PUBLICAR, col(a,b) designa el vector\ncolumna de componentes a y b; mat((a,b),(c,d)) designa la matriz cuyas\nfilas son (a,b) y (c,d). Si las entradas son bloques, se trata de la\ncorrespondiente matriz por bloques, con las dimensiones compatibles\ndeclaradas en cada modelo. norm(z) es la norma euclídea, o la norma\nhermítica del vector complejo. ket(psi) designa el mismo vector de estado\nque la notación de Dirac; e_0 y e_1 son los vectores de la base de lectura,\ny e_j es el vector de esa base con índice j en un registro mayor.\nEstas convenciones no cambian las operaciones ni sus realizaciones físicas.\n\nEn P(a,c_{\\mathrm{protocolo}}), P(a,b,x,y) y expresiones análogas, los últimos argumentos son\nlas condiciones del protocolo: estas funciones representan probabilidades\ncondicionadas, no probabilidades conjuntas con los controles. La misma\nconvención se aplica a F para frecuencias. Uniforme(0,1) designa la\ndistribución uniforme de referencia con soporte de preparación\n0 menor o igual que r y r menor que 1; no añade masa puntual en los extremos.\nphys(Q) y phys(V) identifican las realizaciones físicas, no sus salidas.\nLas cadenas de relaciones se escriben como mapas sucesivos; cuando se\nespecifica T_j, la recurrencia R_j = T_j(R_{j-1}) conserva cada paso.\nPara bits A y B del dominio {0,1}, la puerta NOT se escribe B = 1 - A.\nEsto expresa su tabla de verdad, no una negación de proposiciones.\nLa marca post identifica el estado posterior a una medida, no una potencia.\nc_protocolo es la configuración del protocolo, distinta de una matriz C\no de un puerto binario C. Los diagramas de lectura muestran el paso del\nresultado no observado al resultado b perteneciente a {0,1}; la flecha\nno es una evolución de xi como si fuese un valor físico.\n\nEl símbolo $\\xi$ no constituye un tercer valor almacenado ni fija\nprobabilidades: estas se derivan de la preparación y de las operaciones.\nUna vez registrada una salida, esa ejecución tiene un resultado\nconocido; las probabilidades describen las predicciones y las frecuencias\nesperadas en repeticiones del protocolo. Su dominio general es [0,1],\nincluidos los casos de certeza e imposibilidad.\n\n**5. Exposición completa de cada equivalencia.** Para cada operación se\npresentarán su definición en Q, su realización propuesta en V, la\ncorrespondencia entre ambas y la justificación de sus resultados. Se\ndistinguirán las premisas asumidas, las identidades matemáticas derivadas,\nlas reglas físicas de lectura y los resultados experimentales disponibles.\nLas reglas de predicción y medida empleadas para Q y V deberán quedar\nexplícitas; la igualdad buscada no se introducirá como una premisa.\n\n**6. Criterio observable común.** Para un protocolo C con salidas\ncorrespondientes a, la equivalencia exige:\n\n$$\nP_V(\\mathbf a,c_{\\mathrm{protocolo}})=P_Q(\\mathbf a,c_{\\mathrm{protocolo}}).\n$$\n\nLas comparaciones experimentales usarán criterios estadísticos comunes,\nun número de repeticiones declarado y tolerancias justificadas. Coincidir\nen un resultado aislado o en una distribución marginal no establece por\nsí solo la igualdad de todas las correlaciones ni de todos los protocolos.\n\n**7. Alcance y composición.** El modelo Q de referencia y los protocolos\nadmitidos se especificarán. Para establecer equivalencia completa en ese\nmodelo habrá que justificar las operaciones elementales, su composición,\nlas medidas admitidas y la extensión a varias unidades. Una equivalencia\nparcial se identificará como tal. La equivalencia de resultados y una\neventual ventaja de recursos se evaluarán por separado.\n\n**La simetría de las condiciones es el punto de partida de la demostración;\nla equivalencia operacional completa V = Q es la hipótesis que debe\nestablecerse mediante el desarrollo.**\n\n------------------------------------------------------------------------\n\n## Resumen",
+      "deps": [],
+      "source": {
+        "file": "ES_52_Maquina_V_UNIHOLOG.md",
+        "start_line": 18,
+        "end_line": 141
+      },
+      "structural_verification": "PREMISA_DECLARADA"
+    },
+    {
+      "id": "D_HIPOTESISV",
+      "kind": "definition",
+      "name": "$D_{HIPOTESISV}$ — Hipótesis de equivalencia física que se propone investigar,",
+      "description": "$D_{HIPOTESISV}$ — Hipótesis de equivalencia física que se propone investigar,\nno un teorema obtenido ni una premisa que pueda darse por demostrada.\n\nEste trabajo parte de una pregunta muy sencilla: ¿es imprescindible\nconstruir una máquina con componentes específicamente cuánticos para\nobtener el comportamiento computacional que buscamos en una máquina\ncuántica?\n\nLa hipótesis que desarrollo aquí es que no necesariamente.\n\nPropongo una máquina, que denominaré **V**, construible mediante\nelectrónica convencional, cuyo principio fundamental consiste en\nrenunciar deliberadamente a conocer los valores internos durante el\nproceso de cálculo.\n\nLa máquina no almacena $\\xi$.\n\n$$\n\\boxed{\\xi:\\text{resultado binario no observado}.}\n$$\n\nLos valores continúan perteneciendo al dominio lógico:\n\n$$\n\\{0,1\\}.\n$$\n\nMientras no medimos, no conocemos cuál de ellos tenemos. Sin embargo,\ndesconocer los valores no significa desconocer las **relaciones entre\nellos**.\n\nPodemos conocer, construir y transformar relaciones entre valores\ndesconocidos. Podemos propagar esas relaciones, introducir retardos,\nfases, excitaciones, inhibiciones y composiciones sin realizar una\nmedida intermedia.\n\nSolamente cuando imponemos una medida en:\n\n$$\nt=t_0\n$$\n\nobtenemos necesariamente:\n\n$$\nb\\in\\{0,1\\}.\n$$\n\nLa propuesta consiste en someter una máquina cuántica Q y una máquina\nconvencional V exactamente a las mismas condiciones operacionales y\nestudiar si existe alguna operación observable de Q que V no pueda\nreplicar.\n\nV no pretende simular matemáticamente Q.\n\n$$\n\\boxed{\\text{V replica Q; no simula Q}.}\n$$\n\nLo presentado es una hipótesis de trabajo y una invitación a estudiarla,\ndiscutirla, ampliarla, refutarla o construirla.\n\n------------------------------------------------------------------------\n\n# 1. El origen de la idea",
+      "deps": [],
+      "source": {
+        "file": "ES_52_Maquina_V_UNIHOLOG.md",
+        "start_line": 142,
+        "end_line": 207
+      },
+      "structural_verification": "PREMISA_DECLARADA"
+    },
+    {
+      "id": "P_INVERSION",
+      "kind": "proposition",
+      "name": "$P_{INVERSION}$ — Un inversor establece una relación entre entrada y salida",
+      "description": "$P_{INVERSION}$ — Un inversor establece una relación entre entrada y salida\nsin exigir su lectura previa.\n\nEn un computador convencional queremos conocer y controlar los estados\nlógicos. Pero podemos construir físicamente un circuito convencional y\n**renunciar a conocer el valor que está recorriendo ese circuito**.\n\nUn transistor no necesita que un observador conozca el valor sobre el\nque actúa. Una puerta NOT tampoco.\n\nSi $K(A)=\\xi$, podemos construir físicamente:\n\n$$\nB=(1-A)\n$$\n\nsin medir previamente A. Entonces:\n\n$$\nK(A)=\\xi,\\qquad K(B)=\\xi,\n$$\n\npero conocemos:\n\n$$\n\\boxed{A\\neq B.}\n$$\n\no:\n\n$$\nA\\oplus B=1.\n$$\n\n**Podemos desconocer los valores y conocer las relaciones.**\n\n# 2. Qué significa $\\xi$",
+      "deps": [],
+      "source": {
+        "file": "ES_52_Maquina_V_UNIHOLOG.md",
+        "start_line": 208,
+        "end_line": 245
+      },
+      "structural_verification": "PREMISA_DECLARADA",
+      "proof": {
+        "method": "prolog_direct_markdown_derivation",
+        "status": "declared",
+        "steps": [
+          "$P_{INVERSION}$ — Un inversor establece una relación entre entrada y salida sin exigir su lectura previa.",
+          "En un computador convencional queremos conocer y controlar los estados lógicos.",
+          "Pero podemos construir físicamente un circuito convencional y **renunciar a conocer el valor que está recorriendo ese circuito**.",
+          "Un transistor no necesita que un observador conozca el valor sobre el que actúa.",
+          "Una puerta NOT tampoco.",
+          "Si $K(A)=\\xi$, podemos construir físicamente:",
+          "$$ B=(1-A) $$",
+          "sin medir previamente A."
+        ],
+        "verification_scope": "declared_in_markdown_not_independently_verified"
+      }
+    },
+    {
+      "id": "D_DESCONOCIDO",
+      "kind": "definition",
+      "name": "$D_{DESCONOCIDO}$ — Notación epistemológica y dominio binario.",
+      "description": "$D_{DESCONOCIDO}$ — Notación epistemológica y dominio binario.\n\nEscribiremos $K(A)=\\xi$ cuando el valor de A sea desconocido.\n\n$$\n\\boxed{\\xi\\text{ no es un valor}.}\n$$\n\nNo estamos definiendo $\\{0,1,\\xi\\}$. El dominio lógico continúa siendo:\n\n$$\n\\boxed{\\{0,1\\}.}\n$$\n\n$\\xi$ no es un tercer estado lógico, un valor almacenado, una señal\nelectrónica, una superposición que debamos implementar ni una variable\noculta. Es nuestra notación para:\n\n$$\n\\boxed{\\text{valor desconocido}.}\n$$\n\nPodemos escribir $K(A)=\\xi$ para hacer explícito que hablamos de nuestro\nconocimiento. La máquina no almacena $\\xi$.\n\n# 3. La medida",
+      "deps": [],
+      "source": {
+        "file": "ES_52_Maquina_V_UNIHOLOG.md",
+        "start_line": 246,
+        "end_line": 272
+      },
+      "structural_verification": "PREMISA_DECLARADA"
+    },
+    {
+      "id": "D_LECTURA",
+      "kind": "definition",
+      "name": "$D_{LECTURA}$ — Resultado registrado en el instante de observación.",
+      "description": "$D_{LECTURA}$ — Resultado registrado en el instante de observación.\n\nDeps: D_DESCONOCIDO\n\nAl observar A en $t=t_0$ realizamos $M(A,t_0)$ y:\n\n$$\n\\boxed{M(A,t_0)\\in\\{0,1\\}.}\n$$\n\nNunca $M(A,t_0)=\\xi$. Por tanto:\n\n$$\n\\boxed{\\xi\\mapsto b\\in\\{0,1\\}}\n$$\n\nexpresa que antes desconocemos el valor y después conocemos el\nresultado.\n\n# 4. El colapso entendido como medida\n\nHasta $t=t_0$ no conocemos el resultado. En $t=t_0$ medimos y obtenemos\n$b\\in\\{0,1\\}$.\n\nPara este trabajo basta la consecuencia experimental:\n\n$$\n\\boxed{\\text{antes de medir: resultado desconocido;}}\n$$\n\n$$\n\\boxed{\\text{después de medir: resultado conocido.}}\n$$\n\n# 5. Dos máquinas: Q y V\n\nUsaremos Q para la máquina cuántica y V para la máquina VED.\n\n> **No exigiremos a V una información que no exigimos a Q, ni\n> atribuiremos a V un valor que no observamos en Q.**\n\nAntes de medir:\n\n$$\nK(Q(t))=\\xi,\\qquad K(V(t))=\\xi.\n$$\n\nAl medir:\n\n$$\nM_Q(t_0)\\in\\{0,1\\},\\qquad M_V(t_0)\\in\\{0,1\\}.\n$$\n\nAsí:\n\n$$\n\\boxed{Q: \\xi\\mapsto b\\in\\{0,1\\}}\n$$\n\n$$\n\\boxed{V: \\xi\\mapsto b\\in\\{0,1\\}}\n$$\n\n# 6. Computar sin medir valores internos\n\nLa propuesta no consiste en ocultar al usuario una variable conocida\ninternamente. Durante el cálculo no utilizamos la medida de los valores\ninternos como condición necesaria para continuar.\n\nSi:\n\n$$\nK(A)=\\xi,\\qquad B=(1-A),\\qquad C=B,\\qquad D=(1-C),\n$$\n\npodemos mantener desconocidos los valores individuales y conocer toda la\nestructura relacional. **La información computacional está en las\nrelaciones.**\n\n# 7. Computar relaciones",
+      "deps": [
+        "D_DESCONOCIDO"
+      ],
+      "source": {
+        "file": "ES_52_Maquina_V_UNIHOLOG.md",
+        "start_line": 273,
+        "end_line": 353
+      },
+      "structural_verification": "CERTIFICADO_ESTRUCTURAL"
+    },
+    {
+      "id": "D_RELACIONES",
+      "kind": "definition",
+      "name": "$D_{RELACIONES}$ — Transformaciones de relaciones sin observación intermedia.",
+      "description": "$D_{RELACIONES}$ — Transformaciones de relaciones sin observación intermedia.\n\nDeps: D_PROTOCOLO, D_DESCONOCIDO\n\nRepresentemos las relaciones por $\\mathcal R$. Podemos aplicar\ntransformaciones:\n\n$$\n\\mathcal R_j=T_j(\\mathcal R_{j-1}),\\qquad j\\in\\{1,\\ldots,n\\}.\n$$\n\nMientras:\n\n$$\nK(V_1)=\\xi,K(V_2)=\\xi,\\ldots,K(V_n)=\\xi.\n$$\n\nEl principio es:\n\n$$\n\\boxed{\\text{transformar relaciones sin medir los valores relacionados}.}\n$$\n\n# 8. Una operación física no necesita conocer su entrada\n\nPara un inversor:\n\n$$\nB=(1-A).\n$$\n\nNo necesita realizar primero $M(A)$. Por tanto:\n\n$$\n\\xi\\mapsto\\xi\n$$\n\nno significa que nada haya sucedido: conocemos exactamente la relación\n$B=(1-A)$, aunque A y B sean desconocidos.\n\n# 9. La función temporal $f(t)$",
+      "deps": [
+        "D_PROTOCOLO",
+        "D_DESCONOCIDO"
+      ],
+      "source": {
+        "file": "ES_52_Maquina_V_UNIHOLOG.md",
+        "start_line": 354,
+        "end_line": 395
+      },
+      "structural_verification": "CERTIFICADO_ESTRUCTURAL",
+      "measurement_relationship": "unclear"
+    },
+    {
+      "id": "D_TIEMPO",
+      "kind": "definition",
+      "name": "$D_{TIEMPO}$ — Evolución física e instante de lectura.",
+      "description": "$D_{TIEMPO}$ — Evolución física e instante de lectura.\n\nDeps: D_LECTURA, D_RELACIONES\n\nIntroducimos una evolución física $f(t)$. Puede describir la evolución\nde la máquina mientras:\n\n$$\nK(V(t))=\\xi\n$$\n\ny $\\mathcal R(t)$ evoluciona.\n\nLa medida selecciona $t=t_0$:\n\n$$\nM(V(t_0))\\in\\{0,1\\}.\n$$\n\nEl resultado binario procede de haber restringido esta primera V al modo\nlógico comparable con un qubit, no de que $f(t)$ sea binaria.\n\n# 10. La neurona biológica como inspiración\n\nUna posible V futura puede parecerse más a una neurona biológica:\nmúltiples señales excitadoras e inhibidoras, pulsos, trenes temporales,\nretardos y realimentación.\n\nUna unidad V podría incorporar:\n\n$$\n\\text{excitación},\\quad\n\\text{inhibición},\\quad\n\\text{retardo},\\quad\n\\text{fase},\\quad\n\\text{realimentación}.\n$$\n\nEste trabajo establece primero el principio, no la construcción\ncompleta.\n\n# 11. La fase $\\phi$\n\nLa fase debe tratarse simétricamente:\n\n$$\nQ'=\\Phi_\\phi(Q),\\qquad\nV'=\\Phi_\\phi(V).\n$$\n\nAquí Phi_phi designa la operación de fase phi de cada modelo; no se\npresupone que sus realizaciones físicas sean iguales. Se conserva el\ncontrol phi explícitamente, aun cuando el estado no haya sido observado.\n\nPodemos conocer:\n\n$$\nX'=T_\\phi(X)\n$$\n\nsin conocer X ni $X'$:\n\n$$\nK(X)=\\xi,\\qquad K(X')=\\xi.\n$$\n\nPor tanto:\n\n$$\n\\boxed{\\text{conocer la transformación}\\neq\\text{conocer el valor transformado}.}\n$$\n\n## 11.1. Amplitudes: definiciones independientes y criterio de comparación",
+      "deps": [
+        "D_LECTURA",
+        "D_RELACIONES"
+      ],
+      "source": {
+        "file": "ES_52_Maquina_V_UNIHOLOG.md",
+        "start_line": 396,
+        "end_line": 469
+      },
+      "structural_verification": "CERTIFICADO_ESTRUCTURAL",
+      "measurement_relationship": "unclear"
+    },
+    {
+      "id": "D_AMPLITUDES",
+      "kind": "definition",
+      "name": "$D_{AMPLITUDES}$ — Amplitudes Q y normalización de señales V.",
+      "description": "$D_{AMPLITUDES}$ — Amplitudes Q y normalización de señales V.\n\nDeps: D_PROTOCOLO, D_LECTURA\n\nPara Q escribimos el estado puro de una unidad en la base de lectura:\n\n$$\n\\operatorname{ket}(\\psi_Q(t))=\\alpha_Q(t)e_{0}+\\beta_Q(t)e_{1},\n\\qquad |\\alpha_Q|^2+|\\beta_Q|^2=1.\n$$\n\nPara la realización de señales candidata de V, sean s0(t) y s1(t)\nlas envolventes complejas de dos canales coherentes, descritas mediante\ncomponentes reales de amplitud y fase. No representan bits ya leídos.\nSi la potencia total p_norm = |s0|² + |s1|² es positiva, definimos:\n\n$$\n\\alpha_V=\\frac{s_0}{\\sqrt{p_{\\mathrm{norm}}}},\\qquad\n\\beta_V=\\frac{s_1}{\\sqrt{p_{\\mathrm{norm}}}}.\n$$\n\nLa normalización da |αV|² + |βV|² = 1. Son amplitudes normalizadas\nde señales; llamarlas amplitudes de probabilidad requiere además una\nregla de lectura que conecte sus módulos cuadrados con las frecuencias\nde salidas binarias. Esa conexión se desarrolla en la sección 12.2.\nNo se deduce únicamente del desconocimiento de los valores internos.\n\nEl símbolo $\\xi$ se reserva para el conocimiento de las salidas no leídas.\nLas amplitudes pueden ser conocidas a partir de la preparación y del\nmodelo, o estimadas mediante experimentos repetidos, sin que por ello\nse conozca la salida de una ejecución concreta. No se identifica una\namplitud compleja con un resultado binario o con una probabilidad real.\n\nEl objetivo de comparación en este modelo de señales es:\n\n$$\n\\operatorname{col}(\\alpha_V(t),\\beta_V(t))\n=e^{i\\gamma(t)}\n\\operatorname{col}(\\alpha_Q(t),\\beta_Q(t)),\n$$\n\ncon γ una fase global común a ambos canales. Esta correspondencia es\nun criterio suficiente para las operaciones y medidas del modelo,\nno una exigencia de que toda arquitectura V tenga esos mismos estados\ninternos. La hipótesis no se introduce como resultado: se comprueba\nmediante las ecuaciones de evolución y las condiciones iniciales.\n\n## 11.2. Evolución temporal de Q y de una realización V candidata\n\nPara una Q ideal cerrada, definimos GQ = HQ/ℏ. Su evolución es:",
+      "deps": [
+        "D_PROTOCOLO",
+        "D_LECTURA"
+      ],
+      "source": {
+        "file": "ES_52_Maquina_V_UNIHOLOG.md",
+        "start_line": 470,
+        "end_line": 520
+      },
+      "structural_verification": "CERTIFICADO_ESTRUCTURAL",
+      "measurement_relationship": "unclear"
+    },
+    {
+      "id": "A_EVOLUCIONQ",
+      "kind": "foundation",
+      "name": "$A_{EVOLUCIONQ}$ — Ley del modelo Q ideal cerrado, citada como referencia.",
+      "description": "$A_{EVOLUCIONQ}$ — Ley del modelo Q ideal cerrado, citada como referencia.\n\nDeps: D_AMPLITUDES\n\n$$\ni\\frac{d z_Q}{dt}=G_Q(t)z_Q(t),\\qquad G_Q^\\dagger=G_Q.\n$$\n\nLa evolución unitaria generada por el Hamiltoniano se describe en\n[IBM Quantum Learning: Utility II](https://quantum.cloud.ibm.com/learning/en/courses/utility-scale-quantum-computing/utility-ii).\n\nPara V proponemos un bloque continuo de señales con la siguiente\nespecificación real. Escribimos GV = A + iB, con A real simétrica\ny B real antisimétrica, y s = u + iv. Las componentes deben satisfacer:",
+      "deps": [
+        "D_AMPLITUDES"
+      ],
+      "source": {
+        "file": "ES_52_Maquina_V_UNIHOLOG.md",
+        "start_line": 521,
+        "end_line": 535
+      },
+      "structural_verification": "CERTIFICADO_ESTRUCTURAL"
+    },
+    {
+      "id": "D_CIRCUITOV",
+      "kind": "definition",
+      "name": "$D_{CIRCUITOV}$ — Ley especificada para el bloque de señales candidato;",
+      "description": "$D_{CIRCUITOV}$ — Ley especificada para el bloque de señales candidato;\nsu realización física permanece por validar.\n\nDeps: D_AMPLITUDES\n\n$$\n\\frac{d}{dt}\\operatorname{col}(u,v)\n=\\operatorname{mat}((B,A),(-A,B))\n\\operatorname{col}(u,v).\n$$\n\nEsta ecuación prescribe integraciones y acoplamientos lineales entre\ncomponentes de señales. Un circuito candidato tendrá que realizar sus\ncoeficientes mediante elementos y conexiones especificados y calibrados.\nNo se afirma que un inversor, una AND o una ALU arbitraria satisfagan\nautomáticamente esta ley. Es un diseño dinámico propuesto, no una\ncaracterización experimental del circuito original del autor.\n\nMultiplicando y agrupando sus componentes reales e imaginarias se deriva:\n\n$$\n\\dot s=(B-iA)s=-iG_Vs.\n$$\n\nLa matriz real del bloque es antisimétrica. En consecuencia:",
+      "deps": [
+        "D_AMPLITUDES"
+      ],
+      "source": {
+        "file": "ES_52_Maquina_V_UNIHOLOG.md",
+        "start_line": 536,
+        "end_line": 561
+      },
+      "structural_verification": "CERTIFICADO_ESTRUCTURAL"
+    },
+    {
+      "id": "P_NORMAV",
+      "kind": "proposition",
+      "name": "$P_{NORMAV}$ — Conservación de la norma bajo la ley ideal D_CIRCUITOV.",
+      "description": "$P_{NORMAV}$ — Conservación de la norma bajo la ley ideal D_CIRCUITOV.\n\nDeps: D_CIRCUITOV\n\n$$\n\\frac{d}{dt}(s^\\dagger s)\n=i s^\\dagger G_V^\\dagger s-i s^\\dagger G_Vs=0.\n$$\n\nPor tanto, N es constante en este modelo ideal y la normalización\nde las señales no añade una evolución no lineal:\n\n$$\ni\\dot z_V=G_Vz_V.\n$$\n\nLas dos leyes se han expuesto: una es la del modelo Q de referencia;\nla otra se obtiene de los acoplamientos reales prescritos para V.\nNo se declara de antemano que sus desarrollos sean distintos.",
+      "deps": [
+        "D_CIRCUITOV"
+      ],
+      "source": {
+        "file": "ES_52_Maquina_V_UNIHOLOG.md",
+        "start_line": 562,
+        "end_line": 581
+      },
+      "structural_verification": "CERTIFICADO_ESTRUCTURAL",
+      "proof": {
+        "method": "prolog_direct_markdown_derivation",
+        "status": "declared",
+        "steps": [
+          "$P_{NORMAV}$ — Conservación de la norma bajo la ley ideal D_CIRCUITOV.",
+          "Deps: D_CIRCUITOV",
+          "$$ \\frac{d}{dt}(s^\\dagger s) =i s^\\dagger G_V^\\dagger s-i s^\\dagger G_Vs=0. $$",
+          "Por tanto, N es constante en este modelo ideal y la normalización de las señales no añade una evolución no lineal:",
+          "$$ i\\dot z_V=G_Vz_V. $$",
+          "Las dos leyes se han expuesto: una es la del modelo Q de referencia; la otra se obtiene de los acoplamientos reales prescritos para V.",
+          "No se declara de antemano que sus desarrollos sean distintos."
+        ],
+        "verification_scope": "declared_in_markdown_not_independently_verified"
+      }
+    },
+    {
+      "id": "T_AMPLITUDECOND",
+      "kind": "theorem",
+      "name": "$T_{AMPLITUDECOND}$ — Equivalencia condicional de las evoluciones ideales.",
+      "description": "$T_{AMPLITUDECOND}$ — Equivalencia condicional de las evoluciones ideales.\n\nDeps: D_AMPLITUDES, A_EVOLUCIONQ, D_CIRCUITOV, P_NORMAV\n\nLa igualdad de generadores significa igualdad de las funciones GV y GQ\nen todo el intervalo de evolución considerado, no solo en un instante.\nSe supone que son continuas en ese intervalo, de modo que el problema\nlineal con la preparación inicial declarada tiene solución única.\n\n$$\n(G_V=G_Q\\land z_V(t_i)=z_Q(t_i))\\implies z_V(t)=z_Q(t).\n$$\n\nDemostración bajo los supuestos declarados: si corresponden la\npreparación y la calibración con GV(t) = GQ(t),\nla diferencia e = zV − zQ satisface i ė = GQ e y e(0) = 0.\nPor unicidad de la solución de la ecuación lineal, para coeficientes\ncontinuos o por tramos regulares, e(t) = 0. Si GV = GQ + g(t)I,\ncon g real, solo aparece la fase global exp(−i∫g dt), sin cambiar las\nprobabilidades del registro aislado.\n\n**Resultado condicional de evolución.** Bajo esas leyes, preparación y\ncalibración, las amplitudes evolucionan igual hasta la lectura, salvo\nfase global. Verificar los coeficientes de un circuito real es una\nobligación experimental; no se sustituye por asumir su igualdad.\n\n## 11.3. Solución explícita para dos canales acoplados",
+      "deps": [
+        "D_AMPLITUDES",
+        "A_EVOLUCIONQ",
+        "D_CIRCUITOV",
+        "P_NORMAV"
+      ],
+      "source": {
+        "file": "ES_52_Maquina_V_UNIHOLOG.md",
+        "start_line": 582,
+        "end_line": 609
+      },
+      "structural_verification": "CERTIFICADO_ESTRUCTURAL",
+      "proof": {
+        "method": "prolog_direct_markdown_derivation",
+        "status": "verified",
+        "steps": [
+          "$T_{AMPLITUDECOND}$ — Equivalencia condicional de las evoluciones ideales.",
+          "Deps: D_AMPLITUDES, A_EVOLUCIONQ, D_CIRCUITOV, P_NORMAV",
+          "La igualdad de generadores significa igualdad de las funciones GV y GQ en todo el intervalo de evolución considerado, no solo en un instante.",
+          "Se supone que son continuas en ese intervalo, de modo que el problema lineal con la preparación inicial declarada tiene solución única.",
+          "$$ (G_V=G_Q\\land z_V(t_i)=z_Q(t_i))\\implies z_V(t)=z_Q(t). $$",
+          "Demostración bajo los supuestos declarados: si corresponden la preparación y la calibración con GV(t) = GQ(t), la diferencia e = zV − zQ satisface i ė = GQ e y e(0) = 0.",
+          "Por unicidad de la solución de la ecuación lineal, para coeficientes continuos o por tramos regulares, e(t) = 0.",
+          "Si GV = GQ + g(t)I, con g real, solo aparece la fase global exp(−i∫g dt), sin cambiar las probabilidades del registro aislado."
+        ],
+        "verification_scope": "internal_deduction_from_declared_markdown_premises"
+      },
+      "measurement_relationship": "additive"
+    },
+    {
+      "id": "P_SOLUCION",
+      "kind": "proposition",
+      "name": "$P_{SOLUCION}$ — Solución de las leyes de dos canales con coeficientes constantes.",
+      "description": "$P_{SOLUCION}$ — Solución de las leyes de dos canales con coeficientes constantes.\n\nDeps: A_EVOLUCIONQ, D_CIRCUITOV\n\nPara coeficientes constantes, consideramos separadamente en cada modelo\nuna matriz de la forma:\n\n$$\nG_X=\\operatorname{mat}((\\omega_{0X},\\kappa_X e^{-i\\chi_X}),(\\kappa_X e^{i\\chi_X},\\omega_{1X})),\\qquad X\\in\\{Q,V\\}.\n$$\n\nDefinimos ΩX = (ω0X + ω1X)/2, ΔX = (ω0X − ω1X)/2 y\ngX = √(ΔX² + κX²). Para τ = t − ti, cX = cos(gXτ) y\nhX = sin(gXτ)/gX, con hX = τ si gX = 0, se obtiene:\n\n$$\n\\boxed{P_{SOLUCION}:\\quad\\alpha_X(t)=e^{-i\\Omega_X\\tau}\n\\left[(c_X-i\\Delta_X h_X)\\alpha_X(t_i)\n-i\\kappa_X e^{-i\\chi_X}h_X\\beta_X(t_i)\\right],\n\\qquad\n\\beta_X(t)=e^{-i\\Omega_X\\tau}\n\\left[-i\\kappa_X e^{i\\chi_X}h_X\\alpha_X(t_i)\n+(c_X+i\\Delta_X h_X)\\beta_X(t_i)\\right].}\n$$\n\nLa derivación usa (GX − ΩXI)² = gX² I y la serie de la exponencial.\nNo ha utilizado una medida intermedia. Las expresiones permiten comparar\nparámetros de ambas máquinas sin imponer igualdad a sus salidas:\ncuando corresponden las condiciones iniciales, Δ, κ y χ, el desarrollo\ncoincide salvo la fase global debida a Ω. Si los parámetros no corresponden,\nse calculan ambas respuestas antes de concluir si existe una diferencia\nobservable para el protocolo elegido.\n\nComo controles de esta solución:\n\n- Si κ = 0, los canales conservan sus módulos y acumulan fases\n  exp(−iω0τ) y exp(−iω1τ); la fase relativa cambia en\n  −(ω1 − ω0)τ en ambos modelos.\n- Si Δ = 0 y la entrada es (1,0), las intensidades normalizadas son\n  cos²(κτ) y sin²(κτ) en ambos modelos.\n- Si Ω = Δ = χ = 0 y κτ = π/2, el bloque realiza −iX:\n  intercambia las amplitudes salvo una fase global.\n- Si Ω = χ = 0, Δ = κ = g/√2 y gτ = π/2, el bloque realiza −iH.\n  Dos bloques de ese tipo producen −I, equivalente a la identidad\n  para las lecturas del registro aislado.\n\nEstos controles comprueban evolución de fase, transferencia entre\ncanales y composición. La coincidencia no procede de atribuir al\ndesconocimiento una ley dinámica, sino de resolver las leyes especificadas.\n\n## 11.4. Medida, mezclas e imperfecciones: alcance del desarrollo\n\nEn Q, la regla de lectura en la base de referencia asigna |αQ|² y\n|βQ|². En V, esa asignación solo está justificada si la lectura física\npropuesta realiza las probabilidades |αV|² y |βV|²; su demostración\ncondicional se expone en la sección 12.2. Igual evolución de amplitudes\nno permite omitir la comprobación de lectura y actualización.\n\nPara preparaciones estadísticamente mezcladas no se promedian amplitudes\ncomo si todas las ejecuciones fueran coherentes. Se comparan los estados\nde densidad ρX = E[zX zX†], las operaciones y las distribuciones observables.\nEsto evita confundir desconocimiento de la preparación con fase coherente.\n\nLas pérdidas, retardos no previstos, ruido y errores de coeficientes\nse declararán en ambas realizaciones. No se compara una Q ideal con\nuna V imperfecta para atribuir la diferencia a sus principios, ni se\nomiten las imperfecciones de V al comparar dispositivos reales.\nLa igualdad de las ecuaciones ideales es un resultado matemático\ncondicionado; la igualdad de dispositivos requiere caracterización\nfísica y tolerancias comunes. La comparación de una arquitectura V\ndistinta de este modelo de señales necesita sus propias leyes de evolución.\n\nComo comprobación adicional de las fórmulas, se han integrado directamente\nlas cuatro ecuaciones reales de V y contrastado con la solución compleja\nen 103 casos de evolución constante. El error numérico máximo fue\naproximadamente 8.49 × 10⁻¹²; el error de conservación de norma fue\naproximadamente 7.32 × 10⁻¹⁴. Se comprobaron también los bloques X,\nH y H-H y una secuencia de ocho tramos de control. Son controles numéricos del modelo, no datos de un\ndispositivo físico ni prueba de las hipótesis de lectura de la sección 12.2.\n\n# 12. Dos caminos y fase relativa",
+      "deps": [
+        "A_EVOLUCIONQ",
+        "D_CIRCUITOV"
+      ],
+      "source": {
+        "file": "ES_52_Maquina_V_UNIHOLOG.md",
+        "start_line": 610,
+        "end_line": 691
+      },
+      "structural_verification": "CERTIFICADO_ESTRUCTURAL",
+      "proof": {
+        "method": "prolog_direct_markdown_derivation",
+        "status": "declared",
+        "steps": [
+          "$P_{SOLUCION}$ — Solución de las leyes de dos canales con coeficientes constantes.",
+          "Deps: A_EVOLUCIONQ, D_CIRCUITOV",
+          "Para coeficientes constantes, consideramos separadamente en cada modelo una matriz de la forma:",
+          "$$ G_X=\\operatorname{mat}((\\omega_{0X},\\kappa_X e^{-i\\chi_X}),(\\kappa_X e^{i\\chi_X},\\omega_{1X})),\\qquad X\\in\\{Q,V\\}. $$",
+          "Definimos ΩX = (ω0X + ω1X)/2, ΔX = (ω0X − ω1X)/2 y gX = √(ΔX² + κX²).",
+          "Para τ = t − ti, cX = cos(gXτ) y hX = sin(gXτ)/gX, con hX = τ si gX = 0, se obtiene:",
+          "$$ \\boxed{P_{SOLUCION}:\\quad\\alpha_X(t)=e^{-i\\Omega_X\\tau} \\left[(c_X-i\\Delta_X h_X)\\alpha_X(t_i) -i\\kappa_X e^{-i\\chi_X}h_X\\beta_X(t_i)\\right], \\qquad \\beta_X(t)=e^{-i\\Omega_X\\tau} \\left[-i\\kappa_X e^{i\\chi_X}h_X\\alpha_X(t_i) +(c_X+i\\Delta_X h_X)\\beta_X(t_i)\\right].} $$",
+          "La derivación usa (GX − ΩXI)² = gX² I y la serie de la exponencial."
+        ],
+        "verification_scope": "declared_in_markdown_not_independently_verified"
+      },
+      "measurement_relationship": "additive"
+    },
+    {
+      "id": "P_INTERFERENCIA",
+      "kind": "proposition",
+      "name": "$P_{INTERFERENCIA}$ — Identidades de suma y diferencia de fases coherentes.",
+      "description": "$P_{INTERFERENCIA}$ — Identidades de suma y diferencia de fases coherentes.\n\nDeps: D_AMPLITUDES\n\nSi:\n\n$$\n\\phi_B-\\phi_A=\\phi,\n$$\n\npodemos combinar:\n\n$$\nR_C\\propto e^{i\\phi_A}+e^{i\\phi_B},\n$$\n\n$$\nR_D\\propto e^{i\\phi_A}-e^{i\\phi_B}.\n$$\n\nCon $\\phi_B=\\phi_A+\\phi$:\n\n$$\nR_C\\propto e^{i\\phi_A}(1+e^{i\\phi}),\n$$\n\n$$\nR_D\\propto e^{i\\phi_A}(1-e^{i\\phi}).\n$$\n\nY:\n\n$$\n\\boxed{P_{INTERFERENCIA}:\\quad\n|1+e^{i\\phi}|^2=4\\cos\\left(\\frac{\\phi}{2}\\right)^2,\n\\qquad\n|1-e^{i\\phi}|^2=4\\sin\\left(\\frac{\\phi}{2}\\right)^2.}\n$$\n\nEsto no determina previamente qué salida observaremos. Antes de medir:\n\n$$\nK(C)=\\xi,\\qquad K(D)=\\xi.\n$$\n\n## 12.1. Primer protocolo explícito de comparación Q-V",
+      "deps": [
+        "D_AMPLITUDES"
+      ],
+      "source": {
+        "file": "ES_52_Maquina_V_UNIHOLOG.md",
+        "start_line": 692,
+        "end_line": 738
+      },
+      "structural_verification": "CERTIFICADO_ESTRUCTURAL",
+      "proof": {
+        "method": "prolog_direct_markdown_derivation",
+        "status": "declared",
+        "steps": [
+          "$P_{INTERFERENCIA}$ — Identidades de suma y diferencia de fases coherentes.",
+          "Deps: D_AMPLITUDES",
+          "Si:",
+          "$$ \\phi_B-\\phi_A=\\phi, $$",
+          "podemos combinar:",
+          "$$ R_C\\propto e^{i\\phi_A}+e^{i\\phi_B}, $$",
+          "$$ R_D\\propto e^{i\\phi_A}-e^{i\\phi_B}. $$",
+          "Con $\\phi_B=\\phi_A+\\phi$:"
+        ],
+        "verification_scope": "declared_in_markdown_not_independently_verified"
+      }
+    },
+    {
+      "id": "D_PROTOCOLOFASE",
+      "kind": "definition",
+      "name": "$D_{PROTOCOLOFASE}$ — Preparación y operaciones del contraste de fase.",
+      "description": "$D_{PROTOCOLOFASE}$ — Preparación y operaciones del contraste de fase.\n\nDeps: D_PROTOCOLO, D_AMPLITUDES, P_INTERFERENCIA\n\nFijamos un protocolo Cφ: preparación de referencia, división en dos\ncaminos de igual amplitud, aplicación de una fase relativa φ,\nrecombinación y lectura binaria en t = t₀. No se realizará una lectura\nintermedia de los caminos en ninguna de las dos máquinas.\n\nLa preparación es una operación especificada, no una obligación de\nobservar continuamente el estado interno. El instante t₀ se fija respecto\nal comienzo de cada ejecución mediante una regla temporal común.\n\n### Desarrollo del protocolo en Q\n\nEn el modelo ideal de un qubit, representamos la división y recombinación\npor H y el cambio de fase por Uφ:\n\n$$\nH=\\frac{1}{\\sqrt 2}\n\\operatorname{mat}((1,1),(1,-1)),\n\\qquad\nU_\\phi=\\operatorname{mat}((1,0),(0,e^{i\\phi})).\n$$\n\nPara la preparación de referencia |0⟩, el estado antes de la lectura es:\n\n$$\nH U_\\phi He_{0}\n=\\frac{1+e^{i\\phi}}{2}e_{0}\n+\\frac{1-e^{i\\phi}}{2}e_{1}.\n$$\n\nLa regla de medida del modelo Q asigna a cada salida el módulo cuadrado\nde su amplitud. Por tanto:\n\n$$\nP_Q(q=0, C_\\phi)=\\cos(\\phi/2)^2,\\qquad\nP_Q(q=1, C_\\phi)=\\sin(\\phi/2)^2.\n$$\n\nEsta regla y el papel de la fase en las operaciones se describen en\n[IBM Quantum Learning: Quantum information](https://quantum.cloud.ibm.com/learning/en/courses/basics-of-quantum-information/single-systems/quantum-information).\nLa derivación anterior aplica esas reglas al protocolo aquí definido.\n\n### Desarrollo correspondiente en V\n\nPara precisar las expresiones proporcionales de esta sección, consideramos\ndos señales coherentes de igual amplitud y una recombinación ideal con\nganancias calibradas. El factor común de amplitud y fase se elimina al\nnormalizar. Las señales de salida normalizadas son:\n\n$$\nc_V(\\phi)=\\frac{1+e^{i\\phi}}{2},\\qquad\nd_V(\\phi)=\\frac{1-e^{i\\phi}}{2}.\n$$\n\nEstos números describen amplitudes y fases de señales físicas, no dos\nvalores binarios leídos simultáneamente ni un $\\xi$ almacenado.\nSu realización electrónica concreta deberá especificar cómo se producen\ny combinan las señales. La escritura matemática no sustituye esa realización.\n\nSe obtiene la identidad:\n\n$$\nI_C=|c_V|^2=\\cos(\\phi/2)^2,\\qquad\nI_D=|d_V|^2=\\sin(\\phi/2)^2,\\qquad I_C+I_D=1.\n$$\n\nAsí, bajo las condiciones de señal declaradas, las intensidades\nnormalizadas de V coinciden con las probabilidades previstas por Q.\nCalcular estas magnitudes no exige observar los valores internos durante\nla ejecución; del mismo modo, calcular las amplitudes de Q no exige medirlas.\n\n### Regla de lectura y alcance de la equivalencia\n\nEn Q se ha explicitado una regla que conecta amplitudes con probabilidades\nde salidas binarias. Para completar la comparación se deberá explicitar\nla regla física correspondiente de V y justificar si cumple:\n\n$$\nP_V(v=0, C_\\phi)=I_C,\\qquad\nP_V(v=1, C_\\phi)=I_D.\n$$\n\nEsta exigencia es simétrica: ambas descripciones necesitan una conexión\nentre su evolución física y los resultados registrados. No requiere que\nV comparta el mecanismo físico de Q, ni que se mida previamente su interior.\nTampoco permite identificar automáticamente intensidad y probabilidad.\n\n**Si la lectura de V satisface estas igualdades, queda establecida la\nequivalencia de distribuciones de salida para este protocolo ideal:**\n\n$$\nP_V(v=a, C_\\phi)=P_Q(q=a, C_\\phi),\\qquad a\\in\\{0,1\\}.\n$$\n\nLo establecido aquí es la coincidencia algebraica de las intensidades\nnormalizadas con las probabilidades de referencia y la condición precisa\npara convertirla en equivalencia de lectura. No se presenta como una\nmedición experimental ni como prueba de equivalencia para todos los protocolos.\n\n### Resultados de referencia para el contraste\n\n| Fase relativa φ | P_Q(0) | P_Q(1) | Resultado exigido a la lectura de V |\n| --- | --- | --- | --- |\n| 0 | 1 | 0 | Salida 0 con certeza en el modelo ideal |\n| π/2 | 1/2 | 1/2 | Ambas salidas con la misma probabilidad |\n| π | 0 | 1 | Salida 1 con certeza en el modelo ideal |\n| 3π/2 | 1/2 | 1/2 | Ambas salidas con la misma probabilidad |\n\nLa prueba general de este protocolo comprende todos los valores de φ;\nestos cuatro casos son puntos de control, no su sustituto. En dispositivos\nreales se declararán las imperfecciones de ambas máquinas y se compararán\nlas frecuencias con incertidumbres estadísticas comunes. No se exigirá\nigualdad exacta entre frecuencias de muestras finitas independientes.\n\n## 12.2. Una lectura electrónica candidata y su demostración condicional",
+      "deps": [
+        "D_PROTOCOLO",
+        "D_AMPLITUDES",
+        "P_INTERFERENCIA"
+      ],
+      "source": {
+        "file": "ES_52_Maquina_V_UNIHOLOG.md",
+        "start_line": 739,
+        "end_line": 857
+      },
+      "structural_verification": "CERTIFICADO_ESTRUCTURAL",
+      "measurement_relationship": "unclear"
+    },
+    {
+      "id": "D_COMPARADOR",
+      "kind": "definition",
+      "name": "$D_{COMPARADOR}$ — Circuito candidato de umbral y referencia temporal.",
+      "description": "$D_{COMPARADOR}$ — Circuito candidato de umbral y referencia temporal.\n\nDeps: D_LECTURA, D_PROTOCOLOFASE\n\nPara avanzar desde las intensidades hacia una salida binaria, presentamos\nuna construcción candidata. Es una extensión propuesta del modelo V,\nno la descripción de un prototipo ya construido ni un resultado experimental.\nTampoco presupone que este mecanismo sea el único posible.\n\n### Señales que alimentan la lectura\n\nSean cV y dV las señales complejas de la sección anterior. Su descripción\npuede darse mediante cuatro componentes reales:\n\n$$\nc_V=x_C+i y_C,\\qquad d_V=x_D+i y_D.\n$$\n\nDefinimos las magnitudes físicas que debe producir el bloque de lectura:\n\n$$\nJ_C=x_C^2+y_C^2,\\qquad J_D=x_D^2+y_D^2,\n\\qquad w=\\frac{J_C}{J_C+J_D}.\n$$\n\nLa construcción requiere J_C + J_D > 0. Si ambas señales son nulas, la\nejecución es inválida y debe registrarse como tal, sin asignarle una\nprobabilidad arbitraria. En el protocolo ideal de la sección 12.1:\n\n$$\nw=\\cos(\\phi/2)^2.\n$$\n\nEl circuito candidato transforma señales mediante operaciones físicas de\ncuadrado, suma y normalización. No necesita que un observador conozca los\nvalores numéricos durante el cálculo. Esta transformación interna de señales\nno se identifica con la observación externa de la salida. Sus efectos y\neventuales perturbaciones deberán incluirse en la realización física.\n\n### Referencia temporal y comparador\n\nIntroducimos una referencia periódica con fase inicial η, y describimos\nsu posición normalizada en el instante de lectura por:\n\n$$\nr(t_0)=\\operatorname{frac}\\left(\\frac{\\omega t_0+\\eta}{2\\pi}\\right),\n\\qquad 0\\leq r(t_0)<1.\n$$\n\nAquí frac toma la parte fraccionaria y ω es la frecuencia angular de la\nreferencia. Una señal en rampa puede representar esa posición de fase.\nEl comparador, seguido de un registro activado en t₀, entrega:\n\n$$\n(r(t_0)<w\\implies v=0),\\qquad(r(t_0)\\geq w\\implies v=1).\n$$\n\nEste es un mecanismo de lectura definido mediante señales y un umbral;\nno introduce $\\xi$ como un estado del circuito. El resultado puede estar\ndeterminado por las condiciones físicas de cada ejecución aunque no sea\nconocido por el observador antes de la lectura.\n\n### Condición de preparación que debe justificarse",
+      "deps": [
+        "D_LECTURA",
+        "D_PROTOCOLOFASE"
+      ],
+      "source": {
+        "file": "ES_52_Maquina_V_UNIHOLOG.md",
+        "start_line": 858,
+        "end_line": 921
+      },
+      "structural_verification": "CERTIFICADO_ESTRUCTURAL",
+      "measurement_relationship": "unclear"
+    },
+    {
+      "id": "D_CONDICIONREFERENCIA",
+      "kind": "definition",
+      "name": "$D_{CONDICIONREFERENCIA}$ — Condición de uniformidad e independencia",
+      "description": "$D_{CONDICIONREFERENCIA}$ — Condición de uniformidad e independencia\nde la referencia; no afirmación de que haya sido comprobada físicamente.\n\nDeps: D_COMPARADOR\n\nLa demostración requiere que la fase η esté uniformemente distribuida\nen [0,2π) entre preparaciones, independientemente de φ y de los controles\ndel protocolo. El instante t₀ se fija según la regla común y no se elige\ndespués de consultar η. Estas condiciones implican:\n\n$$\nr(t_0)\\mid C_\\phi\\sim\\operatorname{Uniforme}(0,1).\n$$\n\n**Desconocer η no demuestra que su distribución sea uniforme.** La\ndistribución y su independencia deberán justificarse mediante el mecanismo\nde preparación y contrastarse experimentalmente. La construcción no exige\nuna interpretación particular de la probabilidad: una distribución sobre\npreparaciones desconocidas basta para la siguiente derivación.\n\nLa referencia y su preparación son recursos físicos declarados de V.\nNo proporcionan información sobre la salida de Q. Su admisión debe\ncomprobarse frente a las restricciones del protocolo común. Si este\nprohíbe ese recurso, esta construcción candidata no satisface sus premisas.\n\n### Derivación de las probabilidades de lectura",
+      "deps": [
+        "D_COMPARADOR"
+      ],
+      "source": {
+        "file": "ES_52_Maquina_V_UNIHOLOG.md",
+        "start_line": 922,
+        "end_line": 948
+      },
+      "structural_verification": "CERTIFICADO_ESTRUCTURAL"
+    },
+    {
+      "id": "P_LECTURAUNIFORME",
+      "kind": "proposition",
+      "name": "$P_{LECTURAUNIFORME}$ — Probabilidades del comparador bajo",
+      "description": "$P_{LECTURAUNIFORME}$ — Probabilidades del comparador bajo\nD_CONDICIONREFERENCIA.\n\nDeps: D_COMPARADOR, D_CONDICIONREFERENCIA\n\nBajo las condiciones anteriores, w está fijado por el protocolo y:\n\n$$\nP_V(v=0, C_\\phi)\n=P(r(t_0)<w\\mid C_\\phi)\n=\\int_0^w dr=w.\n$$\n\nPor complementariedad:\n\n$$\nP_V(v=1, C_\\phi)=1-w.\n$$\n\nSustituyendo el valor calculado de w:\n\n$$\nP_V(v=0, C_\\phi)=\\cos(\\phi/2)^2,\\qquad\nP_V(v=1, C_\\phi)=\\sin(\\phi/2)^2.\n$$\n\n**Proposición condicional.** Si V realiza la transformación de señales\nde la sección 12.1, produce el umbral w indicado y satisface las condiciones\nde preparación y lectura de esta sección, reproduce la distribución de\nla lectura final de Q para todos los valores de φ en este protocolo ideal.\n\nLa demostración abarca también los extremos: para w = 0 el comparador\nentrega siempre 1; para w = 1 entrega siempre 0, pues r pertenece a [0,1).\nNo se necesita leer ni seleccionar previamente un resultado individual.\n\n### Qué se ha establecido y qué falta construir\n\n| Elemento | Resultado de este desarrollo | Validación física pendiente |\n| --- | --- | --- |\n| Transformación de dos caminos | Identidad algebraica de amplitudes e intensidades | Circuito y calibración de amplitud y fase |\n| Umbral w | Normalización definida para señales no nulas | Operaciones sobre señales y precisión del umbral |\n| Referencia temporal | Uniformidad de r si se cumplen las condiciones de η | Preparación, independencia y estabilidad |\n| Lectura binaria | Distribución derivada mediante el comparador ideal | Registro en t₀, tiempos de respuesta y errores |\n\nEsta construcción implementa una distribución de salida mediante un\nmecanismo físico candidato. No demuestra por sí sola una arquitectura\ncuántica completa, una ventaja de recursos ni una equivalencia de\nmedidas sucesivas. Después de cada lectura habrá que especificar la\nevolución y preparación posteriores de V y compararlas con las de Q.\nLa equivalencia de varias unidades también exige distribuciones conjuntas;\nno se obtiene automáticamente de esta equivalencia de una sola lectura.\n\n## 12.3. Medidas sucesivas: construcción y equivalencia de una unidad ideal",
+      "deps": [
+        "D_COMPARADOR",
+        "D_CONDICIONREFERENCIA"
+      ],
+      "source": {
+        "file": "ES_52_Maquina_V_UNIHOLOG.md",
+        "start_line": 949,
+        "end_line": 1002
+      },
+      "structural_verification": "CERTIFICADO_ESTRUCTURAL",
+      "proof": {
+        "method": "prolog_direct_markdown_derivation",
+        "status": "declared",
+        "steps": [
+          "$P_{LECTURAUNIFORME}$ — Probabilidades del comparador bajo D_CONDICIONREFERENCIA.",
+          "Deps: D_COMPARADOR, D_CONDICIONREFERENCIA",
+          "Bajo las condiciones anteriores, w está fijado por el protocolo y:",
+          "$$ P_V(v=0, C_\\phi) =P(r(t_0)<w\\mid C_\\phi) =\\int_0^w dr=w. $$",
+          "Por complementariedad:",
+          "$$ P_V(v=1, C_\\phi)=1-w. $$",
+          "Sustituyendo el valor calculado de w:",
+          "$$ P_V(v=0, C_\\phi)=\\cos(\\phi/2)^2,\\qquad P_V(v=1, C_\\phi)=\\sin(\\phi/2)^2. $$"
+        ],
+        "verification_scope": "declared_in_markdown_not_independently_verified"
+      },
+      "measurement_relationship": "additive"
+    },
+    {
+      "id": "D_ACTUALIZACION",
+      "kind": "definition",
+      "name": "$D_{ACTUALIZACION}$ — Transformación y realimentación del modelo de una unidad.",
+      "description": "$D_{ACTUALIZACION}$ — Transformación y realimentación del modelo de una unidad.\n\nDeps: D_CIRCUITOV, D_COMPARADOR, P_LECTURAUNIFORME\n\nLa lectura anterior debe completarse con una transformación posterior al\nresultado. Mantener las señales anteriores sin modificarlas no reproduce,\nen general, las medidas sucesivas de Q. Proponemos el siguiente mecanismo\nideal de realimentación, cuyo funcionamiento físico debe validarse.\n\n### Estado de señales y operaciones entre medidas\n\nDescribimos una unidad V mediante dos señales complejas normalizadas:\n\n$$\nz=\\operatorname{col}(\\alpha,\\beta),\n\\qquad |\\alpha|^2+|\\beta|^2=1.\n$$\n\nEsta es una descripción matemática de señales; no supone que la salida\nbinaria haya sido observada. El estado de Q correspondiente es:\n\n$$\n\\operatorname{ket}(\\psi)=\\alpha e_{0}+\\beta e_{1}.\n$$\n\nPara cada operación unitaria U admitida por el protocolo, el bloque de\ntransformación de V debe realizar z′ = Uz. Una especificación en señales\nreales se obtiene escribiendo U = A + iB, con A y B matrices reales:\n\n$$\n\\operatorname{col}(\\operatorname{Re}z',\\operatorname{Im}z')\n=\\operatorname{mat}((A,-B),(B,A))\n\\operatorname{col}(\\operatorname{Re}z,\\operatorname{Im}z).\n$$\n\nLa matriz real es ortogonal si U es unitaria. Define las ganancias y\ncombinaciones lineales que requeriría un bloque analógico ideal sobre\ncuatro componentes reales. Este cálculo especifica la transformación;\nno acredita todavía un circuito construido con precisión suficiente.\n\n### Lectura y realimentación en la base de referencia\n\nEn cada instante de medida tk se calcula físicamente el umbral\nw = |α|² mediante el bloque de lectura. El comparador entrega 0 cuando\nrk < w y 1 en caso contrario. Tras registrar la salida, la realimentación\nprepara las señales correspondientes al resultado:\n\n$$\n(v=0\\implies z_{\\mathrm{post}}=e_0),\\qquad(v=1\\implies z_{\\mathrm{post}}=e_1),\n\\qquad e_0=\\operatorname{col}(1,0),\\quad e_1=\\operatorname{col}(0,1).\n$$\n\nEl registro selecciona el canal que se conserva y reinicializa el par\nde señales con amplitud de referencia. Para una unidad aislada esto\ncoincide, salvo una fase global sin efecto observable, con el estado\nposterior de una medida proyectiva ideal de Q en esa base.\n\nSi el protocolo solo admite una lectura final en t₀, esta realimentación\nno se activa durante el cálculo. Si admite varias medidas, ambas máquinas\nse leen en los mismos instantes t1, …, tm. No se introducen medidas\nadicionales en V para obtener información que no esté disponible en Q.\n\n### Medida en una base elegida por el protocolo\n\nSean b0 y b1 los vectores ortonormales de la base elegida, y sea\nB = (b0 b1) la matriz unitaria cuyas columnas son esos vectores.\nLa operación de medida de V se define mediante tres pasos:\n\n1. Transformar las señales a esa base: y = B†z.\n2. Leer mediante el comparador con umbral w = |y0|².\n3. Preparar, tras el resultado v, las señales z⁺ = B ev = bv.\n\nSe obtiene:\n\n$$\nP_V(v=a, z,B)=|b_a^\\dagger z|^2,\n\\qquad z_{\\mathrm{post}}=b_a.\n$$\n\nLa medida proyectiva correspondiente de Q tiene esos mismos valores de\nprobabilidad y prepara el mismo vector de base, salvo fase global. La\nregla de actualización de Q se hace explícita aquí; no se exige a V\nninguna actualización ausente del modelo Q de referencia.\nVéase [IBM Quantum Learning: Quantum information, multiple systems](https://quantum.cloud.ibm.com/learning/en/courses/basics-of-quantum-information/multiple-systems/quantum-information)\npara la regla de medida y la actualización condicionada al resultado.\n\n### Renovación de la referencia de lectura\n\nNo basta con que cada rk sea marginalmente uniforme. Para reproducir\nsecuencias, debe ser uniforme condicionado al historial anterior hk−1\ny a los controles presentes del protocolo:\n\n$$\nr_k\\mid(h_{k-1},C)\\sim\\operatorname{Uniforme}(0,1).\n$$\n\nUna referencia nueva e independiente en cada lectura satisface esta\ncondición. Reutilizar una fase desconocida sin justificar sus correlaciones\nno basta. La preparación de esas referencias y su independencia son\nobligaciones físicas de esta construcción candidata, no resultados ya\nobtenidos mediante el desconocimiento del observador.\n\n### Demostración para secuencias finitas",
+      "deps": [
+        "D_CIRCUITOV",
+        "D_COMPARADOR",
+        "P_LECTURAUNIFORME"
+      ],
+      "source": {
+        "file": "ES_52_Maquina_V_UNIHOLOG.md",
+        "start_line": 1003,
+        "end_line": 1106
+      },
+      "structural_verification": "CERTIFICADO_ESTRUCTURAL",
+      "measurement_relationship": "unclear"
+    },
+    {
+      "id": "T_SECUENCIACOND",
+      "kind": "theorem",
+      "name": "$T_{SECUENCIACOND}$ — Equivalencia de secuencias condicionada",
+      "description": "$T_{SECUENCIACOND}$ — Equivalencia de secuencias condicionada\na las reglas ideales y la renovación de referencia declaradas.\n\nDeps: D_PROTOCOLO, D_ACTUALIZACION, P_LECTURAUNIFORME\n\nSuponemos la misma preparación inicial, bloques V que realizan las\noperaciones unitarias correspondientes, la lectura y realimentación\nanteriores y referencias que satisfacen la condición de renovación.\nConsideramos un protocolo finito sobre un qubit aislado, con medidas\nproyectivas ideales de cualquier base y decisiones que pueden depender\nde resultados previos. Los mismos resultados previos permiten las mismas\ndecisiones en ambas máquinas.\n\nAntes de la primera operación, sus descripciones de amplitud coinciden.\nCada operación aplica la misma transformación U, de modo que esa\ncorrespondencia se conserva hasta la primera medida. La uniformidad\ncondicional de r1 proporciona la misma probabilidad para cada salida.\nTras la salida a1, V prepara b_a1 y Q queda en ese mismo estado de base.\n\nPor inducción, para cada historial de probabilidad no nula, ambas\nmáquinas conservan esa correspondencia antes de la siguiente operación,\nasignan las mismas probabilidades condicionadas a la siguiente medida\ny preparan estados posteriores correspondientes. En la siguiente igualdad,\n$c_{\\mathrm{protocolo}}$ fija el protocolo y sus reglas de control; la barra\nvertical indica condicionamiento. Para k = 1, el historial anterior es vacío.\nPor la regla del producto:\n\n$$\nP_V(a_1,\\ldots,a_m\\mid c_{\\mathrm{protocolo}})\n=\\prod_{k=1}^m P_V(a_k\\mid a_1,\\ldots,a_{k-1},c_{\\mathrm{protocolo}})\n=P_Q(a_1,\\ldots,a_m\\mid c_{\\mathrm{protocolo}}).\n$$\n\nLos historiales imposibles tienen probabilidad cero en ambas máquinas;\nno requieren definir un estado condicionado a un suceso imposible.\n\n**Resultado.** Esta construcción ideal reproduce todas las distribuciones\nde secuencias finitas de operaciones unitarias y medidas proyectivas\nde un qubit aislado, bajo las condiciones declaradas. Resuelve dentro\nde ese modelo la lectura posterior y la composición temporal, no solo\nla distribución de una medida final.\n\n### Controles que distinguen una lectura completa de un simple muestreo\n\n| Protocolo común | Predicción en Q y en la V ideal definida |\n| --- | --- |\n| Dos lecturas consecutivas en la misma base, sin operación intermedia | El segundo resultado repite el primero con certeza |\n| Preparar e0, aplicar H dos veces y medir en la base de referencia | Salida 0 con certeza |\n| Medir primero en la base de referencia y después en la base de H | La segunda salida tiene probabilidades 1/2 y 1/2, condicionadas a cualquiera de las primeras |\n\nLa primera fila exige la realimentación; obtener solo la distribución\ncorrecta de una salida no la garantiza. La segunda exige conservar la\nfase y las amplitudes durante la composición, sin lecturas intermedias.\n\nEl resultado es condicional a la realización de los bloques ideales.\nNo demuestra aún una máquina física validada, medidas generales con\nefectos distintos de los aquí definidos, comportamiento de una unidad\nentrelazada con otra ni equivalencia completa de un registro de n qubits.\nTampoco demuestra ventaja de recursos. Esas extensiones necesitan su\npropio desarrollo y no se deducen de repetir unidades aisladas.\n\n# 13. Frecuencia no significa causa física probabilística",
+      "deps": [
+        "D_PROTOCOLO",
+        "D_ACTUALIZACION",
+        "P_LECTURAUNIFORME"
+      ],
+      "source": {
+        "file": "ES_52_Maquina_V_UNIHOLOG.md",
+        "start_line": 1107,
+        "end_line": 1169
+      },
+      "structural_verification": "CERTIFICADO_ESTRUCTURAL",
+      "proof": {
+        "method": "prolog_direct_markdown_derivation",
+        "status": "verified",
+        "steps": [
+          "$T_{SECUENCIACOND}$ — Equivalencia de secuencias condicionada a las reglas ideales y la renovación de referencia declaradas.",
+          "Deps: D_PROTOCOLO, D_ACTUALIZACION, P_LECTURAUNIFORME",
+          "Suponemos la misma preparación inicial, bloques V que realizan las operaciones unitarias correspondientes, la lectura y realimentación anteriores y referencias que satisfacen la condición de renovación.",
+          "Consideramos un protocolo finito sobre un qubit aislado, con medidas proyectivas ideales de cualquier base y decisiones que pueden depender de resultados previos.",
+          "Los mismos resultados previos permiten las mismas decisiones en ambas máquinas.",
+          "Antes de la primera operación, sus descripciones de amplitud coinciden.",
+          "Cada operación aplica la misma transformación U, de modo que esa correspondencia se conserva hasta la primera medida.",
+          "La uniformidad condicional de r1 proporciona la misma probabilidad para cada salida."
+        ],
+        "verification_scope": "internal_deduction_from_declared_markdown_premises"
+      },
+      "measurement_relationship": "additive"
+    },
+    {
+      "id": "D_FRECUENCIAS",
+      "kind": "definition",
+      "name": "$D_{FRECUENCIAS}$ — Frecuencias y probabilidades observables del contraste.",
+      "description": "$D_{FRECUENCIAS}$ — Frecuencias y probabilidades observables del contraste.\n\nDeps: D_LECTURA, D_PROTOCOLO\n\nTras n_ensayos experimentos medidos, con n_ensayos mayor que cero,\npodemos contar N_0 y N_1 y construir:\n\n$$\nF(0)=\\frac{N_0}{n_{\\mathrm{ensayos}}},\\qquad F(1)=\\frac{N_1}{n_{\\mathrm{ensayos}}}.\n$$\n\nLa comparación operacional pregunta si:\n\n$$\nF_Q(0,\\phi)=F_V(0,\\phi),\\qquad\nF_Q(1,\\phi)=F_V(1,\\phi),\n$$\n\no:\n\n$$\n\\left(P_Q(a,\\phi),P_V(a,\\phi)\\right).\n$$\n\n# 14. Cada medida constituye un experimento\n\nUna medida en $t=t_0$ y otra en $t=t_1$ son experimentos distintos salvo\npreparación explícita que los conecte:\n\n$$\nE_0: \\xi\\mapsto b\\in\\{0,1\\},\n$$\n\n$$\nE_1: \\xi\\mapsto b\\in\\{0,1\\}.\n$$\n\nE_0 se observa en t=t0 y E_1 en t=t1, con sus respectivas preparaciones.\n\nNo introducimos una trayectoria conocida que nunca hemos medido.\n\n# 15. Medidas alternativas\n\nSean $M_0,M_1$ y $x\\in\\{0,1\\}$. Antes:\n\n$$\nK(Q)=\\xi,\\qquad K(V)=\\xi.\n$$\n\nEn $t=t_0$:\n\n$$\nM_x(Q,t_0)\\mapsto q\\in\\{0,1\\},\n$$\n\n$$\nM_x(V,t_0)\\mapsto v\\in\\{0,1\\}.\n$$\n\nLa medida no elegida no recibe por ello un resultado observado. Requiere\notro experimento, que comienza nuevamente con valores desconocidos.\n\n# 16. Dos unidades correlacionadas",
+      "deps": [
+        "D_LECTURA",
+        "D_PROTOCOLO"
+      ],
+      "source": {
+        "file": "ES_52_Maquina_V_UNIHOLOG.md",
+        "start_line": 1170,
+        "end_line": 1233
+      },
+      "structural_verification": "CERTIFICADO_ESTRUCTURAL",
+      "measurement_relationship": "unclear"
+    },
+    {
+      "id": "D_DISTRIBUCIONCONJUNTA",
+      "kind": "definition",
+      "name": "$D_{DISTRIBUCIONCONJUNTA}$ — Distribución de salidas de dos unidades.",
+      "description": "$D_{DISTRIBUCIONCONJUNTA}$ — Distribución de salidas de dos unidades.\n\nDeps: D_FRECUENCIAS\n\nTenemos:\n\n$$\nK(Q_A)=\\xi,\\quad K(Q_B)=\\xi,\\qquad\nK(V_A)=\\xi,\\quad K(V_B)=\\xi.\n$$\n\nCon configuraciones $x,y\\in\\{0,1\\}$, al medir en $t=t_0$ obtenemos\n$(a,b)$ con:\n\n$$\na,b\\in\\{0,1\\}.\n$$\n\nConstruimos:\n\n$$\nP_Q(a,b,x,y),\\qquad P_V(a,b,x,y).\n$$\n\nLa condición de replicación es:\n\n$$\n\\boxed{P_V(a,b,x,y)=P_Q(a,b,x,y).}\n$$\n\n# 17. No inventar resultados no medidos\n\nNo imponemos a V una tabla previa $(a_0,a_1,b_0,b_1)$ si esos resultados\nnunca han sido observados conjuntamente. Cada configuración requiere sus\nexperimentos y la misma regla se aplica a Q y V.\n\n# 18. Correlaciones observables\n\nPodemos mapear $0\\mapsto-1$, $1\\mapsto1$ y construir:\n\n$$\nE(x,y)=\\sum_{a,b\\in\\{0,1\\}}(2a-1)(2b-1)\\,P(a,b,x,y).\n$$\n\nTambién:\n\n$$\nS=E(0,0)+E(0,1)+E(1,0)-E(1,1).\n$$\n\nLa pregunta es:\n\n$$\n\\boxed{\\left(E_V(x,y),E_Q(x,y)\\right).}\n$$\n\nSi aparece una diferencia observable encontramos un límite; si no, el\nparalelismo permanece.\n\n## 18.1. Correlación conjunta y condiciones de separación",
+      "deps": [
+        "D_FRECUENCIAS"
+      ],
+      "source": {
+        "file": "ES_52_Maquina_V_UNIHOLOG.md",
+        "start_line": 1234,
+        "end_line": 1294
+      },
+      "structural_verification": "CERTIFICADO_ESTRUCTURAL"
+    },
+    {
+      "id": "D_CORRELACIONES",
+      "kind": "definition",
+      "name": "$D_{CORRELACIONES}$ — Correlaciones de bits registrados y condiciones locales.",
+      "description": "$D_{CORRELACIONES}$ — Correlaciones de bits registrados y condiciones locales.\n\nDeps: D_DISTRIBUCIONCONJUNTA\n\nLa igualdad de probabilidades marginales no basta para la equivalencia.\nDos salidas pueden ser individualmente equilibradas y, sin embargo,\ntener correlaciones conjuntas diferentes. Usamos signos A, B en {−1,+1}\npara distinguirlos de los bits registrados a, b. Con la convención de\nesta sección, A = 2a − 1 y B = 2b − 1:\n\n$$\nE(x,y)=\\sum_{a,b\\in\\{0,1\\}}(2a-1)(2b-1)P(a,b, x,y).\n$$\n\nSi las dos unidades V están separadas y sus respuestas satisfacen una\ndescripción local con condiciones compartidas λ independientes de las\nelecciones x, y, la distribución tiene la forma:\n\n$$\nP_V(a,b, x,y)\n=\\int d\\mu(\\lambda)\\,\nP_A(a\\mid x,\\lambda)P_B(b\\mid y,\\lambda).\n$$\n\nAquí λ describe las condiciones físicas compartidas de la preparación;\nno es el símbolo $\\xi$ ni una lectura adicional. Esta factorización es una\nhipótesis de localidad que debe declararse, no atribuirse automáticamente\na cualquier arquitectura V.\n\nDefinimos las respuestas medias A_x(λ), B_y(λ) en [−1,1]. Para cada λ:",
+      "deps": [
+        "D_DISTRIBUCIONCONJUNTA"
+      ],
+      "source": {
+        "file": "ES_52_Maquina_V_UNIHOLOG.md",
+        "start_line": 1295,
+        "end_line": 1325
+      },
+      "structural_verification": "CERTIFICADO_ESTRUCTURAL"
+    },
+    {
+      "id": "P_CHSHLOCAL",
+      "kind": "proposition",
+      "name": "$P_{CHSHLOCAL}$ — Cota de las correlaciones bajo la factorización",
+      "description": "$P_{CHSHLOCAL}$ — Cota de las correlaciones bajo la factorización\nlocal explícitamente declarada en D_CORRELACIONES.\n\nDeps: D_CORRELACIONES\n\n$$\n|A_0(B_0+B_1)+A_1(B_0-B_1)|\n\\leq |B_0+B_1|+|B_0-B_1|\\leq2.\n$$\n\nIntegrando se obtiene |S_V| ≤ 2. Esta derivación no requiere observar\nconjuntamente resultados de medidas alternativas: utiliza probabilidades\ncondicionadas y la factorización local, no una tabla de observaciones\ncontrafactuales. El desconocimiento de λ no elimina ese límite.\n\n$$\n\\boxed{P_{CHSHLOCAL}:\\quad |S_V|\\leq2.}\n$$\n\nQ puede producir S_Q = 2√2. Por ejemplo, para el estado de referencia\n(|00⟩ + |11⟩)/√2 y los observables A0 = Z, A1 = X,\nB0 = (Z + X)/√2 y B1 = (Z − X)/√2, las correlaciones son:\n\n$$\nE_{00}=E_{01}=E_{10}=\\frac1{\\sqrt2},\\qquad\nE_{11}=-\\frac1{\\sqrt2}.\n$$\n\nLa comparación CHSH y sus cotas se documentan en\n[IBM Quantum: CHSH inequality](https://quantum.cloud.ibm.com/docs/en/tutorials/chsh-inequality).\n\n**Consecuencia para las premisas simétricas.** Si el protocolo Q exige\nelecciones independientes y ausencia de comunicación entre las estaciones\ndurante la lectura, V debe respetar esas mismas restricciones. Una\narquitectura V con la factorización local anterior no puede replicar\nese resultado. No basta con abstenerse de observar sus valores internos.\n\nUn dispositivo central que acceda a x e y puede generar esa distribución\nconjunta, pero no demuestra equivalencia con dos estaciones separadas\nsin comunicación. Son protocolos distintos. La ausencia de señalización\nen las marginales tampoco prueba ausencia de comunicación interna.\n\nEste límite no descarta todos los protocolos computacionales centrales\nde V. Sí obliga a distinguir su alcance de una equivalencia física\nuniversal, incluyendo experimentos distribuidos de Bell.\n\n# 19. Composición\n\nPartimos de $K(V_0)=\\xi$ y componemos:\n\n$$\nV_n=R_n\\circ R_{n-1}\\circ\\cdots\\circ R_1(V_0).\n$$\n\nDesde nuestro conocimiento:\n\n$$\n\\boxed{\\xi\\mapsto\\xi\\mapsto\\xi\\mapsto\\cdots\\mapsto\\xi}\n$$\n\ny al final:\n\n$$\n\\boxed{\\xi\\mapsto b\\in\\{0,1\\}.}\n$$\n\n# 20. De una unidad a $n$ unidades\n\nAntes de medir:\n\n$$\nK(V_1)=\\xi,K(V_2)=\\xi,\\ldots,K(V_n)=\\xi.\n$$\n\nCon una red:\n\n$$\n\\mathcal R=\\{R_1,R_2,\\ldots,R_m\\},\n$$\n\npodemos conocer $\\mathcal R$ sin conocer los valores individuales. Las\nrelaciones evolucionan:\n\n$$\n\\mathcal R_0\\mapsto\\mathcal R_1\\mapsto\\cdots\\mapsto\\mathcal R_k,\n$$\n\nmientras:\n\n$$\n\\forall i,\\quad K(V_i)=\\xi.\n$$\n\n## 20.1. Auditoría de simetría: protocolo común y máquinas independientes",
+      "deps": [
+        "D_CORRELACIONES"
+      ],
+      "source": {
+        "file": "ES_52_Maquina_V_UNIHOLOG.md",
+        "start_line": 1326,
+        "end_line": 1420
+      },
+      "structural_verification": "CERTIFICADO_ESTRUCTURAL",
+      "proof": {
+        "method": "prolog_direct_markdown_derivation",
+        "status": "declared",
+        "steps": [
+          "$P_{CHSHLOCAL}$ — Cota de las correlaciones bajo la factorización local explícitamente declarada en D_CORRELACIONES.",
+          "Deps: D_CORRELACIONES",
+          "$$ |A_0(B_0+B_1)+A_1(B_0-B_1)| \\leq |B_0+B_1|+|B_0-B_1|\\leq2. $$",
+          "Integrando se obtiene |S_V| ≤ 2.",
+          "Esta derivación no requiere observar conjuntamente resultados de medidas alternativas: utiliza probabilidades condicionadas y la factorización local, no una tabla de observaciones contrafactuales.",
+          "El desconocimiento de λ no elimina ese límite.",
+          "$$ \\boxed{P_{CHSHLOCAL}:\\quad |S_V|\\leq2.} $$",
+          "Q puede producir S_Q = 2√2."
+        ],
+        "verification_scope": "declared_in_markdown_not_independently_verified"
+      }
+    },
+    {
+      "id": "D_SIMETRIA",
+      "kind": "definition",
+      "name": "$D_{SIMETRIA}$ — Alcance de la comparación y de sus obligaciones simétricas.",
+      "description": "$D_{SIMETRIA}$ — Alcance de la comparación y de sus obligaciones simétricas.\n\nDeps: D_PROTOCOLO\n\nLa afirmación «si las unidades y conexiones son equivalentes y la\nequivalencia se conserva al componerlas, las redes son equivalentes»\nes un teorema condicional. No comprueba por sí sola ninguna conexión\nfísica ni demuestra que las hipótesis se cumplan. Las comprobaciones\ndeben corresponder a las operaciones y conexiones de la máquina V\ndel autor, no a una representación añadida a partir del modelo Q.\n\nEl criterio de contraste debe partir de un protocolo común C, definido\nsin presuponer el resultado de ninguna máquina. Comprende preparaciones\noperacionalmente correspondientes, controles, conexiones permitidas,\nrestricciones de acceso, instantes y configuraciones de lectura, salidas\ncomparables y recursos admitidos. Cada realización implementa ese\nprotocolo mediante sus propios mecanismos físicos.\n\n| Elemento del contraste | Obligación de Q | Obligación de V |\n| --- | --- | --- |\n| Preparación | Declarar cómo realiza la entrada del protocolo | Declarar cómo realiza la entrada correspondiente |\n| Operación | Declarar o caracterizar su respuesta al control común | Declarar o caracterizar su respuesta al mismo control |\n| Conexión | Especificar interfaces y transformación física conjunta | Especificar interfaces y transformación física conjunta |\n| Acceso interno | Respetar las observaciones permitidas por C | Respetar las mismas restricciones |\n| Lectura | Registrar salidas según tiempos y configuraciones de C | Registrar salidas según tiempos y configuraciones de C |\n| Evidencia | Identificar predicciones del modelo y datos disponibles | Identificar predicciones del modelo y datos disponibles |\n| Recursos y errores | Declarar comunicación, control, precisión y pérdidas | Declarar los mismos tipos de recursos y errores |\n\nNo se exige a V un espacio de Hilbert, amplitudes almacenadas ni un\nmecanismo de actualización idéntico al de Q como condición de admisión.\nTampoco se exige a Q adoptar la electrónica o la representación relacional\nde V. Lo que debe contrastarse es la distribución observable completa:\n\n$$\n\\left(P_Q(\\mathbf a,c_{\\mathrm{protocolo}}),P_V(\\mathbf a,c_{\\mathrm{protocolo}})\\right).\n$$\n\nLas predicciones deben derivarse de las reglas declaradas de cada\nrealización, sin añadir a V una arquitectura o un mecanismo distinto\nde los especificados por el autor.\nLa comparación puede ser teórica entre modelos ideales o experimental\nentre dispositivos caracterizados; se identificará expresamente cuál\nse realiza. No se confundirá una coincidencia matemática ideal con una\nvalidación física de cualquiera de las dos máquinas.\n\nLa necesidad de comparar distribuciones conjuntas es una regla común:\nuna red Q tampoco queda caracterizada para todos los protocolos por\nconocer únicamente las distribuciones de sus unidades aisladas.\nLa ausencia de medida previa no elimina esa obligación en ninguna red.\n\nSi se propone una correspondencia de composición, deberá comprobarse\ncon las operaciones y conexiones independientemente especificadas en\nambos modelos. Puede haber estructuras internas distintas que produzcan\nlas mismas salidas; la prueba no requiere imponer a V la estructura Q.\n\nPor tanto, el paso pendiente no es «adaptar V a la definición interna\nde Q», sino definir la conexión física propuesta, su protocolo común\ncon la conexión Q y contrastar ambas respuestas sin asumir su igualdad.\n\n## 20.2. Construcción local de V1, V2 y V3\n\nLas tres máquinas V son deterministas y se construyen con electrónica\no software convencional. La preparación declara las conexiones y los\ncontroles; no lee los resultados internos no fijados por esa preparación.\nLa medida se desencadena una sola vez en $t=t_0$.\n\n- V1 conserva las operaciones H, H, el oráculo reversible recibido y H,\n  con la preparación declarada $(0,1)$.\n- V2 conserva el registro de trabajo preparado en $1$, los controles\n  preparados en $0$, las multiplicaciones modulares controladas y las\n  conexiones de Fourier inversa.\n- V3 conserva la preparación y el orden de operaciones del protocolo recibido.\n\nEstas descripciones no almacenan una tabla de amplitudes conjuntas.\nLos programas [v1.py](../../comparacion/v1.py),\n[v2.py](../../comparacion/v2.py) y [v3.py](../../comparacion/v3.py)\nusan el controlador [v_relacional.py](../../comparacion/v_relacional.py).\nTambién están incluidos en la carpeta portátil Traductores_V.\n\nLa realización conectada recibe `preparar(plan)` y `disparar(t0)`.\nLa preparación no entrega resultados; el disparo registra una única\nlectura conjunta. Reconsultar devuelve los bits ya registrados y no\nrepite la medida. Un fallo del detector consume esa preparación.\n\nEl controlador no recorre el plan de puertas ni posibles resultados al\ndisparar. El registro y la validación de los bits recibidos no sustituyen\nla dinámica de las conexiones. Las fórmulas de señales de una unidad\nno se convierten en una tabla de estados de todas las unidades.\n\nEl código actual prepara los planes y gestiona la medida. Falta conectar\ny verificar la realización conjunta de las operaciones de las tres\nmáquinas. Sin esa conexión, informa lo pendiente: no calcula una salida\na partir de Q ni la inventa. Esta distinción describe el estado del código,\nno añade una condición física a la definición de V.\n\nLos detectores de los tests comprueban el contrato de preparación y\ndisparo. Sus bits de ensayo no son resultados de los algoritmos completos.\nLos resultados de referencias Q simuladas pertenecen al comprobador,\nno a V. La comparación de tareas completas y tiempos se hará con las\nrealizaciones y las condiciones de ejecución identificadas para ambas.\n\n# 21. No existe un $\\xi$ almacenado",
+      "deps": [
+        "D_PROTOCOLO"
+      ],
+      "source": {
+        "file": "ES_52_Maquina_V_UNIHOLOG.md",
+        "start_line": 1421,
+        "end_line": 1523
+      },
+      "structural_verification": "CERTIFICADO_ESTRUCTURAL"
+    },
+    {
+      "id": "D_REGISTROBINARIO",
+      "kind": "definition",
+      "name": "$D_{REGISTROBINARIO}$ — Salida registrada de varias unidades.",
+      "description": "$D_{REGISTROBINARIO}$ — Salida registrada de varias unidades.\n\nDeps: D_DESCONOCIDO, D_LECTURA\n\n$\\xi$ representa desconocimiento del estado interno hasta la medida en $t=t_0$, no una palabra física almacenada:\n\n$$\nK(V_1)=\\xi,\\quad K(V_2)=\\xi,\\quad\\ldots,\\quad K(V_n)=\\xi.\n$$\n\nAl medir:\n\n$$\n\\boxed{\\mathbf V(t_0)=(v_1,v_2,\\ldots,v_n),\\qquad v_i\\in\\{0,1\\}.}\n$$\n\nObtenemos un resultado, nunca $\\xi$.\n\n# 22. La cuestión de los $2^n$ estados\n\nUn sistema de $n$ bits admite matemáticamente $2^n$ combinaciones\nposibles. Para ciertas relaciones, V no tiene que representarlas\nexplícitamente durante cada ejecución. Extender esta propiedad a todos\nlos protocolos Q es una cuestión distinta que aún debe justificarse.\n\nPor ejemplo:\n\n$$\nV_2=(1-V_1),\\qquad\nV_3=V_1,\\qquad\nV_4=(1-V_3).\n$$\n\nNo necesitamos construir una tabla de $2^4=16$ combinaciones para\nimplementar esas relaciones.\n\n$$\n\\boxed{\\text{n valores desconocidos}\\neq\\text{una representación física de }2^n\\text{ estados}.}\n$$\n\n# 23. V no representa el vector de estado de Q",
+      "deps": [
+        "D_DESCONOCIDO",
+        "D_LECTURA"
+      ],
+      "source": {
+        "file": "ES_52_Maquina_V_UNIHOLOG.md",
+        "start_line": 1524,
+        "end_line": 1565
+      },
+      "structural_verification": "CERTIFICADO_ESTRUCTURAL",
+      "measurement_relationship": "unclear"
+    },
+    {
+      "id": "D_OBJETIVORELACIONAL",
+      "kind": "definition",
+      "name": "$D_{OBJETIVORELACIONAL}$ — Objetivo abierto de evitar la representación",
+      "description": "$D_{OBJETIVORELACIONAL}$ — Objetivo abierto de evitar la representación\nexponencial de amplitudes; no resultado demostrado.\n\nDeps: D_RELACIONES\n\nUna simulación clásica puede intentar representar un registro de n unidades,\ndonde n es un entero no negativo y D = 2^n. Los vectores e_0, ..., e_{D-1}\nforman la base computacional ortonormal del espacio complejo de dimensión D.\nLos coeficientes α_j son complejos y j recorre los enteros de 0 a D-1.\nPara un estado puro normalizado, la suma de sus módulos al cuadrado es uno.\nCon esas convenciones, la expansión vectorial es:\n\n$$\n\\operatorname{ket}(\\Psi)=\\sum_{j=0}^{2^n-1}\\alpha_j e_{j}.\n$$\n\nLa arquitectura V propuesta tiene como objetivo evitar almacenar\n$\\alpha_0,\\ldots,\\alpha_{2^n-1}$. Que pueda hacerlo para todos los\nprotocolos del modelo Q elegido debe comprobarse sobre las reglas propias\nde V. El procedimiento relacional que se propone investigar es:\n\n$$\n\\boxed{\\mathcal R_0\\mapsto\\mathcal R_1\\mapsto\\cdots\\mapsto\\mathcal R_k\n\\mapsto(v_1,\\ldots,v_n).}\n$$\n\n# 24. Replicación, no simulación\n\nV tiene su propia realización física, señales, relaciones, propagación,\ntiempo y medida. Exigimos equivalencia de resultados observables:\n\n$$\n\\boxed{\\operatorname{phys}(Q)\\neq\\operatorname{phys}(V)}\n$$\n\nmientras investigamos:\n\n$$\n\\boxed{Q\\equiv_{\\mathrm{op}}V.}\n$$\n\n**Físicamente diferentes, operacionalmente equivalentes.**\n\n# 25. Criterio general de replicación",
+      "deps": [
+        "D_RELACIONES"
+      ],
+      "source": {
+        "file": "ES_52_Maquina_V_UNIHOLOG.md",
+        "start_line": 1566,
+        "end_line": 1610
+      },
+      "structural_verification": "CERTIFICADO_ESTRUCTURAL"
+    },
+    {
+      "id": "D_EQUIVALENCIA",
+      "kind": "definition",
+      "name": "$D_{EQUIVALENCIA}$ — Definición del criterio observable, no afirmación",
+      "description": "$D_{EQUIVALENCIA}$ — Definición del criterio observable, no afirmación\nde que la equivalencia física universal se haya establecido.\n\nDeps: D_PROTOCOLO, D_DISTRIBUCIONCONJUNTA\n\nPara un protocolo C con una correspondencia fija entre las etiquetas de\nsalida q y v de ambas máquinas:\n\n$$\nP_Q(\\mathbf q,c_{\\mathrm{protocolo}}).\n$$\n\ny:\n\n$$\nP_V(\\mathbf v,c_{\\mathrm{protocolo}}).\n$$\n\nLa replicación operacional exige:\n\n$$\n\\boxed{P_V(\\mathbf v,c_{\\mathrm{protocolo}})=P_Q(\\mathbf q,c_{\\mathrm{protocolo}}).}\n$$\n\nEs una afirmación experimentalmente refutable.\n\n# 26. Principio de simetría Q-V\n\n$$\n\\boxed{\\text{No exigir a V lo que no exigimos a Q.}}\n$$\n\nY recíprocamente: no conceder a V información que Q no tenga. La\ncomparación debe realizarse bajo las mismas reglas.\n\n# 27. Qué hemos encontrado\n\nHemos considerado valor desconocido, medida binaria, relaciones,\noperaciones sin medida intermedia, evolución temporal, propagación, fase\n$\\phi$, interferencia, frecuencias, medidas alternativas, unidades\nrelacionadas, configuraciones independientes, correlaciones,\ncomposición, extensión a $n$ unidades y medida conjunta.\n\nNo hemos necesitado introducir $\\xi$ como estado físico ni medir los\nvalores intermedios. La información necesaria para continuar la\ncomputación puede residir en las relaciones físicas.\n\n# 28. Una máquina electrónica convencional diferente\n\nPodemos construir una máquina cuyo principio sea:\n\n$$\n\\boxed{\\text{no medir mientras se calcula}.}\n$$\n\nPuede usar puertas lógicas, retardos, osciladores, fases, suma y\ndiferencia, realimentación, pulsos, excitación, inhibición y relaciones\ntemporales. La novedad puede residir en **la arquitectura y la forma de\nutilizar la información**.\n\n# 29. Más allá del qubit\n\nAquí V se restringe deliberadamente a una salida $b\\in\\{0,1\\}$ para\ncompararla con Q. Una arquitectura general V podría admitir estados y\nrelaciones más ricos, incluido un dominio complejo y arquitecturas\ninspiradas en la neurona biológica. Esa extensión queda fuera de este\nprimer trabajo.\n\n# 30. La pregunta cambia\n\nLa pregunta no es «¿cómo simulamos Q?», sino:\n\n> **¿Existe alguna operación observable realizada por Q que una máquina\n> V, sometida exactamente a las mismas condiciones de conocimiento,\n> propagación y medida, no pueda replicar?**\n\n# 31. Consecuencia potencial\n\nSi V puede reproducir las operaciones relevantes de Q, podríamos\ninvestigar máquinas construidas con:\n\n$$\n\\boxed{\n\\text{componentes convencionales}\n+\\text{valores desconocidos}\n+\\text{relaciones conocidas}\n+\\text{propagación}\n+\\text{medida}\n}\n$$\n\npara tareas hoy asociadas a arquitecturas cuánticas.\n\n# 32. Qué no estoy afirmando",
+      "deps": [
+        "D_PROTOCOLO",
+        "D_DISTRIBUCIONCONJUNTA"
+      ],
+      "source": {
+        "file": "ES_52_Maquina_V_UNIHOLOG.md",
+        "start_line": 1611,
+        "end_line": 1705
+      },
+      "structural_verification": "CERTIFICADO_ESTRUCTURAL",
+      "measurement_relationship": "unclear"
+    },
+    {
+      "id": "D_ALCANCE",
+      "kind": "definition",
+      "name": "$D_{ALCANCE}$ — Alcance y cuestiones físicas pendientes.",
+      "description": "$D_{ALCANCE}$ — Alcance y cuestiones físicas pendientes.\n\nDeps: D_HIPOTESISV, D_EQUIVALENCIA, D_OBJETIVORELACIONAL\n\nEste trabajo no presenta todavía una V físicamente construida, una\narquitectura electrónica completa, una ventaja experimental de velocidad\nni una demostración experimental de todos los algoritmos cuánticos.\n\nEstablece un principio de construcción y un protocolo de comparación.\nLas cuestiones restantes son precisamente las que hacen interesante\nconstruirla.\n\n# 33. Hipótesis de trabajo\n\n> **Una máquina electrónica convencional capaz de mantener desconocidos\n> sus valores internos mientras construye, conserva, compone y\n> transforma físicamente sus relaciones puede replicar operacionalmente\n> una máquina cuántica si, bajo las mismas preparaciones,\n> transformaciones y medidas, reproduce las mismas distribuciones\n> observables.**\n\n$$\n\\boxed{Q\\equiv_{\\mathrm{op}}V}\n$$\n\nes la hipótesis que proponemos estudiar.\n\nSu esquema mínimo:\n\n$$\n\\boxed{\n\\xi\\mapsto\\xi\n\\mapsto\\cdots\n\\mapsto\\xi\n\\mapsto\nb\\in\\{0,1\\}\n}\n$$\n\nY siempre:\n\n$$\n\\boxed{\\xi:\\text{resultado binario no observado}.}\n$$\n\n# 34. Conclusión: una hipótesis de trabajo abierta",
+      "deps": [
+        "D_HIPOTESISV",
+        "D_EQUIVALENCIA",
+        "D_OBJETIVORELACIONAL"
+      ],
+      "source": {
+        "file": "ES_52_Maquina_V_UNIHOLOG.md",
+        "start_line": 1706,
+        "end_line": 1752
+      },
+      "structural_verification": "CERTIFICADO_ESTRUCTURAL",
+      "measurement_relationship": "unclear"
+    },
+    {
+      "id": "D_ESTADOINVESTIGACION",
+      "kind": "definition",
+      "name": "$D_{ESTADOINVESTIGACION}$ — Conclusiones del desarrollo y estado de la hipótesis.",
+      "description": "$D_{ESTADOINVESTIGACION}$ — Conclusiones del desarrollo y estado de la hipótesis.\n\nDeps: D_ALCANCE, D_SIMETRIA, T_AMPLITUDECOND, T_SECUENCIACOND\n\nLa idea presentada en este trabajo es sencilla: **podemos construir una\nmáquina con electrónica convencional que opere bajo las mismas\ncondiciones fundamentales que hemos impuesto a una máquina cuántica.**\n\nEl punto de partida es:\n\n$$\n\\xi:\\text{resultado binario no observado}.\n$$\n\n$\\xi$ no es un tercer estado, no es un valor almacenado y no pertenece al\ndominio lógico de la máquina.\n\nLa máquina continúa trabajando con $0$ o $1$, pero renunciamos a conocer\nel valor mientras se desarrolla la computación.\n\nLo que sí podemos conocer y transformar son las relaciones:\n\n$$\n\\mathcal R_0\\mapsto\\mathcal R_1\\mapsto\\cdots\\mapsto\\mathcal R_n.\n$$\n\nSolamente cuando realizamos la medida $t=t_0$ obtenemos:\n\n$$\nb\\in\\{0,1\\}.\n$$\n\nNunca obtenemos $\\xi$.\n\nV no pretende simular matemáticamente Q:\n\n$$\n\\boxed{\\text{V replica Q; no simula Q}.}\n$$\n\nEsto abre una posibilidad tecnológica y conceptual: **investigar\nmáquinas construidas con electrónica convencional capaces de reproducir\noperacionalmente aquello para lo que actualmente construimos máquinas\ncuánticas**, y explorar arquitecturas V que no tengan por qué quedar\nlimitadas a la estructura de Q.\n\nLo presentado aquí es una **hipótesis de trabajo**.\n\nEl desarrollo añadido establece identidades de fase y construcciones\nideales condicionadas para lectura y actualización de una unidad, y los\nplanes de conexiones de las tres máquinas V. También\nexplicita el límite CHSH cuando se exige un protocolo distribuido local\nsin comunicación. Estos resultados no constituyen una demostración de\nequivalencia física universal ni una validación experimental de V.\n\nEl registro adjunto NOTAS_DESARROLLO_ES_52.md conserva las condiciones,\ncomprobaciones y cuestiones abiertas, para que no se pierdan durante\nla continuación del trabajo.\n\nAnimo a investigadores en computación cuántica, electrónica, física,\nmatemáticas e informática a estudiarla, debatirla, intentar refutarla,\nampliarla y, sobre todo, construirla.\n\nNo considero este artículo un punto final.\n\n**Es un punto de partida.**\n\n**Queda mucho trabajo por hacer.**\n\n## Invitación a un contraste experimental independiente\n\nCon los recursos disponibles hemos desarrollado el análisis conceptual,\nlas identidades y las construcciones de una unidad aquí especificadas,\ny los planes de conexiones y control de medida de V1, V2 y V3. Las pruebas\ndel controlador comprueban preparación y disparo; no se presentan como\nresultados de los algoritmos completos de esas máquinas.\n\nEstos resultados positivos corresponden a los modelos y protocolos\nanalizados; no constituyen una prueba de equivalencia universal de la\narquitectura física V. El análisis también identifica límites, en\nparticular el de una realización local sin comunicación frente a las\ncorrelaciones CHSH. La comprobación experimental y la caracterización\nde la arquitectura relacional propuesta siguen pendientes.\n\nSoy un investigador independiente con medios modestos. Si no dispongo\nde acceso a un procesador cuántico real para realizar el contraste,\ninvito a quienes sí lo tengan a probar la propuesta y compartir sus\nresultados, tanto si encuentran coincidencias como si encuentran diferencias.\n\nLa comparación debe respetar las premisas expuestas al comienzo:\npreparaciones correspondientes, independencia de las entradas cuando\nel protocolo la exija, operaciones y conexiones declaradas y los mismos\ncriterios de lectura y evaluación para Q y V. No se introducirán en V\nsincronizaciones o correlaciones externas que no formen parte del protocolo.\n\nUna implementación en Python podrá ayudar a especificar y contrastar\nlas reglas propias de V; si modela un circuito aún no construido, sus\nresultados se identificarán como predicciones de ese modelo. Si controla\ny registra un circuito V físico, se documentará esa realización. Los\nresultados Q deberán distinguir entre simulación y ejecución en hardware\nreal. La implementación de V respetará su arquitectura relacional y\nsus reglas propias, sin sustituirlas por una simulación de Q.\n\nPara que el contraste pueda revisarse y repetirse, solicito que se\ncompartan los protocolos, las implementaciones utilizadas, la\nidentificación del procesador, las configuraciones y calibraciones\npertinentes, el número de repeticiones, los datos de salida y sus\nincertidumbres estadísticas. Las pérdidas, selecciones de datos y\ndiscrepancias también deberán declararse.\n\nLa falta de acceso no confirma ni refuta la hipótesis: deja pendiente\nel experimento. Una coincidencia establecerá el alcance de los protocolos\ncontrastados; una diferencia reproducible permitirá localizar un límite\no una condición de la propuesta que deba revisarse.\n\nSi la propuesta supera estos contrastes, espero que los resultados\nfaciliten futuras colaboraciones y que el acceso a los medios necesarios\ndeje de ser una barrera para continuar investigándola. Esa posibilidad\nes una motivación para poner el trabajo a disposición de otros, no una\nconclusión experimental anticipada.\n\n------------------------------------------------------------------------\n\n**Víctor Estrada Díaz**\\\nEinstein-VED --- UNIHOLOG\n\n**Licencia: CC BY-NC-SA**",
+      "deps": [
+        "D_ALCANCE",
+        "D_SIMETRIA",
+        "T_AMPLITUDECOND",
+        "T_SECUENCIACOND"
+      ],
+      "source": {
+        "file": "ES_52_Maquina_V_UNIHOLOG.md",
+        "start_line": 1753,
+        "end_line": 1879
+      },
+      "structural_verification": "CERTIFICADO_ESTRUCTURAL",
+      "measurement_relationship": "unclear"
+    },
+    {
+      "id": "EVAL_PROLOG_MD_DIRECTO_ES_52_Maquina_V_UNIHOLOG",
+      "kind": "meta_validation",
+      "name": "Resultado del evaluador Prolog directo del Markdown",
+      "description": "TEOREMA DERIVADO DESDE PREMISAS DECLARADAS. Lee exclusivamente el Markdown y comprueba las reglas Deps, las referencias explicitas de la prueba y las premisas declaradas. Certifica la derivacion interna de T_SECUENCIACOND en ese sistema; no convierte automaticamente cada premisa declarada en verdad matematica externa.",
+      "deps": [
+        "T_SECUENCIACOND"
+      ],
+      "measurement_relationship": "additive",
+      "proof": {
+        "method": "SWI-Prolog Direct Markdown Auditor",
+        "status": "verified",
+        "steps": [
+          "TEOREMA DERIVADO DESDE PREMISAS DECLARADAS. Lee exclusivamente el Markdown y comprueba las reglas Deps, las referencias explicitas de la prueba y las premisas declaradas. Certifica la derivacion interna de T_SECUENCIACOND en ese sistema; no convierte automaticamente cada premisa declarada en verdad matematica externa."
+        ],
+        "verification_scope": "prolog_direct_markdown_derivation"
+      }
+    }
+  ],
+  "schema_version": 1,
+  "certificate_type": "SWI_PROLOG_DIRECT_MARKDOWN_DERIVATION",
+  "project": "ES_52_Maquina_V_UNIHOLOG",
+  "tool": "SWI-Prolog Direct Markdown Auditor",
+  "generated_on": "2026-10-16T01:22:45+00:00",
+  "verdict": "TEOREMA DERIVADO DESDE PREMISAS DECLARADAS",
+  "passed": true,
+  "refuted": false,
+  "mathematical_status": "DERIVADO_EN_EL_SISTEMA_DECLARADO_POR_EL_MD",
+  "exit_code": 0,
+  "input": "ES_52_Maquina_V_UNIHOLOG.md",
+  "input_sha256": "6c2ac8edb842e2d5ef0c7f0965f0cbaf203e974f3bcdb2acf875162cbb5467d0",
+  "auditor": "PckDemuestra\\audita_md.pl",
+  "auditor_sha256": "a9ad83b7361bf9b2bd40247fa7733d2fa85011c8c93cac3a506d1dc1d400b8ed",
+  "uses_generated_prolog": false,
+  "uses_lean": false,
+  "goal": "T_SECUENCIACOND",
+  "goal_declaration_line": 1107,
+  "goal_rule_line": 1110,
+  "goal_conclusion": "BLOQUE_FORMAL_DECLARADO",
+  "nodes_extracted_from_md": 30,
+  "dependency_rules_extracted_from_md": 26,
+  "declared_premises_from_md": 4,
+  "formula_lines_extracted_from_md": 188,
+  "dependencies_recovered_from_proof": 0,
+  "recovered_dependencies": [],
+  "open_obligations": [],
+  "goal_conditions_missing": [],
+  "coverage": {
+    "scope": "dependency_closure_under_declared_markdown_premises",
+    "certified_nodes": [
+      "A_EVOLUCIONQ",
+      "D_ACTUALIZACION",
+      "D_ALCANCE",
+      "D_AMPLITUDES",
+      "D_CIRCUITOV",
+      "D_COMPARADOR",
+      "D_CONDICIONREFERENCIA",
+      "D_CORRELACIONES",
+      "D_DISTRIBUCIONCONJUNTA",
+      "D_EQUIVALENCIA",
+      "D_ESTADOINVESTIGACION",
+      "D_FRECUENCIAS",
+      "D_LECTURA",
+      "D_OBJETIVORELACIONAL",
+      "D_PROTOCOLOFASE",
+      "D_REGISTROBINARIO",
+      "D_RELACIONES",
+      "D_SIMETRIA",
+      "D_TIEMPO",
+      "P_CHSHLOCAL",
+      "P_INTERFERENCIA",
+      "P_LECTURAUNIFORME",
+      "P_NORMAV",
+      "P_SOLUCION",
+      "T_AMPLITUDECOND",
+      "T_SECUENCIACOND"
+    ],
+    "pending_nodes": [],
+    "declared_premises": [
+      "D_DESCONOCIDO",
+      "D_HIPOTESISV",
+      "D_PROTOCOLO",
+      "P_INVERSION"
+    ],
+    "refutations": 0,
+    "not_a_global_mathematical_certificate": true,
+    "total": 26
+  },
+  "premises_used_by_goal_proof": [
+    {
+      "node": "D_PROTOCOLO",
+      "declaration_line": 18
+    },
+    {
+      "node": "D_DESCONOCIDO",
+      "declaration_line": 246
+    }
+  ],
+  "theorems": {
+    "T_AMPLITUDECOND": "DERIVADO",
+    "T_SECUENCIACOND": "DERIVADO"
+  },
+  "proof_tree": [
+    "TEOREMA t_secuenciacond por Deps (linea 1110)",
+    "  PREMISA_MD d_protocolo (linea 18)",
+    "  TEOREMA d_actualizacion por Deps (linea 1005)",
+    "    TEOREMA d_circuitov por Deps (linea 539)",
+    "      TEOREMA d_amplitudes por Deps (linea 472)",
+    "        PREMISA_MD d_protocolo (linea 18)",
+    "        TEOREMA d_lectura por Deps (linea 275)",
+    "          PREMISA_MD d_desconocido (linea 246)",
+    "    TEOREMA d_comparador por Deps (linea 860)",
+    "      TEOREMA d_lectura por Deps (linea 275)",
+    "        PREMISA_MD d_desconocido (linea 246)",
+    "      TEOREMA d_protocolofase por Deps (linea 741)",
+    "        PREMISA_MD d_protocolo (linea 18)",
+    "        TEOREMA d_amplitudes por Deps (linea 472)",
+    "          PREMISA_MD d_protocolo (linea 18)",
+    "          TEOREMA d_lectura por Deps (linea 275)",
+    "            PREMISA_MD d_desconocido (linea 246)",
+    "        TEOREMA p_interferencia por Deps (linea 694)",
+    "          TEOREMA d_amplitudes por Deps (linea 472)",
+    "            PREMISA_MD d_protocolo (linea 18)",
+    "            TEOREMA d_lectura por Deps (linea 275)",
+    "              PREMISA_MD d_desconocido (linea 246)",
+    "    TEOREMA p_lecturauniforme por Deps (linea 952)",
+    "      TEOREMA d_comparador por Deps (linea 860)",
+    "        TEOREMA d_lectura por Deps (linea 275)",
+    "          PREMISA_MD d_desconocido (linea 246)",
+    "        TEOREMA d_protocolofase por Deps (linea 741)",
+    "          PREMISA_MD d_protocolo (linea 18)",
+    "          TEOREMA d_amplitudes por Deps (linea 472)",
+    "            PREMISA_MD d_protocolo (linea 18)",
+    "            TEOREMA d_lectura por Deps (linea 275)",
+    "              PREMISA_MD d_desconocido (linea 246)",
+    "          TEOREMA p_interferencia por Deps (linea 694)",
+    "            TEOREMA d_amplitudes por Deps (linea 472)",
+    "              PREMISA_MD d_protocolo (linea 18)",
+    "              TEOREMA d_lectura por Deps (linea 275)",
+    "                PREMISA_MD d_desconocido (linea 246)",
+    "      TEOREMA d_condicionreferencia por Deps (linea 925)",
+    "        TEOREMA d_comparador por Deps (linea 860)",
+    "          TEOREMA d_lectura por Deps (linea 275)",
+    "            PREMISA_MD d_desconocido (linea 246)",
+    "          TEOREMA d_protocolofase por Deps (linea 741)",
+    "            PREMISA_MD d_protocolo (linea 18)",
+    "            TEOREMA d_amplitudes por Deps (linea 472)",
+    "              PREMISA_MD d_protocolo (linea 18)",
+    "              TEOREMA d_lectura por Deps (linea 275)",
+    "                PREMISA_MD d_desconocido (linea 246)",
+    "            TEOREMA p_interferencia por Deps (linea 694)",
+    "              TEOREMA d_amplitudes por Deps (linea 472)",
+    "                PREMISA_MD d_protocolo (linea 18)",
+    "                TEOREMA d_lectura por Deps (linea 275)",
+    "                  PREMISA_MD d_desconocido (linea 246)",
+    "  TEOREMA p_lecturauniforme por Deps (linea 952)",
+    "    TEOREMA d_comparador por Deps (linea 860)",
+    "      TEOREMA d_lectura por Deps (linea 275)",
+    "        PREMISA_MD d_desconocido (linea 246)",
+    "      TEOREMA d_protocolofase por Deps (linea 741)",
+    "        PREMISA_MD d_protocolo (linea 18)",
+    "        TEOREMA d_amplitudes por Deps (linea 472)",
+    "          PREMISA_MD d_protocolo (linea 18)",
+    "          TEOREMA d_lectura por Deps (linea 275)",
+    "            PREMISA_MD d_desconocido (linea 246)",
+    "        TEOREMA p_interferencia por Deps (linea 694)",
+    "          TEOREMA d_amplitudes por Deps (linea 472)",
+    "            PREMISA_MD d_protocolo (linea 18)",
+    "            TEOREMA d_lectura por Deps (linea 275)",
+    "              PREMISA_MD d_desconocido (linea 246)",
+    "    TEOREMA d_condicionreferencia por Deps (linea 925)",
+    "      TEOREMA d_comparador por Deps (linea 860)",
+    "        TEOREMA d_lectura por Deps (linea 275)",
+    "          PREMISA_MD d_desconocido (linea 246)",
+    "        TEOREMA d_protocolofase por Deps (linea 741)",
+    "          PREMISA_MD d_protocolo (linea 18)",
+    "          TEOREMA d_amplitudes por Deps (linea 472)",
+    "            PREMISA_MD d_protocolo (linea 18)",
+    "            TEOREMA d_lectura por Deps (linea 275)",
+    "              PREMISA_MD d_desconocido (linea 246)",
+    "          TEOREMA p_interferencia por Deps (linea 694)",
+    "            TEOREMA d_amplitudes por Deps (linea 472)",
+    "              PREMISA_MD d_protocolo (linea 18)",
+    "              TEOREMA d_lectura por Deps (linea 275)",
+    "                PREMISA_MD d_desconocido (linea 246)"
+  ],
+  "proof_tree_sha256": "412f7abc1f5e438a7e8df1b702135dc08f8f4316e9fbd5f1801846065f35c108",
+  "log": "logs\\PROLOG_MD_DIRECTO_ES_52_Maquina_V_UNIHOLOG.log",
+  "scope": "Lee exclusivamente el Markdown y comprueba las reglas Deps, las referencias explicitas de la prueba y las premisas declaradas. Certifica la derivacion interna de T_SECUENCIACOND en ese sistema; no convierte automaticamente cada premisa declarada en verdad matematica externa.",
+  "adec_metadata_repairs": [
+    {
+      "node": "D_RELACIONES",
+      "field": "measurement_relationship",
+      "value": "unclear",
+      "origin": "unspecified_in_artifact"
+    },
+    {
+      "node": "D_TIEMPO",
+      "field": "measurement_relationship",
+      "value": "unclear",
+      "origin": "unspecified_in_artifact"
+    },
+    {
+      "node": "D_AMPLITUDES",
+      "field": "measurement_relationship",
+      "value": "unclear",
+      "origin": "unspecified_in_artifact"
+    },
+    {
+      "node": "D_PROTOCOLOFASE",
+      "field": "measurement_relationship",
+      "value": "unclear",
+      "origin": "unspecified_in_artifact"
+    },
+    {
+      "node": "D_COMPARADOR",
+      "field": "measurement_relationship",
+      "value": "unclear",
+      "origin": "unspecified_in_artifact"
+    },
+    {
+      "node": "D_ACTUALIZACION",
+      "field": "measurement_relationship",
+      "value": "unclear",
+      "origin": "unspecified_in_artifact"
+    },
+    {
+      "node": "D_FRECUENCIAS",
+      "field": "measurement_relationship",
+      "value": "unclear",
+      "origin": "unspecified_in_artifact"
+    },
+    {
+      "node": "D_REGISTROBINARIO",
+      "field": "measurement_relationship",
+      "value": "unclear",
+      "origin": "unspecified_in_artifact"
+    },
+    {
+      "node": "D_EQUIVALENCIA",
+      "field": "measurement_relationship",
+      "value": "unclear",
+      "origin": "unspecified_in_artifact"
+    },
+    {
+      "node": "D_ALCANCE",
+      "field": "measurement_relationship",
+      "value": "unclear",
+      "origin": "unspecified_in_artifact"
+    },
+    {
+      "node": "D_ESTADOINVESTIGACION",
+      "field": "measurement_relationship",
+      "value": "unclear",
+      "origin": "unspecified_in_artifact"
+    }
+  ],
+  "adec_compatible": true,
+  "adec_node_count": 31,
+  "adec_access": {
+    "engine": "ADEC v0.8.6",
+    "mode": "remote_url_or_file_upload",
+    "automatic_url_json": false,
+    "reason": "La web copia la URL publica y descarga el JSON para cargarlo desde el selector de archivos de ADEC."
+  }
+}

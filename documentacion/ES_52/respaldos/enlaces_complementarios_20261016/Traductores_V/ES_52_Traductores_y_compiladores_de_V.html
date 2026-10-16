@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="author" content="Víctor Estrada Díaz">
+<meta name="author-orcid" content="0000-0001-9942-1021">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>-ES_52: Traductores y compiladores de V</title>
+<style>
+body {
+    font-family: Georgia, serif;
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 20px;
+    line-height: 1.6;
+    background: #fcfcfc;
+    color: #222;
+}
+h1, h2, h3, h4 {
+    color: #1a1a1a;
+}
+table {
+    border-collapse: collapse;
+    width:100%;
+    margin:20px 0;
+}
+th, td {
+    border:1px solid #ccc;
+    padding:8px 12px;
+}
+th {
+    background:#f0f0f0;
+}
+blockquote {
+    border-left:4px solid #0077cc;
+    padding-left:16px;
+}
+code {
+    background:#eee;
+    padding:2px 6px;
+}
+pre {
+    background:#f4f4f4;
+    padding:12px;
+    overflow-x:auto;
+}
+img {
+    max-width:100%;
+    height:auto;
+}
+math {
+    font-size:1.1em;
+}
+</style>
+</head>
+<body>
+<h1>-ES_52: Traductores y compiladores de V</h1>
+<p>Autor: Víctor Estrada Díaz. Marco: Einstein-VED - UNIHOLOG.
+Fecha: 10 de octubre de 2026.</p>
+<p><strong>Referencias del proyecto:</strong>
+<a href="../ES_52_Maquina_V_UNIHOLOG.pdf">Documento base</a>
+· <a href="../ES_52_Laminas_Q_V.pdf">Láminas de construcción y comparación Q-V</a>
+· <a href="../ES_52_Presentacion_comunidad.pdf">Presentación a la comunidad</a>
+· <a href="../ES_52_Indice_recursos.pdf">Índice completo de recursos</a>.</p>
+<h2>Licencia Dual - Ética y Uso</h2>
+<ul>
+<li><strong>Texto (CC BY-NC-SA 4.0)</strong>: compartir, adaptar, no comercial, atribución y compartir igual.</li>
+<li><strong>Código (HL3)</strong>: uso comercial permitido solo si cumple principios éticos.
+Prohibidos: guerras, violación de derechos humanos, daño ambiental,
+explotación, vigilancia masiva y discriminación.</li>
+</ul>
+<p><strong>Principios éticos declarados por el autor</strong>: respeto a la dignidad humana,
+no uso lucrativo sin permiso y prohibición de usos dañinos.
+<a href="https://estradad.es/licencia.php">Declaración</a>
+· <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>
+· <a href="https://firstdonoharm.dev/version/3/0/">HL3</a>.</p>
+<h2>Finalidad y reglas</h2>
+<p>Esta herramienta traduce un circuito Q conocido a un plan de construcción
+V. No consulta respuestas de Q ni calcula previamente un resultado para
+ocultarlo hasta la medida. Conserva puertas, controles, conexiones y orden.
+No introduce un registro de amplitudes ni recorre posibles resultados.</p>
+<p>V es la máquina determinista del autor, realizable con electrónica o
+software convencional. El desconocimiento antes de la medida no añade
+un mecanismo aleatorio a su dinámica.</p>
+<p>En V, las salidas permanecen desconocidas antes de la medida. La lectura
+conjunta se desencadena en <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>t</mi><mo>=</mo><msub><mi>t</mi><mn>0</mn></msub></mrow></math>, registrado por el reloj del controlador.
+La evolución de las puertas corresponde a la realización conectada, no
+a la llamada de medida. No se observa esa evolución para obtener valores
+binarios intermedios.</p>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>M</mi><mi>V</mi></msub><mo stretchy="false">(</mo><msub><mi>t</mi><mn>0</mn></msub><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">(</mo><msub><mi>v</mi><mn>0</mn></msub><mo>,</mo><mi>…</mi><mo>,</mo><msub><mi>v</mi><mrow><mi>n</mi><mo>−</mo><mn>1</mn></mrow></msub><mo stretchy="false">)</mo><mo>,</mo><mspace width="2em" /><msub><mi>v</mi><mi>i</mi></msub><mo>∈</mo><mo stretchy="false">{</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy="false">}</mo><mo>.</mo></mrow></math></p>
+<p>Una reconsulta devuelve la lectura registrada y no repite el disparo.
+Un error del detector consume esa preparación. No se reemplaza por otro
+intento ni por una salida inventada.</p>
+<h2>Organización portátil</h2>
+<pre><code class="language-text">ES_52/
+  ES_52_Maquina_V_UNIHOLOG.md
+  ES_52_Laminas_Q_V.md
+  img/
+  Traductores_V/
+    ES_52_Traductores_y_compiladores_de_V.md
+    gestor_v.py
+    traductor_qasm_v.py
+    v_relacional.py
+    operaciones_senales.py
+    v1.py
+    v2.py
+    v3.py
+    protocolo_q3.py
+    ejecucion_v.py
+    requirements.txt
+    v.bat
+    v.ps1
+    v.sh
+    MaquinasQ/
+      par_h_cnot.q
+    MaquinasV/
+      par_h_cnot/
+        v.py
+        v.pl
+        v.cpp
+        v.hpp
+        v.json
+</code></pre>
+<p>Cada archivo <code>MaquinasQ/*.q</code> contiene OpenQASM <strong>2.0</strong>, aunque su extensión
+sea <code>.q</code>. El nombre sin extensión identifica la máquina. Se incluye un
+ejemplo de dos unidades con H y CNOT; no una realización física de esas puertas.</p>
+<p>Los lanzadores calculan las rutas desde su propia ubicación. Los tres
+documentos se enlazan mediante rutas relativas. Al trasladar <strong>todo ES_52</strong>
+se conserva esa navegación. La carpeta Traductores_V también funciona por
+separado, pero sus enlaces al documento base requieren el resto del proyecto.</p>
+<p>La portabilidad de rutas no instala herramientas ni hardware: el destino
+debe disponer de Python y Qiskit, y, según el lenguaje, SWI-Prolog o un
+compilador C++ compatible con la interfaz de GCC/Clang y C++17.</p>
+<h2>Instalación</h2>
+<p>Con Python disponible, instalar las dependencias del paquete:</p>
+<pre><code class="language-text">python -m pip install -r requirements.txt
+</code></pre>
+<p>Puede seleccionarse un intérprete mediante <code>V_PYTHON</code>, SWI-Prolog mediante
+<code>V_SWIPL</code> y un compilador mediante <code>V_CXX</code>. Estas variables contienen la
+ruta al ejecutable, sin argumentos adicionales. Por defecto se buscan
+las herramientas instaladas. No se descargan ni instalan automáticamente.</p>
+<p>Los comandos siguientes se ejecutan desde Traductores_V. Desde otra
+carpeta se utiliza la ruta al lanzador; las máquinas se buscan en su
+MaquinasQ, no en el directorio de trabajo del usuario.</p>
+<h2>Windows: PowerShell o BAT</h2>
+<pre><code class="language-powershell">.\v.ps1 listar
+.\v.ps1 traducir par_h_cnot
+.\v.ps1 compilar par_h_cnot --lenguaje python
+.\v.ps1 compilar par_h_cnot --lenguaje prolog
+.\v.ps1 compilar par_h_cnot --lenguaje cpp
+</code></pre>
+<p>El mismo uso es posible con <code>v.bat</code>, por ejemplo:</p>
+<pre><code class="language-text">v.bat traducir par_h_cnot
+</code></pre>
+<p>La política de ejecución de PowerShell puede impedir abrir el <code>.ps1</code>.
+No se modifica dicha política: puede utilizarse el <code>.bat</code> o llamar
+directamente a <code>python gestor_v.py</code> con los mismos argumentos.</p>
+<h2>Linux y otros entornos con shell</h2>
+<pre><code class="language-sh">sh ./v.sh listar
+sh ./v.sh traducir par_h_cnot
+sh ./v.sh compilar par_h_cnot --lenguaje python
+sh ./v.sh compilar par_h_cnot --lenguaje prolog
+sh ./v.sh compilar par_h_cnot --lenguaje cpp
+</code></pre>
+<h2>Traducción y compilación</h2>
+<p>La traducción genera las cinco salidas en <code>MaquinasV/&lt;nombre&gt;/</code>.
+No sobrescribe una traducción existente: se debe conservarla con otro
+nombre o retirar explícitamente los archivos anteriores para regenerarla.
+El JSON contiene el plan, el mapa de medida y la huella de la entrada,
+no estados internos ni una distribución de respuestas.</p>
+<p>La acción <code>compilar</code> comprueba la sintaxis Python, carga el módulo Prolog
+o comprueba la unidad C++ sin enlazar. No prepara ni dispara una realización
+V. La aceptación de un compilador no es un resultado experimental.</p>
+<p>Se admiten H, X, CNOT, Toffoli, SWAP, CZ, Rx, Rz, P/U1, S, S inversa,
+T, T inversa, Z y CU1/CP cuando el analizador admite sus declaraciones.
+Las puertas definidas en QASM se expanden con sus conexiones. No se
+eliminan fases de sus definiciones de forma silenciosa.</p>
+<p>Se requiere exactamente una medida terminal por unidad, con destinos
+clásicos distintos. Se rechazan medidas intermedias o parciales, reset,
+control dependiente de lecturas, operaciones posteriores a una medida y
+puertas sin traducción definida. OpenQASM 3, U/U2/U3, Y y Ry no se admiten
+en esta primera versión. Estos rechazos describen límites de la herramienta,
+no una refutación de V.</p>
+<h2>Ejecutar una realización conectada</h2>
+<p>La ejecución exige aportar una realización. Sin ella, el lanzador se
+detiene con un mensaje explícito; no usa un simulador ni datos de ensayo
+como sustituto. La realización es código confiable que el usuario decide
+ejecutar y debe respetar las restricciones internas de V.</p>
+<h3>Python</h3>
+<p>El archivo de realización define <code>crear_realizacion()</code>. Devuelve un objeto
+con <code>preparar(plan)</code>, que configura sin devolver lecturas, y <code>disparar(t0)</code>,
+que entrega un bit medido por unidad, en orden de índice de unidad.</p>
+<pre><code class="language-powershell">.\v.ps1 ejecutar par_h_cnot --lenguaje python --realizacion .\mi_realizacion.py
+</code></pre>
+<p>El informe incluye la lectura, su mapa de bits clásicos y el instante de
+disparo. Los destinos clásicos no medidos se dejan sin lectura (<code>null</code>),
+no se inventa un resultado para ellos.</p>
+<h3>Prolog</h3>
+<p>El archivo de realización implementa los predicados multifile
+<code>qasm_v:realizar_preparacion/1</code> y <code>qasm_v:realizar_disparo/2</code>.
+El controlador registra el reloj civil al disparar; no lo confunde con
+una calibración del instante de conversión del dispositivo.</p>
+<pre><code class="language-powershell">.\v.ps1 ejecutar par_h_cnot --lenguaje prolog --realizacion .\mi_realizacion.pl
+</code></pre>
+<h3>C++</h3>
+<p>El archivo de realización incluye <code>v.hpp</code>, implementa la interfaz
+<code>qasm_v::Realizacion</code> y define la fábrica:</p>
+<pre><code class="language-cpp">std::unique_ptr&lt;qasm_v::Realizacion&gt; crear_realizacion();
+</code></pre>
+<p>El gestor genera un programa de conexión, lo compila junto a esa realización
+y ejecuta el binario. No introduce otra dinámica de puertas. La realización
+incluye sus propios recursos y dependencias; esta primera versión no
+configura bibliotecas externas de hardware.</p>
+<pre><code class="language-powershell">.\v.ps1 ejecutar par_h_cnot --lenguaje cpp --realizacion .\mi_realizacion.cpp
+</code></pre>
+<h2>Evaluación y alcance</h2>
+<p>La carpeta pertenece al proyecto 52 y es autónoma para traducir y conectar
+realizaciones. DEMUESTRA permanece fuera como gestor común: utiliza
+<code>documentos_proyecto.json</code> para identificar el documento principal y los
+anexos, generar sus derivados y comprobar sus rutas. No mezcla el contenido
+del 42, del 45 ni sus evaluaciones con este proyecto.</p>
+<p>Desde DEMUESTRA se actualizan los documentos locales con:</p>
+<pre><code class="language-text">python publica.py --documentos-locales ES_52
+</code></pre>
+<p>Esta acción genera HTML, PDF y un informe JSON de fuentes y derivados;
+no publica, no modifica evaluaciones Lean/Prolog ni emite certificados.
+El programa <code>v.pl</code> es una salida del traductor V, no el certificado Prolog
+del documento científico. Sus funciones y sus evaluaciones son distintas.</p>
+<p>El controlador etiqueta una lectura como <code>REALIZACION_NO_VERIFICADA</code>:
+no atribuye certificación por el mero hecho de recibir bits.
+El momento registrado es el de la invocación del disparo, no una garantía
+de simultaneidad física calibrada. Los recursos y la dinámica internos
+de la realización deben revisarse por separado.</p>
+<p>La comparación con Q exige el mismo protocolo y documentar las condiciones,
+salidas, repeticiones, recursos y tiempos correspondientes de ambas.
+Traducir conexiones, compilar código y medir una realización son etapas
+distintas. Ninguna limitación de este gestor se convierte en una conclusión
+negativa sobre V, y ninguna prueba de sintaxis se presenta como equivalencia.</p>
+<p>El analizador empleado es el de
+<a href="https://quantum.cloud.ibm.com/docs/en/guides/interoperate-qiskit-qasm2">OpenQASM 2 de Qiskit</a>.</p>
+
+</body>
+</html>
