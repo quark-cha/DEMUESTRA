@@ -1,0 +1,39 @@
+{
+  "project": "ES_52_Maquina_V_UNIHOLOG",
+  "branch": "CONSTITUTIVE_TIME_TRIGGER_CONTROL",
+  "generated_on": "2026-10-10T00:47:57.506540+00:00",
+  "status": "CONTROL_TEMPORAL_VERIFICADO",
+  "passed": true,
+  "refuted": false,
+  "formal_certification": false,
+  "physical_realization_verified": false,
+  "source_sha256": "a267c6d2a16442dca06a2609049fe7ac5ef0ebabaee74a80ecc1d81401b448f7",
+  "code_sha256": {
+    "v_relacional.py": "aadc543bf7f9d3ea78cc065a06b9be4d794ecf31c3b3f1ca032bb923f87bf01f",
+    "ejecucion_v.py": "06cdf89aa85f5b17f8679691986437df43b78bdf49952b702a1ce7dc57571bee",
+    "registrar_control_temporal.py": "cca68055c5c4bd324e66884dda48fdf6693d403e72e301f1215efa75325e3ab6",
+    "test_t0_constitutivo.py": "636a1566b66c3f4105b5a18dca51a03fd588b29b168033e4e8a116f58c36c103"
+  },
+  "tests": {
+    "successful": 44,
+    "discovered": 58,
+    "skipped": 14,
+    "failures": 0,
+    "errors": 0
+  },
+  "checks": {
+    "t0_recorded_at_trigger": true,
+    "synthetic_t0_rejected": true,
+    "one_trigger_per_preparation": true,
+    "no_plan_evaluation_at_trigger": true,
+    "unknown_observed_outputs_before_trigger": true,
+    "path_model_excluded_from_V": true
+  },
+  "scope": "Control temporal de V1, V2 y V3: preparar, disparar una vez y registrar bits.",
+  "limits": [
+    "El reloj marca la invocacion de disparar, no calibra el instante de conversion de un sensor.",
+    "Los detectores de ensayo comprueban llamadas, no realizan las puertas de V.",
+    "Falta conectar y verificar la dinamica de una realizacion V.",
+    "No se acredita equivalencia con Q ni mejora del orden temporal."
+  ]
+}

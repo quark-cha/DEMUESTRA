@@ -1,0 +1,32 @@
+MÁQUINA V: PRINCIPIOS CUÁNTICOS EN CIRCUITOS CONVENCIONALES
+Víctor Estrada Díaz · Einstein-VED / UNIHOLOG
+
+Este trabajo desarrolla una construcción para utilizar los principios cuánticos en circuitos electrónicos convencionales y en programación, desde el marco Einstein-VED / UNIHOLOG.
+
+La clave de mi máquina V es no conocer los estados no fijados antes de medir en t = t₀. Su coherencia exige preservar ese desconocimiento durante las operaciones. No basta con ocultar al lector una respuesta que el programa ya conoce: introducir ese conocimiento previo cambiaría la máquina definida.
+
+ξ representa desconocimiento. No es un tercer valor lógico ni una palabra física almacenada. Podemos desconocer los valores y conocer las relaciones: un inversor establece B = 1 − A sin exigir una lectura previa de A o B.
+
+En t = t₀ se desencadena la medida y se obtiene una lectura definida en 0 o 1. Una reconsulta devuelve esa misma lectura. La construcción no introduce un registro exponencial de amplitudes ni recorre posibles respuestas durante el disparo.
+
+En mi marco, el indeterminismo y las probabilidades se explican desde el desconocimiento de los estados no fijados. Al medir, el resultado deja de ser una posibilidad pendiente y queda registrado. La incertidumbre se vincula a una propiedad interna del espacio-tiempo, expresada mediante f(t), y al instante desde el que conocemos los hechos. Desconocer un estado no implica su inexistencia: el pasado y el futuro no desaparecen por nuestra posición temporal.
+
+El proyecto reúne las construcciones Q1–V1, Q2–V2 y Q3–V3, sus puertas y un traductor de OpenQASM 2.0 a planes V y controladores en Python, Prolog y C++.
+
+La aportación no se limita a comparar máquinas: define cómo construir V preservando sus premisas y cómo confrontar su funcionamiento, resultados y orden de ejecución con Q mediante los mismos problemas y protocolos. Los documentos, programas e informes permiten recorrer el trabajo y participar.
+
+DOSSIER Y EVALUACIONES EN DEMUESTRA
+https://estradad.es/teorias/pdf/DEMUESTRA/proyectos/ES_52/
+
+TODOS LOS DOCUMENTOS, PROGRAMAS, LÁMINAS Y COMPLEMENTOS
+https://estradad.es/teorias/pdf/DEMUESTRA/proyectos/ES_52/ES_52_Indice_recursos.html
+
+ARTÍCULO COMPLETO
+https://estradad.es/teorias/pdf/DEMUESTRA/proyectos/ES_52/ES_52_Presentacion_comunidad.html
+
+ARCHIVO EINSTEIN-VED / UNIHOLOG EN ZENODO
+Versión: https://doi.org/10.5281/zenodo.23284583
+Conjunto de versiones: https://doi.org/10.5281/zenodo.17172925
+
+Texto: CC BY-NC-SA 4.0. Código: HL3, conforme a los principios éticos declarados. Prohibidos los usos bélicos, discriminatorios y dañinos; no uso lucrativo sin permiso.
+https://estradad.es/licencia.php

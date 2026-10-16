@@ -103,21 +103,6 @@ Este ensayo numérico no corresponde a la lectura por disparo de V. Se conserva 
 | `comparacion/tests/test_propuesta_lectura.py` | [test_propuesta_lectura.py](https://estradad.es/teorias/pdf/DEMUESTRA/comparacion/tests/test_propuesta_lectura.py) |
 | `documentacion/ES_52/VERIFICACION_PROPUESTA_LECTURA_20261010.json` | [VERIFICACION_PROPUESTA_LECTURA_20261010.json](https://estradad.es/teorias/pdf/DEMUESTRA/documentacion/ES_52/VERIFICACION_PROPUESTA_LECTURA_20261010.json) |
 
-## Resultados historicos del modelo anterior
-
-Resultados de un modelo anterior: no deben atribuirse a la máquina V actual ni a este artículo.
-
-| Recurso | Acceso |
-| --- | --- |
-| `documentacion/ES_52/COMPARACION_V_REF_Q_20261008.json` | [COMPARACION_V_REF_Q_20261008.json](https://estradad.es/teorias/pdf/DEMUESTRA/documentacion/ES_52/COMPARACION_V_REF_Q_20261008.json) |
-| `documentacion/ES_52/Q1_V1_RESULTADOS_20261008.json` | [Q1_V1_RESULTADOS_20261008.json](https://estradad.es/teorias/pdf/DEMUESTRA/documentacion/ES_52/Q1_V1_RESULTADOS_20261008.json) |
-| `documentacion/ES_52/Q2_V2_RESULTADOS_20261008.json` | [Q2_V2_RESULTADOS_20261008.json](https://estradad.es/teorias/pdf/DEMUESTRA/documentacion/ES_52/Q2_V2_RESULTADOS_20261008.json) |
-| `documentacion/ES_52/Q3_V3_RESULTADOS_20261008.json` | [Q3_V3_RESULTADOS_20261008.json](https://estradad.es/teorias/pdf/DEMUESTRA/documentacion/ES_52/Q3_V3_RESULTADOS_20261008.json) |
-| `documentacion/ES_52/GUIA_Q3_V3.md` | [GUIA_Q3_V3.pdf](https://estradad.es/teorias/pdf/DEMUESTRA/documentacion/ES_52/GUIA_Q3_V3.pdf) |
-| `documentacion/ES_52/Q3_CIRCUITOS/q3_n4_77c038f9d68c.json` | [q3_n4_77c038f9d68c.json](https://estradad.es/teorias/pdf/DEMUESTRA/documentacion/ES_52/Q3_CIRCUITOS/q3_n4_77c038f9d68c.json) |
-| `documentacion/ES_52/Q3_CIRCUITOS/q3_n8_462729f77eb8.json` | [q3_n8_462729f77eb8.json](https://estradad.es/teorias/pdf/DEMUESTRA/documentacion/ES_52/Q3_CIRCUITOS/q3_n8_462729f77eb8.json) |
-| `documentacion/ES_52/Q3_CIRCUITOS/q3_n12_07d8da17316e.json` | [q3_n12_07d8da17316e.json](https://estradad.es/teorias/pdf/DEMUESTRA/documentacion/ES_52/Q3_CIRCUITOS/q3_n12_07d8da17316e.json) |
-| `documentacion/ES_52/Q3_CIRCUITOS/q3_n16_94e74934d98d.json` | [q3_n16_94e74934d98d.json](https://estradad.es/teorias/pdf/DEMUESTRA/documentacion/ES_52/Q3_CIRCUITOS/q3_n16_94e74934d98d.json) |
 
 ## Informes y evidencias
 

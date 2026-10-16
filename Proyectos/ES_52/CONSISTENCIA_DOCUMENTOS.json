@@ -7,15 +7,15 @@
       "fuente": "ES_52_Maquina_V_UNIHOLOG.md",
       "titulo": "Documento base",
       "tipo": "investigacion",
-      "source_sha256": "c229d9582f8ee586afee08f2d4953662de5fdc68143a62314cac8833ecb33bfb",
+      "source_sha256": "6c2ac8edb842e2d5ef0c7f0965f0cbaf203e974f3bcdb2acf875162cbb5467d0",
       "derivados": {
         "html": {
           "ruta": "ES_52_Maquina_V_UNIHOLOG.html",
-          "sha256": "8d36a73d1183e68f4d0a4c82002e26c115a7a539bd0d592f1600149e504c2c1e"
+          "sha256": "79492eb3330e804ef0316b29266ddea07d7925121ad0bca4fc1bca1a22ca3b07"
         },
         "pdf": {
           "ruta": "ES_52_Maquina_V_UNIHOLOG.pdf",
-          "sha256": "6ee6776c4e5062bfe0023f3b9aab6256436fd94181d1f2799e3093b4aab4fed7"
+          "sha256": "ecee9eac0d38da7aa980c44edc24c38a800876a0037bd79da27cdd430935c84c"
         }
       },
       "certificacion": "NO_EVALUADA_POR_GENERACION_EDITORIAL"
@@ -32,7 +32,7 @@
         },
         "pdf": {
           "ruta": "ES_52_Laminas_Q_V.pdf",
-          "sha256": "419e2484a5201cfcfb602ee616dca1733c452f3e0a3434d87f6f6f7def7ba80e"
+          "sha256": "805e52c3c0cf967e5a36bc7995ad3926766fba087ae995390bea9d953b86dd1c"
         }
       },
       "certificacion": "NO_EVALUADA_POR_GENERACION_EDITORIAL"
@@ -41,15 +41,15 @@
       "fuente": "Traductores_V/ES_52_Traductores_y_compiladores_de_V.md",
       "titulo": "Traductores y compiladores de V",
       "tipo": "software",
-      "source_sha256": "f784a05fb4e002bc4d2523425a636dc89a08610d348befd2bab5b3d42c3be971",
+      "source_sha256": "5f57048e34b17ba3403ed4927429c475b484f018020c552f35fccb807cfd644c",
       "derivados": {
         "html": {
           "ruta": "Traductores_V/ES_52_Traductores_y_compiladores_de_V.html",
-          "sha256": "cb1e38efbf67f8e06b17ae79d294f92396595df7c689f560faa448bb9ecc02f8"
+          "sha256": "b9dd3bd754d0f06f45c5670e4c40e6e8c7bc3b55d164e36df5059fe93031d52f"
         },
         "pdf": {
           "ruta": "Traductores_V/ES_52_Traductores_y_compiladores_de_V.pdf",
-          "sha256": "85e6f22aec4e573f2e94ea73be13bf3d62ea8ecf6c35355a61b5ddd91eee82f4"
+          "sha256": "cfc487734fb01597f7061f2f905cb66b9da155d5bf97e07bff29d599851c6381"
         }
       },
       "certificacion": "NO_EVALUADA_POR_GENERACION_EDITORIAL"
@@ -66,7 +66,7 @@
         },
         "pdf": {
           "ruta": "ES_52_Presentacion_comunidad.pdf",
-          "sha256": "5f639f8439bc8637ae6cf6f50fa4663aae90d8c710541076367deb3a9f4f7dd2"
+          "sha256": "7ac550d6f17926c7d7689bb989ded69de7ff419c8c80b2cac435b65057e6b041"
         }
       },
       "certificacion": "NO_EVALUADA_POR_GENERACION_EDITORIAL"
@@ -75,15 +75,15 @@
       "fuente": "ES_52_Indice_recursos.md",
       "titulo": "Índice completo de recursos del proyecto",
       "tipo": "indice",
-      "source_sha256": "07ad21d135d8f819d4d9ef85b1cc79e00c580454dc0cd395ee2cb026614015f8",
+      "source_sha256": "235ed86e139498e585f3b378148ff9c758e8acfc17f9cf93a8dc0a3a6a4c3551",
       "derivados": {
         "html": {
           "ruta": "ES_52_Indice_recursos.html",
-          "sha256": "41c174007796c25e8227998180dbb4910a51b9696af17fb280d2d5d1d29e0960"
+          "sha256": "1f923c90da05c27d7ef0f9eba0ce60dc3ffa945ccc64a2986a1efc1a8f5f58dd"
         },
         "pdf": {
           "ruta": "ES_52_Indice_recursos.pdf",
-          "sha256": "e1db08b4c6250d89d3694c7082bb371a721dcbf7816cf798c508a2522e6ac9e9"
+          "sha256": "fbba19d71ccaab51341ccdbf4b744a49ea1ca9ccff9c5347b339794fa63506ed"
         }
       },
       "certificacion": "NO_EVALUADA_POR_GENERACION_EDITORIAL"

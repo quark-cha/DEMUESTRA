@@ -1,0 +1,77 @@
+{
+  "project": "ES_52_Maquina_V_UNIHOLOG",
+  "tool": "Contraste numerico Python/Qiskit",
+  "branch": "NUMERICAL_PROPOSAL",
+  "generated_on": "2026-10-10T00:37:31.423311+00:00",
+  "status": "ENSAYO_NO_APLICABLE_A_V",
+  "passed": null,
+  "refuted": false,
+  "numerical_checks_passed": true,
+  "applicable_to_author_V": false,
+  "constraint": "La medida debe desencadenarse, no calcularse recorriendo caminos o salidas.",
+  "constraint_satisfied": false,
+  "formal_certification": false,
+  "physical_realization_verified": false,
+  "source_sha256": "a267c6d2a16442dca06a2609049fe7ac5ef0ebabaee74a80ecc1d81401b448f7",
+  "evidence_sha256": "a6314eeed9eccd01a7f4c111f8df97501f14f216dbebada17ebdca26bc02a456",
+  "evidence_file": "NUMERICO_DATOS_ES_52_Maquina_V_UNIHOLOG.json",
+  "scope": "Ensayo numerico conservado como historial. Sus coincidencias no evaluan V: el recorrido de caminos incumple el criterio de medida por disparo.",
+  "tests": {
+    "status": "NO_REEJECUTADAS",
+    "reason": "No se vuelve a ejecutar el modelo descartado para V."
+  },
+  "results": {
+    "deutsch_cases": [
+      {
+        "function": "constant_0",
+        "task_matches": true
+      },
+      {
+        "function": "constant_1",
+        "task_matches": true
+      },
+      {
+        "function": "identity",
+        "task_matches": true
+      },
+      {
+        "function": "inverter",
+        "task_matches": true
+      }
+    ],
+    "v2_N3_max_error": 1.394265051860899e-34,
+    "v2_capture": {
+      "N": "15",
+      "control": 64,
+      "outcome": {
+        "factors": [
+          3,
+          5
+        ],
+        "verified_order_multiple": 4
+      },
+      "seconds": 74.32823169999756,
+      "visits": 22199239,
+      "stack_peak": 10
+    },
+    "v3_max_error": 1.1102230246251565e-16
+  },
+  "execution_order": {
+    "gate_sequence_preserved": true,
+    "tabular_exponential_memory": false,
+    "output_scan": "hasta 2^n palabras; caminos adicionales pueden ser exponenciales",
+    "time_complexity_improvement_verified": false,
+    "conventional_programming_speedup_verified": false,
+    "Q_hardware_timing_available": false,
+    "timings_comparable_for_advantage": false
+  },
+  "limits": [
+    "La coincidencia comprueba la propuesta basada en matrices unitarias y regla de Born.",
+    "No demuestra que esas leyes se deduzcan solo del desconocimiento del resultado.",
+    "Una lectura favorable de Shor no establece su tasa de exito.",
+    "La precision es numerica finita, no aritmetica exacta.",
+    "Esta propuesta no sustituye automaticamente la arquitectura V del autor.",
+    "La referencia 0.37 es fija y conocida por el comprobador.",
+    "El resultado positivo no modifica los veredictos Lean o Prolog."
+  ]
+}

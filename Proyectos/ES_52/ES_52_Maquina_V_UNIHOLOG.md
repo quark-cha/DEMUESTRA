@@ -657,61 +657,7 @@ Estos controles comprueban evolución de fase, transferencia entre
 canales y composición. La coincidencia no procede de atribuir al
 desconocimiento una ley dinámica, sino de resolver las leyes especificadas.
 
-## 11.4. Amplitudes conjuntas y conexión antes de la lectura
-
-$D_{GENERADORCONJUNTO}$ — Generadores locales y término de interacción.
-
-Deps: D_AMPLITUDES, D_CIRCUITOV
-
-Para dos unidades inicialmente independientes, el registro tiene las
-amplitudes α γ, α δ, β γ y β δ. Una operación local genera
-GA ⊗ I + I ⊗ GB. Una conexión añade un término de interacción GAB.
-La descripción conjunta de cada máquina debe declarar ese término:
-
-$$
-i\dot z_X^{AB}
-=\left(G_X^A\otimes I+I\otimes G_X^B+G_X^{AB}\right)z_X^{AB}.
-$$
-
-No se deduce GAB a partir de las probabilidades aisladas. En el modelo
-de señales V_ref, un generador conjunto hermítico admite la realización
-real de la sección 11.2 sobre sus canales conjuntos. La V relacional
-alternativa puede emplear otro mecanismo, cuya ley deberá especificarse.
-
-Como interacción de contraste tomamos GAB = J Z ⊗ Z, sin términos
-locales adicionales durante ese intervalo. Para la preparación producto
-(1,1)⊗(1,1)/2, con θ = Jτ, la solución es:
-
-$$
-z_X^{AB}(t)=\frac12
-\left\operatorname{col}(e^{-i\theta},e^{i\theta},e^{i\theta},e^{-i\theta}\right).
-$$
-
-La solución se obtiene tanto para Q como para el bloque de fase conjunto
-V especificado, sin leer las unidades antes de conectar. Sus cuatro
-probabilidades de lectura inmediata en la base de referencia son 1/4,
-pero las fases son relevantes para operaciones y bases posteriores.
-El determinante de la matriz de amplitudes es:
-
-$$
-\det=-\frac i2\sin(2\theta).
-$$
-
-Para θ = π/4 es no nulo: el estado conectado no factoriza en dos estados
-puros independientes. La solución conjunta sigue existiendo en ambos
-modelos; lo que cambia es la estructura necesaria para describirla.
-Las secciones 20.1 y 20.2 desarrollan su lectura y composición.
-
-La prueba por unicidad también se aplica al generador total del registro:
-si corresponden la preparación y los generadores conjuntos de Q y V,
-las amplitudes conjuntas coinciden salvo una fase global del registro.
-Comparar solo los generadores locales no permite omitir el término de
-interacción. La fase global de una operación aislada tampoco puede
-descartarse antes de convertirla en una operación controlada: en ese
-caso puede convertirse en fase relativa entre las ramas del control.
-La comparación debe hacerse sobre la operación conjunta completa.
-
-## 11.5. Medida, mezclas e imperfecciones: alcance del desarrollo
+## 11.4. Medida, mezclas e imperfecciones: alcance del desarrollo
 
 En Q, la regla de lectura en la base de referencia asigna |αQ|² y
 |βQ|². En V, esa asignación solo está justificada si la lectura física
@@ -738,8 +684,7 @@ las cuatro ecuaciones reales de V y contrastado con la solución compleja
 en 103 casos de evolución constante. El error numérico máximo fue
 aproximadamente 8.49 × 10⁻¹²; el error de conservación de norma fue
 aproximadamente 7.32 × 10⁻¹⁴. Se comprobaron también los bloques X,
-H y H-H, una secuencia de ocho tramos de control y la interacción ZZ
-en 101 valores. Son controles numéricos del modelo, no datos de un
+H y H-H y una secuencia de ocho tramos de control. Son controles numéricos del modelo, no datos de un
 dispositivo físico ni prueba de las hipótesis de lectura de la sección 12.2.
 
 # 12. Dos caminos y fase relativa
@@ -1471,423 +1416,7 @@ $$
 \forall i,\quad K(V_i)=\xi.
 $$
 
-## 20.1. Registro conjunto: construcción ideal de referencia
-
-$D_{REGISTROREF}$ — Registro auxiliar de señales conjuntas,
-distinto de una arquitectura relacional compacta ya construida.
-
-Deps: D_AMPLITUDES, D_DISTRIBUCIONCONJUNTA
-
-Para estudiar la composición sin omitir las correlaciones, introducimos
-un modelo auxiliar V_ref. No lo identificamos con la arquitectura compacta
-que se propone como objetivo para V. Su función es proporcionar una
-referencia matemática completa para un registro finito controlado
-centralmente, y hacer visibles los recursos que requiere.
-
-Sea D = 2ⁿ. V_ref representa el estado puro conjunto mediante D señales
-complejas z_j, normalizadas por ∑j |z_j|² = 1. Para cada operación U
-del modelo Q, se exige el bloque de transformación z′ = Uz. Como en
-la sección 12.3, su representación real utiliza 2D componentes y la
-matriz por bloques formada por Re U e Im U.
-
-La combinación de esos canales es una especificación de circuito ideal,
-no una prueba de construcción física exacta. El número de canales crece
-exponencialmente; un bloque lineal denso puede requerir del orden de D²
-coeficientes. La exactitud matemática no acredita precisión física
-ilimitada, tiempo eficiente ni ventaja computacional.
-
-### Lectura conjunta sin factorizar los resultados
-
-Para una lectura completa en la base de referencia se forman p_j = |z_j|²
-y sus umbrales acumulados:
-
-$$
-s_0=0,\qquad s_{j+1}=s_j+p_j,\qquad s_D=1.
-$$
-
-Con una referencia r uniforme en [0,1), se registra el único índice j
-para el que s_j ≤ r < s_j+1. Los intervalos de longitud cero no se
-seleccionan. El índice j determina la cadena de n bits de salida.
-La probabilidad del resultado es la longitud del intervalo:
-
-$$
-P_{V_{\mathrm{ref}}}(j)=s_{j+1}-s_j=|z_j|^2=P_Q(j).
-$$
-
-Esta es una lectura conjunta: no se reemplaza por n comparadores
-independientes que perderían las correlaciones del registro.
-
-### Medida parcial y estado posterior
-
-Para una familia de proyectores ortogonales Πa que sumen la identidad,
-incluidas las medidas de una parte del registro:
-
-$$
-y_a=\Pi_a z,\qquad p_a=\operatorname{norm}(y_a)^2.
-$$
-
-Se elige a mediante los intervalos acumulados de esas probabilidades y,
-si p_a > 0, la realimentación prepara:
-
-$$
-z_{\mathrm{post}}=\frac{\Pi_a z}{\sqrt{p_a}}.
-$$
-
-Esto conserva las amplitudes y fases dentro del subespacio seleccionado.
-**No se reinicializa todo el registro a una cadena de bits cuando solo
-se ha medido una parte.** La regla de reinicialización de la unidad
-aislada no puede trasladarse indiscriminadamente a un registro conjunto.
-Las probabilidades y la actualización parcial de Q se describen en
-[IBM Quantum Learning: Multiple systems](https://quantum.cloud.ibm.com/learning/en/courses/basics-of-quantum-information/multiple-systems/quantum-information).
-
-### Ejemplo de dos unidades: preparación y lectura correlacionada
-
-Con el orden de canales 00, 01, 10, 11, la preparación inicial 00,
-una operación H sobre la primera unidad y una CNOT producen:
-
-$$
-\operatorname{col}(1,0,0,0)
-\longrightarrow\frac1{\sqrt2}\operatorname{col}(1,0,1,0)
-\longrightarrow\frac1{\sqrt2}\operatorname{col}(1,0,0,1).
-$$
-
-La CNOT intercambia los canales 10 y 11; H combina pares de canales
-mediante suma y diferencia. Estas operaciones requieren acoplamiento
-de los canales del registro, no solo puertas sobre bits ya medidos.
-La lectura conjunta da 00 o 11 con probabilidad 1/2 cada uno.
-
-Si se mide solo la primera unidad, el resultado 0 deja el registro en
-00 y el resultado 1 lo deja en 11. La segunda lectura en la misma base
-queda perfectamente correlacionada. Las lecturas en otras bases se
-calculan transformando el registro conjunto antes de aplicar los
-proyectores correspondientes; conocer la correlación 00/11 no basta
-para deducirlas sin ese desarrollo.
-
-### Medidas generales y ruido especificado
-
-Para cubrir instrumentos de medida finitos, sea A el conjunto finito de
-resultados visibles y, para cada a en A, sea N_a el conjunto finito de
-ramas internas. En las sumas, $\mathcal A$ y $\mathcal N_a$ representan esos
-conjuntos. Cada K_{a,ν} es una matriz compleja D por D que actúa sobre el
-registro definido anteriormente; su adjunto es la transpuesta conjugada.
-I_D es la identidad de ese mismo registro. Los operadores satisfacen:
-
-$$
-\sum_{a\in\mathcal A}\sum_{\nu\in\mathcal N_a}
-K_{a,\nu}^{\dagger}K_{a,\nu}=I_D.
-$$
-
-El modelo auxiliar forma las ramas K_{a,ν} z, selecciona una rama con
-probabilidad ||K_{a,ν} z||², prepara esa rama normalizada y entrega solo
-el resultado visible a. El índice ν no se expone si el protocolo Q
-no lo expone. La mezcla condicionada al resultado visible coincide
-con la del instrumento Q. Sea $\rho$ la matriz de densidad de entrada del
-registro, positiva semidefinida y de traza uno. La probabilidad del
-resultado visible a es:
-
-$$
-p_a=\operatorname{tr}\left(
-\sum_{\nu\in\mathcal N_a}K_{a,\nu}\rho K_{a,\nu}^{\dagger}
-\right).
-$$
-
-Para $p_a > 0$, el estado posterior condicionado a ese resultado es:
-
-$$
-\rho_{a,\mathrm{post}}=
-\frac{\sum_{\nu\in\mathcal N_a}K_{a,\nu}\rho K_{a,\nu}^{\dagger}}
-{p_a},\qquad p_a>0.
-$$
-
-Si $p_a = 0$, ese resultado no se selecciona y no se define un estado
-posterior condicionado a él. Esta misma condición se aplica a Q y a V.
-La división por p_a es una multiplicación escalar de la matriz; no una
-inversión de matrices. Sumar las ramas internas antes de normalizar
-mantiene el resultado visible sin revelar el índice ν al control.
-
-Para una preparación mixta se requiere una preparación aleatoria de
-estados puros con ese mismo operador de densidad. Un canal sin resultado
-visible es el caso en que todas las ramas tienen la misma etiqueta
-externa. No se concede al control de V acceso adicional a la etiqueta
-interna ν. El modelo necesita mantener las ramas estadísticas de forma
-coherente con los controles posteriores del protocolo.
-
-Esta extensión usa la descripción por operadores de Kraus de los
-procesos finitos, recogida en
-[IBM Quantum Learning: Noise and errors](https://quantum.cloud.ibm.com/learning/en/courses/tools-for-quantum-advantage/noise-and-errors).
-Para comparar una Q real no se reemplaza silenciosamente su ruido por
-el modelo ideal: se especifica qué canal o tolerancia se contrasta.
-
-### Teorema de referencia y alcance
-
-Si los bloques anteriores se realizan exactamente, las referencias
-son uniformes condicionadas a los historiales y no aportan información
-extra al control, el mismo argumento inductivo de la sección 12.3
-establece igualdad de distribuciones para todo protocolo finito de
-preparaciones especificadas, operaciones y medidas del registro central
-que el modelo represente. Para instrumentos con ramas internas, se
-suman esas ramas antes de comparar los resultados visibles.
-
-La afirmación se refiere a entradas preparadas mediante controles
-clásicos y reglas especificadas. No establece que V_ref pueda recibir
-un estado cuántico externo desconocido y convertirlo automáticamente
-en señales convencionales, ni sustituir interfaces cuánticas de un
-protocolo que las exija. La igualdad con una entrada de ese tipo sería
-una obligación adicional, no cubierta por este teorema.
-
-El modelo auxiliar representa explícitamente amplitudes y funciona
-como una emulación analógica matemática del registro. No demuestra
-la tesis particular de V de evitar esa representación ni su escalabilidad.
-Permite fijar un objetivo de contraste, identificar mecanismos suficientes
-y comprobar qué estructura debe conservar una arquitectura alternativa.
-
-### Obligación central de la arquitectura basada en relaciones
-
-Para reemplazar el banco exponencial por una descripción relacional R,
-deben especificarse su preparación, evolución y lectura sin calcular
-primero toda la tabla de amplitudes. Una correspondencia matemática E
-con el modelo Q, que no tiene que almacenarse físicamente, deberá cumplir:
-
-$$
-E(T_U(R))=U E(R),
-$$
-
-y asignar a cada medida las mismas probabilidades y actualizaciones
-condicionadas, salvo equivalencias de fase global. Alternativamente
-puede usarse una correspondencia por clases operacionalmente indistinguibles.
-
-No es necesario imponer que E sea inyectiva: distintos estados internos
-de V pueden dar el mismo comportamiento observable. Sí debe justificar
-las composiciones admitidas. La existencia de relaciones booleanas
-compactas en algunos ejemplos no establece que todas las operaciones
-conjuntas admitan una representación compacta de este tipo.
-
-**La equivalencia escalable de la V propuesta permanece abierta hasta
-definir esa arquitectura y demostrar sus reglas. El modelo V_ref es
-un resultado condicional de referencia, no una sustitución de ese problema.**
-
-## 20.2. Comprobación explícita de conexión sin medida previa
-
-$D_{CONEXIONREF}$ — Bloques de preparación y conexión del registro auxiliar.
-
-Deps: D_REGISTROREF, D_GENERADORCONJUNTO
-
-La pregunta es si dos unidades V, cada una correspondiente a una unidad
-Q y no observadas antes de conectarse, pueden formar una máquina conjunta
-compatible. La respuesta debe distinguir la posibilidad de conectar señales,
-la operación conjunta realizada y el estado que esa operación deja.
-La ausencia de medida previa es una condición del protocolo, no una
-demostración automática de compatibilidad de cualquier conexión.
-
-### Preparación y entrada conjunta de dos unidades
-
-Sean las señales de las unidades independientes:
-
-$$
-z_A=\operatorname{col}(\alpha,\beta),\qquad z_B=\operatorname{col}(\gamma,\delta).
-$$
-
-Sin leer sus valores se puede especificar un bloque de combinación que
-forme el registro de cuatro señales complejas:
-
-$$
-z_{AB}=z_A\otimes z_B
-=\operatorname{col}(\alpha\gamma,\alpha\delta,\beta\gamma,\beta\delta).
-$$
-
-La normalización se conserva porque ||z_A ⊗ z_B|| = ||z_A|| ||z_B||.
-El bloque requiere multiplicación de las componentes de señales. Para
-dos señales x + iy y u + iv, las componentes de su producto son:
-
-$$
-\operatorname{Re}((x+i y)(u+i v))=x u-y v,\qquad
-\operatorname{Im}((x+i y)(u+i v))=x v+y u.
-$$
-
-Son operaciones sobre señales que no requieren que el observador conozca
-las entradas. Definen un bloque analógico candidato, cuya precisión y
-respuesta temporal necesitan validación. Este bloque de producto corresponde
-a la preparación conjunta de estados inicialmente independientes de Q;
-no describe estados que ya tengan correlaciones conjuntas previas.
-
-### Una conexión CNOT sin leer el control
-
-La operación conjunta Q y su bloque de señales candidato son:
-
-$$
-C=\operatorname{mat}((1,0,0,0),(0,1,0,0),(0,0,0,1),(0,0,1,0)),\qquad z'_{AB}=Cz_{AB}.
-$$
-
-En el registro de canales, esta conexión deja pasar 00 y 01 e intercambia
-10 y 11. Se aplica a las componentes reales e imaginarias. No necesita
-consultar un bit de control previamente medido: transforma el registro
-conjunto antes de su lectura. Una CNOT sobre bits ya registrados sería
-otra operación y no sustituye esta conexión.
-
-Para entradas generales:
-
-$$
-z'_{AB}=\operatorname{col}(\alpha\gamma,\alpha\delta,\beta\delta,\beta\gamma).
-$$
-
-Esta igualdad especifica directamente qué señales debe entregar V y
-coincide con la transformación de amplitudes Q. La lectura en t₀ debe
-realizarse sobre el registro conjunto, como en la sección 20.1.
-
-### Comprobación de cierre del estado conectado
-
-$P_{CIERRECONJUNTO}$ — CNOT puede producir amplitudes no factorizables.
-
-Deps: D_CONEXIONREF
-
-Un vector puro de dos unidades factoriza en dos vectores independientes
-si y solo si su matriz de coeficientes tiene determinante cero:
-
-$$
-\det\operatorname{mat}((z_{00},z_{01}),(z_{10},z_{11}))=0.
-$$
-
-La entrada producto cumple esa condición. Tras CNOT, el determinante es:
-
-$$
-\alpha\beta(\gamma^2-\delta^2).
-$$
-
-No se anula para todas las entradas. En particular, con
-α = β = 1/√2, γ = 1 y δ = 0:
-
-$$
-\boxed{P_{CIERRECONJUNTO}:\quad
-z'_{AB}=\frac1{\sqrt2}\operatorname{col}(1,0,0,1),\qquad
-\det\operatorname{mat}((z'_{00},z'_{01}),(z'_{10},z'_{11}))=\frac12.}
-$$
-
-El resultado no puede almacenarse como dos pares de amplitudes puras
-independientes. El sistema V conectado debe conservar una estructura
-conjunta: el banco de canales de V_ref lo hace; la arquitectura relacional
-alternativa tendría que especificar su propia representación de esa
-estructura. Esto no exige observar el estado interno de ninguna máquina.
-Es una comprobación de cierre de la representación por amplitudes usada
-en V_ref. No obliga a la V relacional a emplear esa representación:
-su compatibilidad debe decidirse mediante el protocolo observable común.
-La distinción entre estados producto y entrelazados de Q se expone en
-[IBM Quantum Learning: Multiple systems](https://quantum.cloud.ibm.com/learning/en/courses/basics-of-quantum-information/multiple-systems/quantum-information).
-
-### Prueba de composición para el registro auxiliar ideal
-
-$T_{COMPOSICIONCOND}$ — Correspondencia composicional bajo las
-transformaciones y lecturas especificadas del registro auxiliar.
-
-Deps: D_REGISTROREF, D_CONEXIONREF, P_LECTURAUNIFORME, T_SECUENCIACOND
-
-Definimos la codificación de señales y la transformación real:
-
-$$
-F(z)=\operatorname{col}(\operatorname{Re}z,\operatorname{Im}z),
-\qquad
-\mathsf R(U)=\operatorname{mat}((\operatorname{Re}U,-\operatorname{Im}U),(\operatorname{Im}U,\operatorname{Re}U)).
-$$
-
-La multiplicación compleja permite comprobar algebraicamente, para
-cualesquiera matrices de tamaños compatibles:
-
-$$
-F(Uz)=\mathsf R(U)F(z),\qquad
-\mathsf R(UW)=\mathsf R(U)\mathsf R(W),\qquad
-\operatorname{norm}(F(z))=\operatorname{norm}(z).
-$$
-
-Estas son identidades generales, no afirmaciones basadas solo en una
-lista de ensayos. Aplicándolas repetidamente:
-
-$$
-\boxed{T_{COMPOSICIONCOND}:\quad
-\mathsf R(U_m)\cdots\mathsf R(U_1)F(z)
-=F(U_m\cdots U_1z).}
-$$
-
-Cada operación local se extiende al registro mediante su producto
-tensorial con identidades; cada conexión se representa por su matriz
-conjunta. Por ejemplo, la operación local U_A ⊗ U_B requiere
-la transformación real R(U_A ⊗ U_B). No se sustituye por una conexión
-arbitraria entre dos bloques ni por el producto tensorial ordinario
-de sus codificaciones reales, que tiene otra dimensión.
-
-Para una medida proyectiva Πa, las mismas identidades proporcionan:
-
-$$
-\operatorname{norm}(\mathsf R(\Pi_a)F(z))^2=\operatorname{norm}(\Pi_a z)^2,
-$$
-
-y la actualización normalizada del registro V corresponde a
-Πa z / ||Πa z|| siempre que la rama tenga probabilidad no nula.
-La elección por intervalos de la sección 20.1 asigna esas probabilidades
-a las ramas. Con referencias uniformes condicionadas al historial,
-la correspondencia se conserva a través de medidas y controles sucesivos.
-La misma identidad F(Kz) = R(K)F(z) cubre las ramas de instrumentos
-generales especificados por matrices K.
-
-**Resultado de la comprobación.** Para entradas de preparación especificada
-y bloques ideales que realicen estas transformaciones, V_ref admite la
-conexión sin medida previa y reproduce los protocolos centrales finitos
-del registro Q representado, incluidas conexiones y medidas posteriores.
-La prueba de composición se sostiene para matrices generales; los ensayos
-numéricos siguientes son comprobaciones adicionales de la implementación
-de esas fórmulas, no una prueba física de los bloques.
-
-### Contraste en bases distintas para la conexión de referencia
-
-Para el estado conjunto (|00⟩ + |11⟩)/√2 y lecturas locales cuyos
-observables son cos θA Z + sin θA X y cos θB Z + sin θB X:
-
-$$
-P(a,b,\theta_A,\theta_B)
-=\frac{1+(-1)^{a+b}\cos(\theta_A-\theta_B)}4.
-$$
-
-La lectura del registro V_ref reproduce esa expresión. En bases Z-Z
-y X-X hay correlación perfecta; en Z-X los cuatro resultados tienen
-probabilidad 1/4. Añadir una fase relativa al canal 11 cambia las
-correlaciones de la lectura X-X: para fase χ, su valor es cos χ.
-Conservar solo la relación binaria de igualdad perdería esa información.
-
-La medida de una unidad seguida de la otra, con actualización conjunta
-y sin operaciones intermedias adicionales, produce la misma distribución
-que la medida conjunta. Esto se cumple en ambos órdenes porque los
-proyectores locales conmutan. Una lectura central que lo reproduzca no
-acredita por ello un protocolo de Bell físicamente separado sin comunicación.
-
-### Comprobaciones numéricas registradas
-
-- 512 casos repartidos entre CNOT, CZ, SWAP e iSWAP, con entradas producto
-  y entradas conjuntas, operaciones locales posteriores y bases complejas.
-- Comparación de distribuciones de lectura conjunta y de lecturas sucesivas
-  A-B y B-A, con actualización parcial del estado.
-- Composición real de matrices contrastada en registros de una, dos y
-  tres unidades, además de la identidad algebraica general.
-- Contraste de la fórmula angular de Bell en 16 pares de configuraciones.
-- Conservación de fases relativas y prueba de no factorización tras CNOT.
-
-Las diferencias numéricas máximas fueron inferiores a 10⁻¹¹ en estas
-pruebas. No se ha contrastado un circuito construido ni una conexión
-relacional distinta del banco conjunto del modelo auxiliar.
-
-### Respuesta a las preguntas sobre compatibilidad
-
-Una unidad ideal aislada admite las operaciones y medidas descritas en
-la sección 12.3. La conexión candidata aquí definida también admite
-entradas no medidas. Su compatibilidad conjunta queda demostrada para
-el registro auxiliar, precisamente porque se ha definido y verificado
-la transformación conjunta y el estado posterior.
-
-No se deduce que toda conexión entre unidades equivalentes aisladamente
-sea compatible. Tampoco se exige que la V relacional del autor realice
-la matriz o el banco conjunto de V_ref. Para comprobar las máquinas
-físicas deben especificarse las realizaciones y conexiones de ambas,
-aplicarles el mismo protocolo y comparar sus resultados. La compatibilidad
-no puede sustituirse por asumir de antemano la igualdad que se busca.
-
-## 20.3. Auditoría de simetría: protocolo común y modelos independientes
+## 20.1. Auditoría de simetría: protocolo común y máquinas independientes
 
 $D_{SIMETRIA}$ — Alcance de la comparación y de sus obligaciones simétricas.
 
@@ -1897,8 +1426,8 @@ La afirmación «si las unidades y conexiones son equivalentes y la
 equivalencia se conserva al componerlas, las redes son equivalentes»
 es un teorema condicional. No comprueba por sí sola ninguna conexión
 física ni demuestra que las hipótesis se cumplan. Las comprobaciones
-de V_ref verifican una codificación candidata construida a partir del
-modelo Q, no la realización física relacional V del autor.
+deben corresponder a las operaciones y conexiones de la máquina V
+del autor, no a una representación añadida a partir del modelo Q.
 
 El criterio de contraste debe partir de un protocolo común C, definido
 sin presuponer el resultado de ninguna máquina. Comprende preparaciones
@@ -1927,8 +1456,8 @@ $$
 $$
 
 Las predicciones deben derivarse de las reglas declaradas de cada
-realización. Una identidad introducida por definición en V_ref no cuenta
-como evidencia de que una conexión física distinta de V la satisfaga.
+realización, sin añadir a V una arquitectura o un mecanismo distinto
+de los especificados por el autor.
 La comparación puede ser teórica entre modelos ideales o experimental
 entre dispositivos caracterizados; se identificará expresamente cuál
 se realiza. No se confundirá una coincidencia matemática ideal con una
@@ -1943,463 +1472,52 @@ Si se propone una correspondencia de composición, deberá comprobarse
 con las operaciones y conexiones independientemente especificadas en
 ambos modelos. Puede haber estructuras internas distintas que produzcan
 las mismas salidas; la prueba no requiere imponer a V la estructura Q.
-El banco de amplitudes queda como ejemplo suficiente del modelo auxiliar,
-no como condición necesaria de la arquitectura V buscada.
 
 Por tanto, el paso pendiente no es «adaptar V a la definición interna
 de Q», sino definir la conexión física propuesta, su protocolo común
 con la conexión Q y contrastar ambas respuestas sin asumir su igualdad.
 
-## 20.4. Desarrollo constructivo y conservación al componer
-
-El contraste ejecutable pertenece a este desarrollo, no a una valoración
-externa del artículo. Se especifican aquí las reglas que ejecuta y el
-argumento que las justifica. Su objeto inmediato es V_ref, definida en
-20.1; no se atribuyen sus resultados a una arquitectura distinta que
-todavía no haya implementado esas reglas.
-
-### Correspondencia de los registros
-
-Para z = x + iy, con x e y reales, definimos F(z) = col(x,y).
-Para una matriz compleja M = A + iB, definimos su bloque real
-R(M) = mat(A,-B;B,A). No se supone la igualdad de respuestas:
-se obtiene desarrollando la multiplicación. La parte real de Mz es
-Ax - By y la imaginaria es Bx + Ay; por tanto:
-
-$$
-F(Mz)=R(M)F(z).
-$$
-
-Además, el cuadrado de la norma real de F(z) es la suma de los
-cuadrados de sus componentes x e y, igual a la norma hermítica
-al cuadrado de z. La aplicación F es una correspondencia matemática
-de representación; no constituye una lectura de los valores internos
-durante el protocolo.
-
-Si se conectan dos bloques M y N sin lectura intermedia, la salida
-real es R(N)R(M)F(z). Aplicando la identidad anterior dos veces se
-obtiene F(NMz). Como F recorre todo el registro real, se concluye:
-
-$$
-R(N)R(M)=R(NM).
-$$
-
-Esta igualdad prueba la conservación de la operación conjunta por
-esa conexión de bloques del modelo ideal. No parte de conocer ni
-medir una salida binaria entre ambos bloques.
-
-### Lectura y actualización: no basta la primera salida
-
-Para cada rama K de un instrumento, el bloque real produce F(Kz).
-La igualdad de normas demuestra que su peso de selección coincide
-con el peso de la rama correspondiente de Q. Para una rama de peso
-positivo, dividir ambas representaciones por la raíz de ese mismo
-peso conserva la correspondencia del estado posterior. Una rama de
-peso cero no produce resultado ni un estado condicionado, en ambos
-modelos.
-
-En una preparación mixta, el razonamiento se aplica a cada componente
-puro con su peso de preparación. Para un resultado visible a se suman
-las contribuciones de todas las ramas internas ν antes de compararlo.
-Esas ramas no se revelan al controlador. Así se obtiene tanto la
-probabilidad visible como la mezcla posterior de 20.1; no solo una
-coincidencia de probabilidades marginales.
-
-### Inducción sobre el protocolo común
-
-La preparación correspondiente proporciona el caso inicial. Supóngase
-que, para un historial visible, coinciden su probabilidad y el estado
-operacional condicionado. Una operación sin lectura conserva esa
-correspondencia por la identidad de bloques. Un instrumento conserva
-los pesos de los resultados y los estados condicionados por el argumento
-anterior. Un control adaptativo recibe únicamente ese mismo historial
-visible y elige la operación prevista en el protocolo, sin acceder al
-estado interno ni a ν.
-
-Por inducción, cada historial finito admitido tiene la misma probabilidad
-y el mismo estado operacional posterior en los dos modelos. Esto cierra
-la demostración matemática del modelo ideal especificado, condicionada
-a la preparación, bloques y lectura de 20.1. Las pruebas numéricas
-siguientes comprueban implementaciones concretas de esas reglas; no son
-la demostración inductiva ni acreditan precisión física infinita.
-
-## 20.5. Contraste reproducible incorporado al trabajo
-
-El banco se encuentra en
-[comparacion/comparar_v_q.py](../../comparacion/comparar_v_q.py).
-La implementación V_ref opera con vectores reales y bloques R(M);
-conserva mezclas mediante ramas internas con pesos. La referencia Q
-opera por separado con matrices de densidad y evolución de operadores
-de Qiskit. No se obtiene la predicción V copiando la salida Q.
-Ambas reciben la misma especificación de preparación y protocolo,
-como exigen las premisas iniciales. La reconstrucción del estado V
-para auditoría pertenece al comprobador y no al controlador del
-protocolo.
-
-La interfaz de control recibe solo el historial visible. Las etiquetas
-auxiliares de un canal sin lectura indican una etapa del protocolo,
-no una observación de su rama interna. El orden de las dos unidades
-es |q1 q0|: q0 es el bit menos significativo. La preparación correlacionada
-usa H sobre q1 y CNOT de q1 hacia q0.
-
-### Protocolos y resultados registrados
-
-La ejecución del 8 de octubre de 2026, con NumPy 2.5.3 y Qiskit 2.5.2,
-completó 77 casos:
-
-| Familia | Casos | Qué se contrasta |
-| --- | ---: | --- |
-| Preparación 0/1 y H, H seguida de H | 4 | Salida y conservación de la operación |
-| H, cambio de fase, H y lectura | 17 | Interferencia; probabilidad cos(ángulo/2)^2 |
-| Lectura X, Y o Z y repetición | 3 | Base de lectura y estado posterior |
-| Lectura Z seguida de X | 1 | Cambio de configuración después de la medida |
-| Control por resultado visible | 1 | Operación adaptativa sin acceso interno |
-| Preparación conjunta y lecturas parciales correlacionadas | 1 | Conexión sin lectura previa y distribución conjunta |
-| Preparación mixta | 1 | Pesos de preparación y lectura |
-| Amortiguamiento y ruido de fase, incluidos sus extremos | 8 | Mismo canal declarado en ambos modelos |
-| Instrumento con varias ramas por resultado visible | 1 | Suma de ramas ocultas y actualización |
-| Protocolos aleatorios reproducibles de una y dos unidades | 40 | Tres operaciones seguidas de lecturas sucesivas |
-| **Total** | **77** | **Coincidencia dentro de la tolerancia declarada** |
-
-Se comparan probabilidades de historiales conjuntos, normalización y
-estados posteriores en cada etapa. La tolerancia numérica es 10^-10.
-El máximo desacuerdo de probabilidades fue 6,67 × 10^-16; el de entradas
-de los estados posteriores, 1,12 × 10^-14; y el de normalización,
-1,12 × 10^-15. Se enumeran las probabilidades: no son frecuencias
-experimentales ni resultados obtenidos de un procesador cuántico físico.
-Se omiten ramas con peso no superior a 10^-14 en ambos cálculos;
-este umbral es numérico y no modifica la regla matemática de peso cero.
-
-El banco incluye dos controles negativos. Si se elimina deliberadamente
-el bloque de fase de V, detecta un desacuerdo de probabilidad cercano
-a 1. Si se destruye el estado conjunto después de una lectura parcial,
-detecta un desacuerdo de 1/4 en los historiales. Por tanto, el criterio
-no declara equivalencia a cualquier implementación ni se limita a
-examinar marginales aisladas. Los ocho tests del banco pasan, incluidos
-los controles negativos y los casos con probabilidad conocida.
-
-El registro completo, con protocolos, resultados, versiones, tolerancias
-y huellas del código y de la fuente, se conserva en
-[COMPARACION_V_REF_Q_20261008.json](../../documentacion/ES_52/COMPARACION_V_REF_Q_20261008.json).
-Las dependencias están en
-[requirements.txt](../../comparacion/requirements.txt).
-La referencia usa la evolución de matrices de densidad documentada en
-[IBM Quantum: Operator](https://quantum.cloud.ibm.com/docs/en/api/qiskit/qiskit.quantum_info.Operator).
-
-Desde DEMUESTRA se reproduce con:
-
-```powershell
-.\.venv-comparacion\Scripts\python.exe -B comparacion/comparar_v_q.py --report documentacion/ES_52/COMPARACION_V_REF_Q_20261008.json
-.\.venv-comparacion\Scripts\python.exe -B -m unittest discover -s comparacion/tests -p "test_*.py"
-```
-
-Si no existe ese entorno, se crea un entorno Python local y se instalan
-las versiones declaradas en requirements.txt. El banco no ejecuta
-PUBLICAR, no emite certificados y no altera evaluaciones anteriores.
-
-### Qué establece esta construcción y qué falta
-
-Para V_ref queda especificada una realización matemática finita mediante
-señales reales, bloques lineales, selección probabilística y realimentación.
-La demostración anterior justifica la equivalencia operacional bajo
-sus hipótesis, y el contraste comprueba 77 instancias de implementación.
-Esto es una construcción suficiente dentro del modelo ideal, no una
-deducción basada solamente en que el resultado se desconoce antes de t0.
-
-El paso a electrónica real requiere expresar esos bloques como circuito,
-declarar rango de señales, precisión, tiempos, generación de referencias
-y realimentación, y obtener cotas de error o datos de medida. Un modelo Q
-ideal tampoco acredita por sí solo la exactitud de un dispositivo Q
-real: esa distinción se mantiene simétricamente. No se exige a V
-precisión infinita mientras se tolera ruido en Q.
-
-Para la V relacional del autor sigue pendiente concretar la representación
-R, sus reglas de preparación y transición, la conexión física y la lectura.
-Después se aplicará el mismo argumento de conservación o un contraste
-operacional equivalente a esas reglas propias, sin sustituirlas por V_ref.
-La necesidad de conservar fases y correlaciones no obliga a almacenar
-amplitudes: obliga a justificar la respuesta que la arquitectura produzca.
-
-Quedan diferenciados cuatro trabajos: integrar los tipos y operaciones
-en la traducción automática; completar las reglas de la arquitectura
-relacional; derivar y contrastar sus composiciones; y construir o
-caracterizar el circuito físico. Una limitación de PUBLICAR o de Lean
-debe registrarse como limitación de la herramienta, no como refutación
-del artículo. Tampoco un test del traductor se presenta como prueba de
-la equivalencia física buscada.
-
-
-## 20.6. Q1 y candidata V1: lectura de fase sin sorteos intermedios
-
-Q1 designa el circuito de Deutsch de dos unidades. Se prepara x = 0
-e y = 1, se aplica H a ambas, se conecta el bloque reversible
-(x,y) → (x,y XOR f(x)), se aplica H a x y se lee x en t0.
-Las cuatro funciones binarias son constante 0, constante 1, identidad
-e inversor. La salida ideal es 0 para las constantes y 1 para las otras.
-El circuito de referencia está descrito en
-[IBM Quantum: algoritmo de Deutsch](https://quantum.cloud.ibm.com/learning/en/courses/fundamentals-of-quantum-algorithms/quantum-query-algorithms/deutsch-algorithm).
-
-La candidata ejecutable está en
-[q1_v1.py](../../comparacion/q1_v1.py).
-Su parte V no consulta la salida Q ni recibe la clasificación correcta.
-Mantiene cuatro canales reales con signo: H combina pares mediante
-suma y diferencia divididas por la raíz de dos, y el bloque f permuta
-los canales correspondientes. Es una instancia V1_ref del modelo de
-señales de 20.1, no una implementación ya demostrada de H mediante
-únicamente generadores de bits ocultos. Esa diferencia de arquitectura
-permanece explícita.
-
-No hay sorteos durante el cálculo ni se genera un número aleatorio al
-leer. La referencia de captura es un oscilador determinista cuya fase
-evoluciona con el tiempo. En t0 se captura su fase y se compara con los
-umbrales acumulados de los canales; un único índice conjunto determina
-la salida binaria. La captura queda retenida: volver a leer no repite
-la selección. La interfaz ordinaria bloquea la lectura antes de t0.
-La evolución de los canales tampoco utiliza el historial de lecturas.
-
-La prueba reproducible recorre 1000 instantes de captura distribuidos
-sobre un periodo para cada una de las cuatro funciones. Es un barrido
-determinista declarado, no 1000 experimentos aleatorios ni una prueba
-de que el observador desconozca físicamente la fase. Las fases explícitas
-son datos del comprobador; ocultarlas en atributos privados no impide
-que un depurador las inspeccione. La ausencia de acceso previo exigida
-para la V física sigue siendo un requisito que debe garantizar la
-implementación, no una propiedad certificada por Python.
-
-Se declara también el recurso del bloque f: su construcción usa las dos
-entradas de la tabla para configurar la conexión; el registro atraviesa
-ese bloque una vez por ejecución. No se atribuye al software una ventaja
-de consultas cuánticas frente a un oráculo clásico desconocido. La
-igualdad comprobada se refiere a las salidas de los circuitos preparados.
-
-La ejecución y el informe se obtienen desde DEMUESTRA con:
-
-```powershell
-.\.venv-comparacion\Scripts\python.exe -B comparacion/q1_v1.py --shots 1000 --report documentacion/ES_52/Q1_V1_RESULTADOS_20261008.json
-```
-
-Los resultados y las huellas del código y del documento se guardan en
-[Q1_V1_RESULTADOS_20261008.json](../../documentacion/ES_52/Q1_V1_RESULTADOS_20261008.json).
-Este contraste no sustituye los certificados existentes ni declara
-construida la arquitectura relacional física.
-
-
-## 20.7. Q2 y candidata V2: búsqueda de periodo y factorización
-
-Q2 designa el circuito de búsqueda de periodo de Shor, seguido del
-procesamiento clásico que obtiene divisores del entero N. Se fija una
-base a coprima con N, se prepara el registro de trabajo en 1, se aplican
-H al registro de control, multiplicaciones modulares controladas y
-Fourier inversa, y se lee el registro de control en t0. La lectura
-permite proponer denominadores mediante fracciones continuas; se verifica
-la relación modular antes de extraer factores mediante máximo común divisor.
-La explicación y un contraste físico de N = 15 aparecen en
-[IBM Quantum: Shor](https://quantum.cloud.ibm.com/docs/en/tutorials/shors-algorithm).
-
-La candidata está en [q2_v2.py](../../comparacion/q2_v2.py). Q2 calcula
-su distribución con operadores y Fourier de Qiskit. V2 realiza las
-permutaciones modulares y los bloques reales seno/coseno por separado,
-sin consultar la distribución Q, sin conocer el periodo correcto ni
-recibir los factores. Su representación es V2_ref, un registro explícito
-de canales reales de 20.1; no se presenta como la arquitectura compacta
-de generadores binarios todavía pendiente.
-
-Ambos modelos ideales usan la misma preparación, operación y lectura.
-No se simula ruido en uno mientras se exige exactitud al otro.
-Tampoco se certifica la construcción física de ninguno. En V2 no hay
-sorteos durante la operación ni al capturar: se lee la fase determinista
-del oscilador en t0, y el latch conserva el resultado. Las fases de este
-banco son condiciones de prueba declaradas, no evidencia de
-inaccesibilidad física ni de independencia de generadores.
-
-### Resultados y lecturas que no permiten extraer factores
-
-Se han contrastado N = 15 y N = 21 con a = 2. Las salidas permiten
-obtener respectivamente 3 × 5 y 3 × 7. La diferencia máxima entre las
-probabilidades Q2 y V2 es 6,12 × 10^-16 para 15 y 8,46 × 10^-15 para 21,
-por debajo de la tolerancia de 10^-10. El contraste también examina la
-distribución completa y su distancia de variación total.
-
-No todas las lecturas permiten recuperar factores. El primer intento
-de 15 devuelve 0 y no se utiliza para deducir un periodo. Se conserva
-ese intento y se repite desde una preparación nueva; el segundo permite
-obtener los factores. Para 21 el primer intento es útil. Los instantes
-y fases de cada intento están registrados. No se seleccionan solamente
-las lecturas favorables para declarar una coincidencia.
-
-El procesamiento posterior es el mismo para Q y V. Prueba como máximo
-ocho múltiplos del denominador deducido, verifica la condición modular y
-rechaza resultados triviales. Esta regla acotada se declara como parte
-del protocolo; no es una búsqueda oculta de todos los periodos, ni una
-llamada a un factorizador convencional para completar V2. Si una base
-o todas las capturas fallan, el banco lo registra: no se afirma que una
-sola base garantice factorizar todo entero.
-
-### Medición de tiempos: tres referencias diferentes
-
-El informe conserva tres repeticiones, sus tiempos individuales y medianas:
-
-- Q2 local: construcción y evolución de una distribución de búsqueda de
-  periodo en software; no es tiempo de hardware cuántico ni incluye todo
-  el proceso de factorización con reintentos.
-- V2 local: construcción, ejecución, captura y procesamiento con los
-  reintentos declarados hasta obtener factores o agotar cuatro intentos.
-- Referencia convencional: factorización con SymPy factorint, con la
-  caché de factores vaciada antes de cada repetición e importaciones
-  excluidas del tiempo.
-
-No se comparan esos tiempos como si fueran tres dispositivos equivalentes
-ya construidos. Sirven para caracterizar este banco y su coste. Para 15
-y 21, el factorizador convencional es más rápido que la candidata V2.
-Se factoriza también el entero de prueba de 60 bits 982451659877161571
-con la referencia convencional; V2 no se ejecuta para él porque excede
-el límite de recursos. Ese entero de prueba no establece una extrapolación
-a claves RSA ni una medida general de dificultad criptográfica.
-
-### Números grandes: estimación Q y límite de esta V2
-
-El trabajo de Craig Gidney de 2025 estima una factorización RSA de 2048
-bits en menos de una semana con menos de un millón de qubits ruidosos,
-bajo condiciones físicas y de corrección de errores declaradas. Es una
-estimación de una arquitectura futura, no un tiempo observado en este
-banco ni una ejecución RSA-2048 realizada.
-[Fuente primaria](https://arxiv.org/abs/2505.15917).
-
-Esta V2 asigna n bits al trabajo y 2n al control. Mantener dos componentes
-reales por cada posición del registro requiere al menos 16 × 2^(3n)
-bytes; su Fourier real densa añade kernels del orden de 16 × 2^(4n)
-bytes. Para n = 2048, el registro explícito por sí solo resulta
-inabordable. El programa comprueba el tamaño antes de reservar memoria
-y limita este banco a entradas de cinco bits.
-
-Ese límite pertenece a esta representación V2_ref, no demuestra que
-toda arquitectura V sea imposible. Sí impide afirmar que esta V2 Python
-ya factoriza números grandes con la eficiencia prevista para Shor en
-hardware tolerante a fallos. La ventaja de recursos o tiempo de una
-arquitectura relacional necesita su propia construcción y medición.
-
-El contraste se reproduce desde DEMUESTRA con:
-
-```powershell
-.\.venv-comparacion\Scripts\python.exe -B comparacion/q2_v2.py --numbers 15 21 --repeats 3 --report documentacion/ES_52/Q2_V2_RESULTADOS_20261008.json
-```
-
-Las dependencias exactas están en comparacion/requirements.txt. Los
-resultados, reintentos, recursos, entorno y huellas del código y del MD
-se conservan en [Q2_V2_RESULTADOS_20261008.json](../../documentacion/ES_52/Q2_V2_RESULTADOS_20261008.json).
-Los siete tests específicos comprueban coincidencia de distribuciones,
-picos de periodo conocidos, recuperación de factores, bloqueo de lectura,
-captura retenida y rechazo de tamaños excesivos antes de asignar memoria.
-No se modifican los certificados ni las evaluaciones previas.
-
-
-## 20.8. Q3 y candidata V3: contraste de distribuciones y objetivo de ventaja
-
-Los contrastes Q1/V1 y Q2/V2 son un punto de partida positivo dentro
-de sus modelos y protocolos declarados. La siguiente pregunta es si
-una realización V puede reproducir una tarea publicada de ventaja
-cuántica con calidad y recursos comparables. No se supone esa conclusión
-a partir de las coincidencias anteriores.
-
-### Q3 objetivo: un caso conocido de pocos minutos
-
-Se toma como objetivo el muestreo de circuitos de Willow divulgado por
-Google, con una ejecución inferior a cinco minutos. El tiempo clásico
-publicado es una estimación de Google, no un experimento clásico ejecutado
-en este trabajo ni una cota definitiva para todo algoritmo convencional.
-[Fuente primaria](https://blog.google/innovation-and-ai/technology/research/google-willow-quantum-chip/).
-
-La tarea produce cadenas binarias: no consiste en entregar una respuesta
-única. El contraste debe fijar la instancia completa del circuito,
-preparación, número de muestras, configuraciones, criterio de calidad y
-recursos. Generar cadenas válidas rápidamente o igualar solamente sus
-marginales no resuelve necesariamente esa tarea. La evaluación de calidad
-y ruido debe aplicarse simétricamente a Q y V; no se exige a una una
-distribución ideal exacta mientras se concede a la otra un error tolerado.
-La metodología de referencia se describe en
-[Google Research: validación del muestreo de circuitos](https://research.google/blog/validating-random-circuit-sampling-as-a-benchmark-for-measuring-quantum-progress/).
-
-### Programas creados y representación ejecutada
-
-Los programas se incluyen en DEMUESTRA:
-
-- [protocolo_q3.py](../../comparacion/protocolo_q3.py) define las
-  operaciones del protocolo común y su huella.
-- [q3.py](../../comparacion/q3.py) ejecuta la referencia ideal local
-  con puertas nativas de Qiskit.
-- [v3.py](../../comparacion/v3.py) ejecuta la candidata V3_ref mediante
-  componentes reales, sumas, diferencias, rotaciones y cambios de signo.
-- [comparar_q3_v3.py](../../comparacion/comparar_q3_v3.py) compara las
-  distribuciones locales, exporta las instancias e importa muestras externas.
-
-V3 calcula su respuesta sin consultar la salida de Q3. Se prepara el
-registro, se ejecutan sus transformaciones y se captura un índice
-conjunto mediante la fase determinista en t0. No hay sorteos intermedios
-ni un sorteo nuevo al leer. El latch retiene la salida y la interfaz
-ordinaria bloquea la lectura previa. La fase explícita del banco es una
-condición de prueba, no evidencia de inaccesibilidad física.
-
-Esta candidata mantiene el modelo de señales V_ref: no se declara
-implementada la arquitectura compacta de generadores binarios ocultos.
-La privacidad de Python no acredita aislamiento frente a depuradores.
-Tampoco se acredita la construcción física de Q3 por ejecutar Qiskit.
-Ambas realizaciones locales son modelos de cálculo con sus recursos
-declarados.
-
-### Pruebas locales realizadas
-
-Se han contrastado instancias de 4, 8, 12 y 16 unidades con seis ciclos,
-H, Rx, Rz y CZ. El diseño se fija antes de la ejecución. Son circuitos
-locales reproducibles de una familia de muestreo, no las instancias
-publicadas del experimento de Willow ni ejecuciones en ese procesador.
-
-Las distribuciones completas coinciden a tolerancia 10^-10. La distancia
-de variación total es inferior a 10^-14 en las cuatro instancias. Los
-seis tests específicos incluyen otras semillas, bloqueo de lectura,
-retención de captura, identificación del circuito y un control uniforme
-que resulta distinto de la distribución objetivo. Ese control muestra
-que el banco no acepta cualquier generador de cadenas binarias.
-
-Los modelos locales rechazan tamaños superiores a 16 unidades antes de
-reservar el registro. V3 almacena al menos 16 × 2^n bytes en componentes
-reales, además de probabilidades y temporales. Cambiar el nombre o
-aumentar n no elimina ese coste. Por ello, una coincidencia local rápida
-no demuestra reproducción del caso de ventaja ni escalabilidad compacta.
-
-El contraste se reproduce desde DEMUESTRA con:
-
-```powershell
-.\.venv-comparacion\Scripts\python.exe -B comparacion/comparar_q3_v3.py --qubits 4 8 12 16 --cycles 6 --report documentacion/ES_52/Q3_V3_RESULTADOS_20261008.json --export-circuits documentacion/ES_52/Q3_CIRCUITOS
-```
-
-El [informe Q3/V3](../../documentacion/ES_52/Q3_V3_RESULTADOS_20261008.json)
-registra tiempos locales, errores, huellas y límites. Las instancias
-exactas se conservan en documentacion/ES_52/Q3_CIRCUITOS. Son medidas de
-una ejecución de software, no tiempos de hardware Q ni una prueba de
-ventaja sobre los mejores algoritmos clásicos.
-
-### Importación de evidencia y condiciones para una conclusión
-
-El importador exige el mismo circuito identificado por huella, el mismo
-orden de bits y número de muestras, identificadores de realización y
-tiempos declarados. Su resultado es descriptivo: no autentica dispositivos,
-no implementa la validación XEB del experimento y no convierte distancia
-entre histogramas en un certificado. Dos muestras finitas de una misma
-distribución pueden diferir mucho, especialmente en espacios grandes.
-
-La [guía de ejecución e importación](../../documentacion/ES_52/GUIA_Q3_V3.pdf)
-explica el formato y sus restricciones. No hay muestras externas de
-Willow incorporadas: el objetivo publicado sigue sin contrastarse.
-
-Para completar ese objetivo faltan la instancia exacta, sus datos y
-procedimiento de calidad, y las reglas ejecutables de una V que conserve
-las relaciones pertinentes sin el registro exponencial de referencia.
-Una ejecución V independiente que cumpla el mismo criterio de calidad
-con recursos y tiempos comparables sería evidencia fuerte para ese
-protocolo. No bastaría por sí sola para demostrar equivalencia universal.
-Hasta obtener esos datos, no se afirma una ventaja monumental ni se
-descarta la investigación por limitaciones de la herramienta.
-
+## 20.2. Construcción local de V1, V2 y V3
+
+Las tres máquinas V son deterministas y se construyen con electrónica
+o software convencional. La preparación declara las conexiones y los
+controles; no lee los resultados internos no fijados por esa preparación.
+La medida se desencadena una sola vez en $t=t_0$.
+
+- V1 conserva las operaciones H, H, el oráculo reversible recibido y H,
+  con la preparación declarada $(0,1)$.
+- V2 conserva el registro de trabajo preparado en $1$, los controles
+  preparados en $0$, las multiplicaciones modulares controladas y las
+  conexiones de Fourier inversa.
+- V3 conserva la preparación y el orden de operaciones del protocolo recibido.
+
+Estas descripciones no almacenan una tabla de amplitudes conjuntas.
+Los programas [v1.py](../../comparacion/v1.py),
+[v2.py](../../comparacion/v2.py) y [v3.py](../../comparacion/v3.py)
+usan el controlador [v_relacional.py](../../comparacion/v_relacional.py).
+También están incluidos en la carpeta portátil Traductores_V.
+
+La realización conectada recibe `preparar(plan)` y `disparar(t0)`.
+La preparación no entrega resultados; el disparo registra una única
+lectura conjunta. Reconsultar devuelve los bits ya registrados y no
+repite la medida. Un fallo del detector consume esa preparación.
+
+El controlador no recorre el plan de puertas ni posibles resultados al
+disparar. El registro y la validación de los bits recibidos no sustituyen
+la dinámica de las conexiones. Las fórmulas de señales de una unidad
+no se convierten en una tabla de estados de todas las unidades.
+
+El código actual prepara los planes y gestiona la medida. Falta conectar
+y verificar la realización conjunta de las operaciones de las tres
+máquinas. Sin esa conexión, informa lo pendiente: no calcula una salida
+a partir de Q ni la inventa. Esta distinción describe el estado del código,
+no añade una condición física a la definición de V.
+
+Los detectores de los tests comprueban el contrato de preparación y
+disparo. Sus bits de ensayo no son resultados de los algoritmos completos.
+Los resultados de referencias Q simuladas pertenecen al comprobador,
+no a V. La comparación de tareas completas y tiempos se hará con las
+realizaciones y las condiciones de ejecución identificadas para ambas.
 
 # 21. No existe un $\xi$ almacenado
 
@@ -2448,7 +1566,7 @@ $$
 $D_{OBJETIVORELACIONAL}$ — Objetivo abierto de evitar la representación
 exponencial de amplitudes; no resultado demostrado.
 
-Deps: D_RELACIONES, D_REGISTROREF
+Deps: D_RELACIONES
 
 Una simulación clásica puede intentar representar un registro de n unidades,
 donde n es un entero no negativo y D = 2^n. Los vectores e_0, ..., e_{D-1}
@@ -2463,9 +1581,8 @@ $$
 
 La arquitectura V propuesta tiene como objetivo evitar almacenar
 $\alpha_0,\ldots,\alpha_{2^n-1}$. Que pueda hacerlo para todos los
-protocolos del modelo Q elegido debe demostrarse; el modelo auxiliar
-V_ref de la sección 20.1 no cumple ese objetivo. El procedimiento
-relacional que se propone investigar es:
+protocolos del modelo Q elegido debe comprobarse sobre las reglas propias
+de V. El procedimiento relacional que se propone investigar es:
 
 $$
 \boxed{\mathcal R_0\mapsto\mathcal R_1\mapsto\cdots\mapsto\mathcal R_k
@@ -2635,7 +1752,7 @@ $$
 
 $D_{ESTADOINVESTIGACION}$ — Conclusiones del desarrollo y estado de la hipótesis.
 
-Deps: D_ALCANCE, D_SIMETRIA, T_AMPLITUDECOND, T_SECUENCIACOND, T_COMPOSICIONCOND
+Deps: D_ALCANCE, D_SIMETRIA, T_AMPLITUDECOND, T_SECUENCIACOND
 
 La idea presentada en este trabajo es sencilla: **podemos construir una
 máquina con electrónica convencional que opere bajo las mismas
@@ -2682,9 +1799,8 @@ limitadas a la estructura de Q.
 Lo presentado aquí es una **hipótesis de trabajo**.
 
 El desarrollo añadido establece identidades de fase y construcciones
-ideales condicionadas para lectura, actualización y composición. Distingue
-la unidad aislada, el modelo auxiliar de registro exponencial y la
-arquitectura relacional compacta que permanece por construir. También
+ideales condicionadas para lectura y actualización de una unidad, y los
+planes de conexiones de las tres máquinas V. También
 explicita el límite CHSH cuando se exige un protocolo distribuido local
 sin comunicación. Estos resultados no constituyen una demostración de
 equivalencia física universal ni una validación experimental de V.
@@ -2705,12 +1821,11 @@ No considero este artículo un punto final.
 
 ## Invitación a un contraste experimental independiente
 
-Con los recursos disponibles hemos desarrollado el análisis conceptual
-y realizado comprobaciones algebraicas y numéricas de los modelos
-ideales aquí especificados. Todas las comprobaciones numéricas realizadas
-han satisfecho los criterios de verificación establecidos. Las derivaciones
-de equivalencia de amplitudes, operaciones, conexiones y lecturas han
-resultado consistentes bajo las hipótesis explícitas de cada construcción.
+Con los recursos disponibles hemos desarrollado el análisis conceptual,
+las identidades y las construcciones de una unidad aquí especificadas,
+y los planes de conexiones y control de medida de V1, V2 y V3. Las pruebas
+del controlador comprueban preparación y disparo; no se presentan como
+resultados de los algoritmos completos de esas máquinas.
 
 Estos resultados positivos corresponden a los modelos y protocolos
 analizados; no constituyen una prueba de equivalencia universal de la
@@ -2735,8 +1850,8 @@ las reglas propias de V; si modela un circuito aún no construido, sus
 resultados se identificarán como predicciones de ese modelo. Si controla
 y registra un circuito V físico, se documentará esa realización. Los
 resultados Q deberán distinguir entre simulación y ejecución en hardware
-real. El modelo auxiliar V_ref no sustituirá silenciosamente la
-arquitectura relacional que se quiere evaluar.
+real. La implementación de V respetará su arquitectura relacional y
+sus reglas propias, sin sustituirlas por una simulación de Q.
 
 Para que el contraste pueda revisarse y repetirse, solicito que se
 compartan los protocolos, las implementaciones utilizadas, la

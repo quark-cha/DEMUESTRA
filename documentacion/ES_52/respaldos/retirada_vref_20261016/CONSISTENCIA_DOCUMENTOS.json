@@ -1,0 +1,92 @@
+{
+  "version": 1,
+  "alcance": "fuentes y derivados editoriales, no demostraciones",
+  "estado": "DERIVADOS_EDITORIALES_GENERADOS",
+  "documentos": [
+    {
+      "fuente": "ES_52_Maquina_V_UNIHOLOG.md",
+      "titulo": "Documento base",
+      "tipo": "investigacion",
+      "source_sha256": "c229d9582f8ee586afee08f2d4953662de5fdc68143a62314cac8833ecb33bfb",
+      "derivados": {
+        "html": {
+          "ruta": "ES_52_Maquina_V_UNIHOLOG.html",
+          "sha256": "8d36a73d1183e68f4d0a4c82002e26c115a7a539bd0d592f1600149e504c2c1e"
+        },
+        "pdf": {
+          "ruta": "ES_52_Maquina_V_UNIHOLOG.pdf",
+          "sha256": "6ee6776c4e5062bfe0023f3b9aab6256436fd94181d1f2799e3093b4aab4fed7"
+        }
+      },
+      "certificacion": "NO_EVALUADA_POR_GENERACION_EDITORIAL"
+    },
+    {
+      "fuente": "ES_52_Laminas_Q_V.md",
+      "titulo": "Laminas de construccion y comparacion Q-V",
+      "tipo": "laminas",
+      "source_sha256": "ca82fe56876a87e6d1c8d180bca2021b99afe1b0a2277ba19a584d05683cabb2",
+      "derivados": {
+        "html": {
+          "ruta": "ES_52_Laminas_Q_V.html",
+          "sha256": "31ed83bbe2b84a36d2d632704ceb44e7d5da4ba4a61e70a5acc56362a18541ce"
+        },
+        "pdf": {
+          "ruta": "ES_52_Laminas_Q_V.pdf",
+          "sha256": "419e2484a5201cfcfb602ee616dca1733c452f3e0a3434d87f6f6f7def7ba80e"
+        }
+      },
+      "certificacion": "NO_EVALUADA_POR_GENERACION_EDITORIAL"
+    },
+    {
+      "fuente": "Traductores_V/ES_52_Traductores_y_compiladores_de_V.md",
+      "titulo": "Traductores y compiladores de V",
+      "tipo": "software",
+      "source_sha256": "f784a05fb4e002bc4d2523425a636dc89a08610d348befd2bab5b3d42c3be971",
+      "derivados": {
+        "html": {
+          "ruta": "Traductores_V/ES_52_Traductores_y_compiladores_de_V.html",
+          "sha256": "cb1e38efbf67f8e06b17ae79d294f92396595df7c689f560faa448bb9ecc02f8"
+        },
+        "pdf": {
+          "ruta": "Traductores_V/ES_52_Traductores_y_compiladores_de_V.pdf",
+          "sha256": "85e6f22aec4e573f2e94ea73be13bf3d62ea8ecf6c35355a61b5ddd91eee82f4"
+        }
+      },
+      "certificacion": "NO_EVALUADA_POR_GENERACION_EDITORIAL"
+    },
+    {
+      "fuente": "ES_52_Presentacion_comunidad.md",
+      "titulo": "Máquina V: presentación a la comunidad",
+      "tipo": "presentacion",
+      "source_sha256": "39be63eb5503bda2d61fff4d3efcb659b16c802ac19f7c319c0990e0761b96fb",
+      "derivados": {
+        "html": {
+          "ruta": "ES_52_Presentacion_comunidad.html",
+          "sha256": "0319eebfc4d779a5e590dc331b4d42fd774a0a51d8ab2b861e44bdbafe62b945"
+        },
+        "pdf": {
+          "ruta": "ES_52_Presentacion_comunidad.pdf",
+          "sha256": "5f639f8439bc8637ae6cf6f50fa4663aae90d8c710541076367deb3a9f4f7dd2"
+        }
+      },
+      "certificacion": "NO_EVALUADA_POR_GENERACION_EDITORIAL"
+    },
+    {
+      "fuente": "ES_52_Indice_recursos.md",
+      "titulo": "Índice completo de recursos del proyecto",
+      "tipo": "indice",
+      "source_sha256": "07ad21d135d8f819d4d9ef85b1cc79e00c580454dc0cd395ee2cb026614015f8",
+      "derivados": {
+        "html": {
+          "ruta": "ES_52_Indice_recursos.html",
+          "sha256": "41c174007796c25e8227998180dbb4910a51b9696af17fb280d2d5d1d29e0960"
+        },
+        "pdf": {
+          "ruta": "ES_52_Indice_recursos.pdf",
+          "sha256": "e1db08b4c6250d89d3694c7082bb371a721dcbf7816cf798c508a2522e6ac9e9"
+        }
+      },
+      "certificacion": "NO_EVALUADA_POR_GENERACION_EDITORIAL"
+    }
+  ]
+}

@@ -1,0 +1,83 @@
+{
+  "schema": "ADEC_nodes_input_v1",
+  "title": "ES_52_Maquina_V_UNIHOLOG",
+  "version": "1.0",
+  "validation_mode": "article_analysis",
+  "artifact_stage": "prolog_direct_markdown_derivation",
+  "source": "ES_52_Maquina_V_UNIHOLOG.md",
+  "authors": [
+    {
+      "name": "Víctor Estrada Díaz",
+      "orcid": "0000-0001-9942-1021"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "EVAL_PROLOG_MD_DIRECTO_ES_52_Maquina_V_UNIHOLOG",
+      "kind": "meta_validation",
+      "name": "Resultado del evaluador Prolog directo del Markdown",
+      "description": "Lee exclusivamente el Markdown y comprueba las reglas Deps, las referencias explicitas de la prueba y las premisas declaradas. Conserva los cierres de dependencias verificados por nodo. La evaluacion global de el objetivo queda pendiente: consultar el diagnostico del evaluador. La verificacion formal queda pendiente; esto no refuta el argumento ni afirma que el Markdown carezca de demostracion.",
+      "deps": [],
+      "measurement_relationship": "additive",
+      "proof": {
+        "method": "SWI-Prolog Direct Markdown Auditor",
+        "status": "unverified",
+        "steps": [
+          "Lee exclusivamente el Markdown y comprueba las reglas Deps, las referencias explicitas de la prueba y las premisas declaradas. Conserva los cierres de dependencias verificados por nodo. La evaluacion global de el objetivo queda pendiente: consultar el diagnostico del evaluador. La verificacion formal queda pendiente; esto no refuta el argumento ni afirma que el Markdown carezca de demostracion."
+        ],
+        "verification_scope": "prolog_direct_markdown_derivation"
+      }
+    }
+  ],
+  "schema_version": 1,
+  "certificate_type": "SWI_PROLOG_DIRECT_MARKDOWN_DERIVATION",
+  "project": "ES_52_Maquina_V_UNIHOLOG",
+  "tool": "SWI-Prolog Direct Markdown Auditor",
+  "generated_on": "2026-10-16T01:11:06+00:00",
+  "verdict": "ERROR EVALUADOR",
+  "passed": false,
+  "refuted": false,
+  "mathematical_status": "NO_DETERMINADO",
+  "exit_code": 3,
+  "input": "ES_52_Maquina_V_UNIHOLOG.md",
+  "input_sha256": null,
+  "auditor": "PckDemuestra\\audita_md.pl",
+  "auditor_sha256": "a9ad83b7361bf9b2bd40247fa7733d2fa85011c8c93cac3a506d1dc1d400b8ed",
+  "uses_generated_prolog": false,
+  "uses_lean": false,
+  "goal": null,
+  "goal_declaration_line": null,
+  "goal_rule_line": null,
+  "goal_conclusion": null,
+  "nodes_extracted_from_md": null,
+  "dependency_rules_extracted_from_md": null,
+  "declared_premises_from_md": null,
+  "formula_lines_extracted_from_md": null,
+  "dependencies_recovered_from_proof": null,
+  "recovered_dependencies": [],
+  "open_obligations": [],
+  "goal_conditions_missing": [],
+  "coverage": {
+    "scope": "dependency_closure_under_declared_markdown_premises",
+    "certified_nodes": [],
+    "pending_nodes": [],
+    "declared_premises": [],
+    "refutations": 0,
+    "not_a_global_mathematical_certificate": true,
+    "total": 0
+  },
+  "premises_used_by_goal_proof": [],
+  "theorems": {},
+  "proof_tree": [],
+  "proof_tree_sha256": null,
+  "log": "logs\\PROLOG_MD_DIRECTO_ES_52_Maquina_V_UNIHOLOG.log",
+  "scope": "Lee exclusivamente el Markdown y comprueba las reglas Deps, las referencias explicitas de la prueba y las premisas declaradas. Conserva los cierres de dependencias verificados por nodo. La evaluacion global de el objetivo queda pendiente: consultar el diagnostico del evaluador. La verificacion formal queda pendiente; esto no refuta el argumento ni afirma que el Markdown carezca de demostracion.",
+  "adec_compatible": true,
+  "adec_node_count": 1,
+  "adec_access": {
+    "engine": "ADEC v0.8.6",
+    "mode": "remote_url_or_file_upload",
+    "automatic_url_json": false,
+    "reason": "La web copia la URL publica y descarga el JSON para cargarlo desde el selector de archivos de ADEC."
+  }
+}

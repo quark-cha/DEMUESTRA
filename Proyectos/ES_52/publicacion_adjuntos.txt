@@ -30,14 +30,3 @@ comparacion/propuesta_lectura.py
 comparacion/verificar_propuesta.py
 comparacion/tests/test_propuesta_lectura.py
 documentacion/ES_52/VERIFICACION_PROPUESTA_LECTURA_20261010.json
-# Resultados historicos del modelo anterior, no evaluacion actual de V.
-documentacion/ES_52/COMPARACION_V_REF_Q_20261008.json
-documentacion/ES_52/Q1_V1_RESULTADOS_20261008.json
-documentacion/ES_52/Q2_V2_RESULTADOS_20261008.json
-documentacion/ES_52/Q3_V3_RESULTADOS_20261008.json
-documentacion/ES_52/GUIA_Q3_V3.md
-documentacion/ES_52/GUIA_Q3_V3.pdf
-documentacion/ES_52/Q3_CIRCUITOS/q3_n4_77c038f9d68c.json
-documentacion/ES_52/Q3_CIRCUITOS/q3_n8_462729f77eb8.json
-documentacion/ES_52/Q3_CIRCUITOS/q3_n12_07d8da17316e.json
-documentacion/ES_52/Q3_CIRCUITOS/q3_n16_94e74934d98d.json

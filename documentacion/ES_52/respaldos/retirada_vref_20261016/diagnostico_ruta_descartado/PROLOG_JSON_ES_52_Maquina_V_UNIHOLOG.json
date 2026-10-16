@@ -1,0 +1,53 @@
+{
+  "project": "ES_52_Maquina_V_UNIHOLOG",
+  "tool": "SWI-Prolog",
+  "branch": "INITIAL_JSON_TO_PROLOG",
+  "input_file": "ES_52_Maquina_V_UNIHOLOG.extracted.json",
+  "generated_on": "2026-10-16T01:11:06+00:00",
+  "passed": false,
+  "refuted": false,
+  "mathematical_status": "NO DETERMINADO",
+  "scope": "Alcanzabilidad en el grafo de dependencias declarado del JSON inicial. No verifica la validez matematica de las reglas ni consulta las otras ramas.",
+  "verdict": "INCONCLUSO",
+  "exit_code": null,
+  "diagnosis": "INCONCLUSO. Alcanzabilidad en el grafo de dependencias declarado del JSON inicial. No verifica la validez matematica de las reglas ni consulta las otras ramas.",
+  "output": "",
+  "nodes": [
+    {
+      "id": "EVAL_PROLOG_JSON_ES_52_Maquina_V_UNIHOLOG",
+      "kind": "meta_validation",
+      "name": "Resultado independiente de Prolog desde el JSON inicial",
+      "description": "INCONCLUSO. Alcanzabilidad en el grafo de dependencias declarado del JSON inicial. No verifica la validez matematica de las reglas ni consulta las otras ramas.",
+      "deps": [],
+      "measurement_relationship": "additive",
+      "proof": {
+        "method": "SWI-Prolog",
+        "status": "unverified",
+        "steps": [
+          "INCONCLUSO. Alcanzabilidad en el grafo de dependencias declarado del JSON inicial. No verifica la validez matematica de las reglas ni consulta las otras ramas."
+        ],
+        "verification_scope": "prolog_initial_json_dependency_reachability"
+      }
+    }
+  ],
+  "schema": "ADEC_nodes_input_v1",
+  "title": "ES_52_Maquina_V_UNIHOLOG",
+  "version": "1.0",
+  "validation_mode": "article_analysis",
+  "artifact_stage": "prolog_initial_json_dependency_reachability",
+  "source": "ES_52_Maquina_V_UNIHOLOG.md",
+  "authors": [
+    {
+      "name": "Víctor Estrada Díaz",
+      "orcid": "0000-0001-9942-1021"
+    }
+  ],
+  "adec_compatible": true,
+  "adec_node_count": 1,
+  "adec_access": {
+    "engine": "ADEC v0.8.6",
+    "mode": "remote_url_or_file_upload",
+    "automatic_url_json": false,
+    "reason": "La web copia la URL publica y descarga el JSON para cargarlo desde el selector de archivos de ADEC."
+  }
+}

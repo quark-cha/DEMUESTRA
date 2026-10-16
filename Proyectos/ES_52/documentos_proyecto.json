@@ -9,6 +9,10 @@
     {"fuente": "ES_52_Indice_recursos.md", "titulo": "Índice completo de recursos del proyecto", "tipo": "indice"}
   ],
   "adjuntos": [
+    "ES_52_Maquina_V_UNIHOLOG.extracted.json",
+    "TRADUCCION_ES_52_Maquina_V_UNIHOLOG.json",
+    "PROLOG_JSON_ES_52_Maquina_V_UNIHOLOG.json",
+    "PROLOG_MD_DIRECTO_ES_52_Maquina_V_UNIHOLOG.json",
     "NUMERICO_ES_52_Maquina_V_UNIHOLOG.pdf",
     "PROLOG_MD_DIRECTO_ES_52_Maquina_V_UNIHOLOG.pdf",
     "TEMPORAL_ES_52_Maquina_V_UNIHOLOG.pdf",
@@ -18,6 +22,11 @@
     "Traductores_V/traductor_qasm_v.py",
     "Traductores_V/v_relacional.py",
     "Traductores_V/operaciones_senales.py",
+    "Traductores_V/v1.py",
+    "Traductores_V/v2.py",
+    "Traductores_V/v3.py",
+    "Traductores_V/protocolo_q3.py",
+    "Traductores_V/ejecucion_v.py",
     "Traductores_V/requirements.txt",
     "Traductores_V/v.bat",
     "Traductores_V/v.ps1",

@@ -29,6 +29,10 @@ V. No consulta respuestas de Q ni calcula previamente un resultado para
 ocultarlo hasta la medida. Conserva puertas, controles, conexiones y orden.
 No introduce un registro de amplitudes ni recorre posibles resultados.
 
+V es la máquina determinista del autor, realizable con electrónica o
+software convencional. El desconocimiento antes de la medida no añade
+un mecanismo aleatorio a su dinámica.
+
 En V, las salidas permanecen desconocidas antes de la medida. La lectura
 conjunta se desencadena en $t=t_0$, registrado por el reloj del controlador.
 La evolución de las puertas corresponde a la realización conectada, no
@@ -56,6 +60,11 @@ ES_52/
     traductor_qasm_v.py
     v_relacional.py
     operaciones_senales.py
+    v1.py
+    v2.py
+    v3.py
+    protocolo_q3.py
+    ejecucion_v.py
     requirements.txt
     v.bat
     v.ps1

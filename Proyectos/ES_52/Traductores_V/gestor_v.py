@@ -9,8 +9,6 @@ import shutil
 import subprocess
 import sys
 
-from traductor_qasm_v import generar, traducir
-
 ROOT = Path(__file__).resolve().parent
 
 
@@ -123,6 +121,15 @@ def main():
         if not args.maquina or not args.maquina.isidentifier() or not args.maquina.isascii():
             raise ValueError('Indica el nombre de una maquina de MaquinasQ, sin extension')
         if args.accion == 'traducir':
+            try:
+                from traductor_qasm_v import generar, traducir
+            except ModuleNotFoundError as error:
+                if error.name != 'qiskit':
+                    raise
+                raise RuntimeError(
+                    'Falta Qiskit para leer OpenQASM 2. Instala con el mismo Python: '
+                    f'"{sys.executable}" -m pip install -r "{ROOT / "requirements.txt"}". '
+                    'Qiskit se usa como analizador, no como motor de V.') from error
             source = ROOT / 'MaquinasQ' / (args.maquina + '.q')
             plan = traducir(source.read_text(encoding='utf-8-sig'))
             for output in generar(plan, ROOT / 'MaquinasV' / args.maquina, nombre='v'):
